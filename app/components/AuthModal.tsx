@@ -49,11 +49,16 @@ export default function AuthModal({
   }
 
   async function handleGoogle() {
+    // Always use the production URL so Google → Supabase → app redirect
+    // works whether the user is on localhost or the deployed site.
+    const redirectTo =
+      process.env.NEXT_PUBLIC_SITE_URL
+        ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+        : `${window.location.origin}/auth/callback`;
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
+      options: { redirectTo },
     });
     if (error) setError(error.message);
   }
@@ -64,10 +69,20 @@ export default function AuthModal({
     setLoading(true);
 
     if (mode === "signup") {
+      // emailRedirectTo ensures the confirmation link in the email
+      // points to the live site, not localhost.
+      const emailRedirectTo =
+        process.env.NEXT_PUBLIC_SITE_URL
+          ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+          : `${window.location.origin}/auth/callback`;
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: name } },
+        options: {
+          data: { full_name: name },
+          emailRedirectTo,
+        },
       });
       if (error) { setError(error.message); setLoading(false); return; }
       setDone(true);
@@ -124,16 +139,24 @@ export default function AuthModal({
           <div style={{ textAlign: "center", padding: "8px 0" }}>
             <div style={{ fontSize: 36, marginBottom: 14 }}>📬</div>
             <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 8 }}>Check your email</div>
-            <div style={{ fontSize: 12, color: "#6B6B70", lineHeight: 1.6 }}>
+            <div style={{ fontSize: 12, color: "#6B6B70", lineHeight: 1.7 }}>
               We sent a confirmation link to<br />
               <strong style={{ color: "#1A1A1A" }}>{email}</strong>.<br />
               Click it to activate your account, then sign in.
             </div>
+            <div style={{
+              marginTop: 14, padding: "10px 14px",
+              background: "#FFF9F0", border: "1px solid #FFE4C8",
+              borderRadius: 8, fontSize: 11, color: "#92500A", lineHeight: 1.6, textAlign: "left",
+            }}>
+              💡 <strong>Didn&apos;t get it?</strong> Check your <strong>spam / junk</strong> folder.
+              It can take up to 2 minutes to arrive. If it&apos;s still missing, try signing up again.
+            </div>
             <button
               onClick={() => { setDone(false); switchMode("signin"); }}
               style={{
-                marginTop: 20, background: "none", border: "1px solid #CFCFD4",
-                borderRadius: 8, padding: "8px 20px", fontSize: 12, fontWeight: 600,
+                marginTop: 16, background: "none", border: "1px solid #CFCFD4",
+                borderRadius: 8, padding: "9px 24px", fontSize: 12, fontWeight: 600,
                 cursor: "pointer", fontFamily: "inherit", color: "#1A1A1A",
               }}
             >
