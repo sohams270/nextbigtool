@@ -91,7 +91,7 @@ body {
 .submit-tool-wrap {
   padding: 2px;
   border-radius: 999px;
-  background: linear-gradient(270deg, #FF6B35, #FF3B6B, #FF9A5C, #FF6B35);
+  background: linear-gradient(270deg, #3B7FFF, #7B2FFF, #BF5FFF, #3B7FFF);
   background-size: 300% 300%;
   animation: submit-border 3s ease infinite;
   display: inline-flex;
