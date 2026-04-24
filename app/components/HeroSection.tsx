@@ -216,7 +216,7 @@ export default function HeroSection() {
         </div>
 
         {/* Stats — kept but removed, replaced above. Keep structure for spacing ref */}
-        <div style={{ display: "flex", justifyContent: "center", display: "none" }}>
+        <div style={{ display: "none" }}>
           {STATS.map(([n, l], i) => (
             <div
               key={l}
