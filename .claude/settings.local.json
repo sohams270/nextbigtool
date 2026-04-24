@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-eslint --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-eslint --no-src-dir --import-alias \"@/*\")",
+      "Read(//Users/sohams17/**)",
+      "Bash(npx create-next-app@latest nextbigtool-app --typescript --tailwind --app --no-eslint --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(cp -r /Users/sohams17/nextbigtool-app/. /Users/sohams17/NextBigTool/)",
+      "Bash(rm -rf /Users/sohams17/nextbigtool-app)",
+      "Bash(npx tsc *)",
+      "Bash(npm install *)",
+      "Bash(npx next *)",
+      "Bash(npm run *)",
+      "Bash(pkill -f \"next dev\")",
+      "mcp__Claude_Preview__preview_start",
+      "mcp__3ce43b11-46af-48a6-8832-f74826257980__download_file_content",
+      "Bash(python3 -c ' *)",
+      "Bash(sips -z 32 32 /Users/sohams17/NextBigTool/public/favicon-source.png --out /Users/sohams17/NextBigTool/public/favicon-32.png)",
+      "Bash(sips -z 16 16 /Users/sohams17/NextBigTool/public/favicon-source.png --out /Users/sohams17/NextBigTool/public/favicon-16.png)",
+      "Bash(sips -z 180 180 /Users/sohams17/NextBigTool/public/favicon-source.png --out /Users/sohams17/NextBigTool/public/apple-touch-icon.png)",
+      "Bash(pip3 install *)",
+      "Bash(git remote *)",
+      "Bash(git add *)"
+    ]
+  }
+}
