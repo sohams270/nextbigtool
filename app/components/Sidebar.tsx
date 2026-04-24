@@ -1,107 +1,189 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import NMark from "./NMark";
-import Pill from "./Pill";
-import Avatar from "./Avatar";
 
-const SECTIONS = [
-  { label: "Overview", items: [{ name: "Dashboard", href: "/dashboard" }, { name: "My Products", href: "/dashboard" }] },
-  { label: "Grow", items: [{ name: "Interested Users", href: "/dashboard/crm", badge: "New" }, { name: "Build in Public", href: "/dashboard" }, { name: "Analytics", href: "/dashboard" }] },
-  { label: "Launch", items: [{ name: "Submit New Tool", href: "/dashboard/submit" }, { name: "Re-Launch", href: "/dashboard" }, { name: "Badges", href: "/dashboard" }] },
-  { label: "Account", items: [{ name: "Upgrade Plan", href: "/pricing" }, { name: "Settings", href: "/dashboard" }] },
+const NAV = [
+  { id: "overview",        label: "Overview",          href: "/dashboard",                   icon: GridIcon },
+  { id: "products",        label: "My Products",        href: "/dashboard/products",          icon: BoxIcon,     badge: null },
+  { id: "interested",      label: "Interested Users",   href: "/dashboard/interested",        icon: UsersIcon,   locked: true },
+  { id: "bip",             label: "Build In Public",    href: "/dashboard/build-in-public",   icon: EditIcon },
+  { id: "newsletter",      label: "Newsletter",          href: "/dashboard/newsletter",        icon: MailIcon },
+  { id: "hof",             label: "Hall of Fame",        href: "/dashboard/hall-of-fame",      icon: TrophyIcon,  locked: true },
+  { id: "plan",            label: "My Plan",             href: "/dashboard/plan",              icon: StarIcon },
+  { id: "profile",         label: "My Profile",          href: "/dashboard/profile",           icon: PersonIcon },
+  { id: "settings",        label: "Settings",            href: "/dashboard/settings",          icon: GearIcon },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside
-      style={{
-        width: 220,
-        background: "#141528",
-        color: "#fff",
-        display: "flex",
-        flexDirection: "column",
-        padding: 14,
-        flexShrink: 0,
-        minHeight: "100vh",
-      }}
-    >
-      <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24, padding: "0 6px", textDecoration: "none" }}>
-        <NMark size={20} />
-        <span style={{ fontWeight: 800, fontSize: 12, color: "#fff" }}>Next Big Tool</span>
+    <aside style={{
+      width: 224,
+      background: "#0e0e10",
+      color: "#fff",
+      display: "flex",
+      flexDirection: "column",
+      padding: "18px 12px",
+      flexShrink: 0,
+      minHeight: "100vh",
+      position: "sticky",
+      top: 0,
+    }}>
+      {/* Logo */}
+      <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28, padding: "0 8px", textDecoration: "none" }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: 8,
+          background: "linear-gradient(135deg,#ff6a3d,#ff3d88)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontWeight: 900, fontSize: 14, color: "#fff", letterSpacing: "-0.04em",
+        }}>N</div>
+        <span style={{ fontWeight: 800, fontSize: 13, color: "#fff", letterSpacing: "-0.02em" }}>NextBigTool</span>
       </Link>
 
-      {SECTIONS.map((s) => (
-        <div key={s.label} style={{ marginBottom: 14 }}>
-          <span
-            style={{
-              fontSize: 9,
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              color: "rgba(255,255,255,0.4)",
-              padding: "0 8px",
-              display: "block",
-              marginBottom: 4,
-            }}
-          >
-            {s.label}
-          </span>
-          {s.items.map((item) => {
-            const active = pathname === item.href && item.name !== "My Products" && item.name !== "Build in Public" && item.name !== "Analytics" && item.name !== "Re-Launch" && item.name !== "Badges" && item.name !== "Settings"
-              || (item.name === "Dashboard" && pathname === "/dashboard")
-              || (item.name === "Interested Users" && pathname === "/dashboard/crm")
-              || (item.name === "Submit New Tool" && pathname === "/dashboard/submit")
-              || (item.name === "Upgrade Plan" && pathname === "/pricing");
-            return (
-              <Link key={item.name} href={item.href} style={{ textDecoration: "none" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "7px 10px",
-                    borderRadius: 6,
-                    marginBottom: 2,
-                    background: active ? "rgba(255,107,53,0.14)" : "transparent",
-                    borderRight: active ? "2px solid #FF6B35" : "2px solid transparent",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: active ? 700 : 500,
-                      color: active ? "#fff" : "rgba(255,255,255,0.75)",
-                    }}
-                  >
-                    {item.name}
-                  </span>
-                  {item.badge && <Pill color="orangeSolid" size="xs">{item.badge}</Pill>}
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      ))}
+      {/* Nav */}
+      <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+        {NAV.map((item) => {
+          const active = pathname === item.href;
+          const Icon = item.icon;
+          return (
+            <Link key={item.id} href={item.href} style={{ textDecoration: "none" }}>
+              <div style={{
+                display: "flex", alignItems: "center", gap: 10,
+                padding: "8px 10px", borderRadius: 8,
+                background: active ? "rgba(255,106,61,0.15)" : "transparent",
+                transition: "background 0.15s",
+                cursor: "pointer",
+              }}
+                onMouseEnter={(e) => { if (!active) (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.06)"; }}
+                onMouseLeave={(e) => { if (!active) (e.currentTarget as HTMLDivElement).style.background = "transparent"; }}
+              >
+                <Icon size={15} color={active ? "#ff6a3d" : "rgba(255,255,255,0.5)"} />
+                <span style={{
+                  flex: 1,
+                  fontSize: 12.5, fontWeight: active ? 700 : 500,
+                  color: active ? "#fff" : "rgba(255,255,255,0.7)",
+                  letterSpacing: active ? "-0.01em" : "0",
+                }}>
+                  {item.label}
+                </span>
+                {item.locked && (
+                  <LockIcon size={12} color="rgba(255,255,255,0.3)" />
+                )}
+              </div>
+            </Link>
+          );
+        })}
+      </nav>
 
-      <div
-        style={{
-          marginTop: "auto",
-          borderTop: "1px solid rgba(255,255,255,0.1)",
-          paddingTop: 12,
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-        }}
-      >
-        <Avatar size={28} letter="S" color="#FF6B35" />
-        <div style={{ flex: 1 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>Soham D.</span>
+      {/* Plan card */}
+      <div style={{
+        marginTop: 16,
+        background: "rgba(255,255,255,0.06)",
+        border: "1px solid rgba(255,255,255,0.1)",
+        borderRadius: 12,
+        padding: "12px 14px",
+      }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>
+          Current plan
         </div>
-        <Pill color="orangeSolid" size="xs">Free</Pill>
+        <div style={{ fontSize: 13, fontWeight: 800, color: "#fff", marginBottom: 2 }}>Free</div>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginBottom: 10 }}>
+          1 post / mo · 3 products
+        </div>
+        <Link href="/dashboard/plan" style={{ textDecoration: "none" }}>
+          <div style={{
+            background: "linear-gradient(90deg,#ff6a3d,#ff3d88)",
+            borderRadius: 7, padding: "7px 12px",
+            textAlign: "center", fontSize: 11, fontWeight: 700, color: "#fff",
+            cursor: "pointer",
+          }}>
+            Upgrade plan →
+          </div>
+        </Link>
       </div>
     </aside>
+  );
+}
+
+/* ─── Icons ─── */
+function GridIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+      <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+    </svg>
+  );
+}
+function BoxIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+    </svg>
+  );
+}
+function UsersIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+    </svg>
+  );
+}
+function EditIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>
+  );
+}
+function MailIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+      <polyline points="22,6 12,13 2,6"/>
+    </svg>
+  );
+}
+function TrophyIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4z"/>
+      <path d="M17 4h2a2 2 0 012 2v2a4 4 0 01-4 4M7 4H5a2 2 0 00-2 2v2a4 4 0 004 4"/>
+    </svg>
+  );
+}
+function StarIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    </svg>
+  );
+}
+function PersonIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </svg>
+  );
+}
+function GearIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+    </svg>
+  );
+}
+function LockIcon({ size = 12, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="11" width="14" height="10" rx="2"/>
+      <path d="M8 11V7a4 4 0 018 0v4"/>
+    </svg>
   );
 }
