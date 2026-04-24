@@ -206,11 +206,11 @@ function RailDropBtn({
 
   const btnStyle: React.CSSProperties = {
     display: "inline-flex", alignItems: "center", gap: 5,
-    padding: "9px 16px", borderRadius: 999, border: "none",
+    padding: "7px 13px", borderRadius: 999, border: "none",
     background: featured ? "#fff" : "transparent",
     boxShadow: featured ? "0 1px 2px rgba(15,15,16,.08)" : "none",
     color: "#0f0f10",
-    fontWeight: featured ? 600 : 500, fontSize: 14,
+    fontWeight: featured ? 600 : 500, fontSize: 13,
     whiteSpace: "nowrap" as const,
     cursor: "pointer", fontFamily: "inherit",
     transition: "background .15s",
@@ -293,36 +293,38 @@ export default function TopNav({ dark }: { dark?: boolean }) {
           maxWidth: 1200, margin: "0 auto",
           padding: "0 28px",
           height: 60,
-          display: "flex", alignItems: "center", gap: 0,
+          display: "flex", alignItems: "center",
         }}>
 
-          {/* ── Logo ── */}
-          <Link href="/" aria-label="NextBigTool home" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 7, flexShrink: 0 }}>
-            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-              <defs>
-                <linearGradient id="nbt-g" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stopColor="#ff6a3d"/>
-                  <stop offset="1" stopColor="#ff3d88"/>
-                </linearGradient>
-              </defs>
-              <path d="M3 15.5 L28 4 L22 28 L15 19 L3 15.5 Z" fill="url(#nbt-g)"/>
-              <path d="M15 19 L22 12" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" opacity="0.85"/>
-            </svg>
-            <div style={{ lineHeight: 1, letterSpacing: "-0.03em" }}>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "#ff6a3d", textTransform: "lowercase" as const }}>next</div>
-              <div style={{ fontSize: 19, fontWeight: 800, color: dark ? "#fff" : "#0f0f10", marginTop: 1 }}>
-                Big<span style={{ color: "#ff6a3d" }}>Tool</span>
+          {/* ── Logo (left zone, flex:1) ── */}
+          <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
+            <Link href="/" aria-label="NextBigTool home" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 7, flexShrink: 0 }}>
+              <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="nbt-g" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#ff6a3d"/>
+                    <stop offset="1" stopColor="#ff3d88"/>
+                  </linearGradient>
+                </defs>
+                <path d="M3 15.5 L28 4 L22 28 L15 19 L3 15.5 Z" fill="url(#nbt-g)"/>
+                <path d="M15 19 L22 12" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" opacity="0.85"/>
+              </svg>
+              <div style={{ lineHeight: 1, letterSpacing: "-0.03em" }}>
+                <div style={{ fontSize: 8.5, fontWeight: 700, color: "#ff6a3d", textTransform: "lowercase" as const }}>next</div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: dark ? "#fff" : "#0f0f10", marginTop: 1 }}>
+                  Big<span style={{ color: "#ff6a3d" }}>Tool</span>
+                </div>
               </div>
-            </div>
-          </Link>
+            </Link>
+          </div>
 
-          {/* ── Pill Rail ── */}
+          {/* ── Pill Rail (center zone, auto width) ── */}
           <div style={{
             display: "flex", alignItems: "center",
             background: railBg,
-            borderRadius: 999, padding: 4, gap: 2,
-            marginLeft: 40,
+            borderRadius: 999, padding: 3, gap: 1,
             color: railTxt,
+            flexShrink: 0,
           }}>
             <RailDropBtn label="Discover"   items={DISCOVER_ITEMS}  hero={DISCOVER_HERO} />
             <RailDropBtn label="Newsletter" featured href="/newsletter" />
@@ -330,20 +332,20 @@ export default function TopNav({ dark }: { dark?: boolean }) {
             <RailDropBtn label="Pricing"    href="/pricing" />
           </div>
 
-          {/* ── Actions ── */}
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+          {/* ── Actions (right zone, flex:1, right-aligned) ── */}
+          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, flexShrink: 0 }}>
             {isSignedIn ? (
               /* Signed-in: show avatar + Dashboard link */
               <>
                 <Link href="/dashboard" style={{ textDecoration: "none" }}>
                   <button style={{
-                    padding: "9px 20px", borderRadius: 999,
+                    padding: "8px 16px", borderRadius: 999,
                     border: `1px solid ${dark ? "rgba(255,255,255,0.2)" : "#e3e3e0"}`,
                     background: dark ? "rgba(255,255,255,0.08)" : "#fff",
-                    fontWeight: 500, fontSize: 14,
+                    fontWeight: 500, fontSize: 13,
                     color: dark ? "rgba(255,255,255,0.9)" : "#0f0f10",
                     whiteSpace: "nowrap" as const, cursor: "pointer", fontFamily: "inherit",
-                    display: "inline-flex", alignItems: "center", gap: 8,
+                    display: "inline-flex", alignItems: "center", gap: 7,
                     transition: "background .15s, border-color .15s",
                   }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = dark ? "rgba(255,255,255,0.13)" : "#f6f6f4"; }}
@@ -361,10 +363,10 @@ export default function TopNav({ dark }: { dark?: boolean }) {
               <button
                 onClick={() => openAuthModal("Welcome back", "Sign in to your NextBigTool account.")}
                 style={{
-                  padding: "9px 20px", borderRadius: 999,
+                  padding: "8px 16px", borderRadius: 999,
                   border: `1px solid ${dark ? "rgba(255,255,255,0.2)" : "#e3e3e0"}`,
                   background: dark ? "rgba(255,255,255,0.08)" : "#fff",
-                  fontWeight: 500, fontSize: 14,
+                  fontWeight: 500, fontSize: 13,
                   color: dark ? "rgba(255,255,255,0.9)" : "#0f0f10",
                   whiteSpace: "nowrap" as const, cursor: "pointer", fontFamily: "inherit",
                   transition: "background .15s, border-color .15s",
@@ -380,10 +382,10 @@ export default function TopNav({ dark }: { dark?: boolean }) {
             <button
               onClick={handleSubmitClick}
               style={{
-                padding: "10px 20px", borderRadius: 999, border: "none",
+                padding: "9px 16px", borderRadius: 999, border: "none",
                 background: "linear-gradient(90deg,#ff6a3d,#ff3d88)",
-                color: "#fff", fontWeight: 600, fontSize: 14,
-                display: "inline-flex", alignItems: "center", gap: 7,
+                color: "#fff", fontWeight: 600, fontSize: 13,
+                display: "inline-flex", alignItems: "center", gap: 6,
                 whiteSpace: "nowrap" as const, cursor: "pointer", fontFamily: "inherit",
                 boxShadow: "0 4px 14px rgba(255,61,136,0.32)",
                 transition: "transform .15s, box-shadow .15s",
