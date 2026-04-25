@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import NBTWordmark from "./NBTWordmark";
 
 const NAV = [
   { id: "overview",        label: "Overview",          href: "/dashboard",                   icon: GridIcon },
@@ -31,14 +32,8 @@ export default function Sidebar() {
       top: 0,
     }}>
       {/* Logo */}
-      <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28, padding: "0 8px", textDecoration: "none" }}>
-        <div style={{
-          width: 28, height: 28, borderRadius: 8,
-          background: "linear-gradient(135deg,#ff6a3d,#ff3d88)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontWeight: 900, fontSize: 14, color: "#fff", letterSpacing: "-0.04em",
-        }}>N</div>
-        <span style={{ fontWeight: 800, fontSize: 13, color: "#fff", letterSpacing: "-0.02em" }}>NextBigTool</span>
+      <Link href="/" style={{ display: "flex", alignItems: "center", marginBottom: 28, padding: "0 8px", textDecoration: "none" }}>
+        <NBTWordmark height={22} dark />
       </Link>
 
       {/* Nav */}

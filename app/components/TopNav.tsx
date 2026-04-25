@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AuthModal from "./AuthModal";
+import NBTWordmark from "./NBTWordmark";
 import { createClient } from "@/utils/supabase/client";
 
 /* ─── types ──────────────────────────────────────────────────────────── */
@@ -298,23 +299,8 @@ export default function TopNav({ dark }: { dark?: boolean }) {
 
           {/* ── Logo (left zone, flex:1) ── */}
           <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
-            <Link href="/" aria-label="NextBigTool home" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 7, flexShrink: 0 }}>
-              <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-                <defs>
-                  <linearGradient id="nbt-g" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stopColor="#ff6a3d"/>
-                    <stop offset="1" stopColor="#ff3d88"/>
-                  </linearGradient>
-                </defs>
-                <path d="M3 15.5 L28 4 L22 28 L15 19 L3 15.5 Z" fill="url(#nbt-g)"/>
-                <path d="M15 19 L22 12" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" opacity="0.85"/>
-              </svg>
-              <div style={{ lineHeight: 1, letterSpacing: "-0.03em" }}>
-                <div style={{ fontSize: 8.5, fontWeight: 700, color: "#ff6a3d", textTransform: "lowercase" as const }}>next</div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: dark ? "#fff" : "#0f0f10", marginTop: 1 }}>
-                  Big<span style={{ color: "#ff6a3d" }}>Tool</span>
-                </div>
-              </div>
+            <Link href="/" aria-label="NextBigTool home" style={{ textDecoration: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
+              <NBTWordmark height={26} dark={dark} />
             </Link>
           </div>
 

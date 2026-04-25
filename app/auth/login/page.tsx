@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import Btn from "@/app/components/Btn";
-import NMark from "@/app/components/NMark";
+import NBTWordmark from "@/app/components/NBTWordmark";
 
 export default function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -71,9 +71,8 @@ export default function AuthPage() {
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F5F5F5" }}>
       <div style={{ background: "#fff", border: "1px solid #CFCFD4", borderRadius: 12, padding: 40, maxWidth: 400, width: "100%" }}>
         {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28 }}>
-          <NMark size={28} />
-          <span style={{ fontSize: 15, fontWeight: 800 }}>Next Big Tool</span>
+        <div style={{ marginBottom: 28 }}>
+          <NBTWordmark height={22} />
         </div>
 
         <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-import Image from "next/image";
+import NBTWordmark from "./NBTWordmark";
 
 export default function AuthModal({
   onClose,
@@ -74,12 +74,9 @@ export default function AuthModal({
 
         {/* Logo + title */}
         <div style={{ marginBottom: 24 }}>
-          <Image
-            src="/logo.png"
-            alt="Next Big Tool"
-            height={28} width={62}
-            style={{ objectFit: "contain", marginBottom: 14 }}
-          />
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
+            <NBTWordmark height={24} />
+          </div>
           <div style={{ fontSize: 18, fontWeight: 800, color: "#1A1A1A", letterSpacing: "-0.02em" }}>
             {title ?? "Welcome to NextBigTool"}
           </div>
