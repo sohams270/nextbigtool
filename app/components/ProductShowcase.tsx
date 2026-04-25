@@ -10,8 +10,8 @@
  */
 
 import Link from "next/link";
-import Image from "next/image";
 import UpvoteButton from "./UpvoteButton";
+import ToolLogoImg from "./ToolLogoImg";
 
 /* ─── types ──────────────────────────────────────────────────────────── */
 export type ShowcaseTool = {
@@ -76,16 +76,10 @@ function ProductLogo({
           flexShrink: 0,
           border: "1px solid rgba(0,0,0,0.08)",
           boxShadow: "inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.06)",
+          background: "#f6f6f4",
         }}
       >
-        <Image
-          src={tool.logo_url}
-          alt={`${tool.name} logo`}
-          width={size}
-          height={size}
-          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-          unoptimized
-        />
+        <ToolLogoImg src={tool.logo_url} alt={`${tool.name} logo`} size={size} />
       </div>
     );
   }
