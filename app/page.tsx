@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import TopNav from "./components/TopNav";
-import ProductCard from "./components/ProductCard";
+import ProductShowcase from "./components/ProductShowcase";
 import PostCard, { type PostRow } from "./components/PostCard";
 import PostStoryWallButton from "./components/PostStoryWallButton";
 import HeroSection from "./components/HeroSection";
@@ -92,14 +92,11 @@ export default async function HomePage() {
     userUpvotedIds = (votes ?? []).map((v: { tool_id: string }) => v.tool_id);
   }
 
-  const featuredTool = tools.find((t) => t.featured) ?? tools[0] ?? null;
-  const trending = tools.filter((t) => t !== featuredTool).slice(0, 5);
-
-  function getTagNames(t: ToolRow) {
-    const tags = t.tool_tags.map((tt) => tt.tags?.name).filter(Boolean) as string[];
-    const pricing = t.pricing.charAt(0).toUpperCase() + t.pricing.slice(1);
-    return [...tags.slice(0, 2), pricing];
-  }
+  // Sort: featured tool first, then by upvote_count desc
+  const sortedTools = [
+    ...tools.filter((t) => t.featured),
+    ...tools.filter((t) => !t.featured),
+  ];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#F5F5F5" }}>
@@ -144,57 +141,13 @@ export default async function HomePage() {
             margin: "0 auto",
           }}
         >
-          {/* Feed */}
+          {/* Feed — new editorial leaderboard design */}
           <div>
-            {featuredTool && (
-              <>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 14, fontWeight: 800 }}>Featured Today</span>
-                    <Pill color="gray" size="xs">Paid placement</Pill>
-                  </div>
-                </div>
-                <div style={{ marginBottom: 28 }}>
-                  <ProductCard
-                    featured
-                    name={featuredTool.name}
-                    tagline={featuredTool.tagline}
-                    tags={getTagNames(featuredTool)}
-                    votes={featuredTool.upvote_count}
-                    badge="Featured"
-                    logoLetter={featuredTool.name[0]}
-                    toolId={featuredTool.id}
-                    slug={featuredTool.slug}
-                    userId={user?.id ?? null}
-                    isUpvoted={userUpvotedIds.includes(featuredTool.id)}
-                  />
-                </div>
-              </>
-            )}
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <span style={{ fontSize: 14, fontWeight: 800 }}>Trending This Week</span>
-              <span style={{ fontSize: 11, color: "#FF6B35", fontWeight: 600, cursor: "pointer" }}>See all →</span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {trending.map((p, i) => (
-                <ProductCard
-                  key={p.id}
-                  rank={`#${i + 1}`}
-                  name={p.name}
-                  tagline={p.tagline}
-                  tags={getTagNames(p)}
-                  votes={p.upvote_count}
-                  logoLetter={p.name[0]}
-                  badge={i === 0 ? "New" : undefined}
-                  badgeColor="green"
-                  toolId={p.id}
-                  slug={p.slug}
-                  userId={user?.id ?? null}
-                  isUpvoted={userUpvotedIds.includes(p.id)}
-                />
-              ))}
-            </div>
+            <ProductShowcase
+              tools={sortedTools}
+              userId={user?.id ?? null}
+              userUpvotedIds={userUpvotedIds}
+            />
           </div>
 
           {/* Sidebar */}
