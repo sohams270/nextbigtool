@@ -75,7 +75,7 @@ export default function AuthModal({
         {/* Logo + title */}
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
-            <NBTWordmark height={46} />
+            <NBTWordmark height={28} />
           </div>
           <div style={{ fontSize: 18, fontWeight: 800, color: "#1A1A1A", letterSpacing: "-0.02em" }}>
             {title ?? "Welcome to NextBigTool"}

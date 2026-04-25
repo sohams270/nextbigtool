@@ -33,7 +33,7 @@ export default function Sidebar() {
     }}>
       {/* Logo */}
       <Link href="/" style={{ display: "flex", alignItems: "center", marginBottom: 28, padding: "0 8px", textDecoration: "none" }}>
-        <NBTWordmark height={34} dark priority />
+        <NBTWordmark height={20} dark priority />
       </Link>
 
       {/* Nav */}

@@ -72,7 +72,7 @@ export default function AuthPage() {
       <div style={{ background: "#fff", border: "1px solid #CFCFD4", borderRadius: 12, padding: 40, maxWidth: 400, width: "100%" }}>
         {/* Logo */}
         <div style={{ marginBottom: 28 }}>
-          <NBTWordmark height={36} priority />
+          <NBTWordmark height={22} priority />
         </div>
 
         <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>
