@@ -27,7 +27,7 @@ function Toggle({ yearly, onChange }: { yearly: boolean; onChange: (v: boolean) 
       <span style={{
         background: "#d1fae5", color: "#065f46", fontSize: 12, fontWeight: 700,
         padding: "3px 10px", borderRadius: 999, letterSpacing: "0.01em",
-      }}>Save 89%</span>
+      }}>Save 38%</span>
     </div>
   );
 }
@@ -122,7 +122,7 @@ function FaqAccordion() {
 /* ─── Main Page ───────────────────────────────────────────────────────── */
 export default function PricingPage() {
   const [yearly, setYearly] = useState(false);
-  const corePrice = yearly ? "$9" : "$79";
+  const corePrice = yearly ? "$49" : "$79";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#F5F5F5", fontFamily: "Inter, sans-serif" }}>
@@ -207,8 +207,8 @@ export default function PricingPage() {
             </div>
             <div style={{ fontSize: 13, color: "#d1fae5", fontWeight: 600, marginBottom: 16 }}>
               {yearly
-                ? "Billed as $108/year"
-                : "Or $9/month billed yearly — save $840/year."}
+                ? "Billed as $588/year"
+                : "Or $49/month billed yearly — save $360/year."}
             </div>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.9)", lineHeight: 1.6, margin: "0 0 20px" }}>
               For serious builders turning discovery into real pipeline and traction.

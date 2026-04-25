@@ -76,13 +76,13 @@ const PLANS: Plan[] = [
     id: "core",
     label: "CORE",
     price: "$79",
-    priceYearly: "$9",
+    priceYearly: "$49",
     per: "/month",
     perYearly: "/month",
     subPrice: (yearly: boolean) =>
       yearly
-        ? <span style={{ fontSize: 12, color: "#d1fae5", fontWeight: 600 }}>Billed as $108/year</span>
-        : <span style={{ fontSize: 12, color: "#d1fae5", fontWeight: 600 }}>Or $9/month billed yearly — save $840/year.</span>,
+        ? <span style={{ fontSize: 12, color: "#d1fae5", fontWeight: 600 }}>Billed as $588/year</span>
+        : <span style={{ fontSize: 12, color: "#d1fae5", fontWeight: 600 }}>Or $49/month billed yearly — save $360/year.</span>,
     desc: "",
     bodyText: "For serious builders turning discovery into real pipeline and traction.",
     featuresHeader: "EVERYTHING IN BASIC, PLUS",
@@ -133,7 +133,7 @@ export default function PlanToggle() {
           }} />
         </button>
         <span style={{ fontSize: 13, fontWeight: 600, color: yearly ? "#0f0f10" : "#9090a0" }}>Yearly</span>
-        <span style={{ background: "#d1fae5", color: "#065f46", fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 999 }}>Save 89%</span>
+        <span style={{ background: "#d1fae5", color: "#065f46", fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 999 }}>Save 38%</span>
       </div>
 
       {/* Cards */}
