@@ -122,7 +122,7 @@ export default async function InterestedPage() {
               background: "linear-gradient(90deg,#ff6a3d,#ff3d88)", borderRadius: 9,
               padding: "0 20px", height: 38, fontSize: 13, fontWeight: 700, color: "#fff",
               display: "inline-flex", alignItems: "center", textDecoration: "none",
-            }}>Upgrade to Core — $12/mo</Link>
+            }}>Upgrade to Core — $79/mo</Link>
             <Link href="/dashboard/plan" style={{
               background: "transparent", border: "1px solid #d8d8d4", borderRadius: 9,
               padding: "0 16px", height: 38, fontSize: 13, fontWeight: 600, color: "#3a3a45",

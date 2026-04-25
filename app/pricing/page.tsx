@@ -1,175 +1,393 @@
+"use client";
+
+import { useState } from "react";
 import TopNav from "../components/TopNav";
-import Btn from "../components/Btn";
-import Pill from "../components/Pill";
 import Link from "next/link";
 
-type Feature = [label: string, star?: boolean];
-
-function PriceCard({
-  tier, price, unit, features, cta, ctaHref = "/auth/login",
-  highlight, headerBg, headerColor,
-}: {
-  tier: string; price: string; unit: string; features: Feature[];
-  cta: string; ctaHref?: string; highlight?: boolean;
-  headerBg?: string; headerColor?: string;
-}) {
+/* ─── Toggle ──────────────────────────────────────────────────────────── */
+function Toggle({ yearly, onChange }: { yearly: boolean; onChange: (v: boolean) => void }) {
   return (
-    <div
-      style={{
-        border: `1px solid ${highlight ? "#FF6B35" : "#CFCFD4"}`,
-        borderRadius: 14, background: "#fff",
-        overflow: "hidden", position: "relative",
-        display: "flex", flexDirection: "column",
-        boxShadow: highlight ? "0 8px 32px rgba(255,107,53,0.18)" : "none",
-        transform: highlight ? "translateY(-6px)" : "none",
-      }}
-    >
-      {highlight && (
-        <div style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)", background: "#fff", color: "#FF6B35", padding: "3px 12px", borderRadius: 999, fontSize: 9, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap", zIndex: 1, border: "1px solid #FFE3D6" }}>
-          ★ Best value
-        </div>
-      )}
-      <div style={{ background: headerBg || "#F5F5F5", padding: highlight ? "36px 24px 22px" : "22px 24px" }}>
-        <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: headerColor || "#6B6B70" }}>{tier}</div>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginTop: 8 }}>
-          <span style={{ fontSize: 38, fontWeight: 800, letterSpacing: "-0.03em", color: headerColor || "#1A1A1A" }}>{price}</span>
-          <span style={{ fontSize: 11, color: headerColor ? "rgba(255,255,255,0.7)" : "#6B6B70", whiteSpace: "nowrap" }}>{unit}</span>
-        </div>
-      </div>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 48 }}>
+      <span style={{ fontSize: 14, fontWeight: 600, color: yearly ? "#9090a0" : "#0f0f10" }}>Monthly</span>
+      <button
+        onClick={() => onChange(!yearly)}
+        style={{
+          width: 48, height: 26, borderRadius: 999, border: "none", cursor: "pointer", padding: 3,
+          background: "#FF6B35", position: "relative", transition: "background 0.2s", flexShrink: 0,
+        }}
+        aria-label="Toggle billing period"
+      >
+        <div style={{
+          width: 20, height: 20, borderRadius: "50%", background: "#fff",
+          position: "absolute", top: 3, left: yearly ? "calc(100% - 23px)" : 3,
+          transition: "left 0.2s",
+        }} />
+      </button>
+      <span style={{ fontSize: 14, fontWeight: 600, color: yearly ? "#0f0f10" : "#9090a0" }}>Yearly</span>
+      <span style={{
+        background: "#d1fae5", color: "#065f46", fontSize: 12, fontWeight: 700,
+        padding: "3px 10px", borderRadius: 999, letterSpacing: "0.01em",
+      }}>Save 89%</span>
+    </div>
+  );
+}
 
-      <div style={{ padding: "22px 24px", display: "flex", flexDirection: "column", flex: 1 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 20 }}>
-          {features.map(([label, star]) => (
-            <div key={label} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-              <div style={{ width: 18, height: 18, borderRadius: 9, background: star ? "#FFE3D6" : "rgba(0,184,122,0.12)", color: star ? "#FF6B35" : "#00B87A", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, flexShrink: 0, marginTop: 1 }}>
-                {star ? "★" : "✓"}
+/* ─── Check icon ──────────────────────────────────────────────────────── */
+function Check({ dark }: { dark?: boolean }) {
+  return (
+    <div style={{
+      width: 20, height: 20, borderRadius: "50%", flexShrink: 0, marginTop: 1,
+      background: dark ? "rgba(255,255,255,0.15)" : "rgba(0,184,122,0.12)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }}>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={dark ? "#fff" : "#00B87A"} strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 12l5 5 9-11" />
+      </svg>
+    </div>
+  );
+}
+
+/* ─── Table check / dash ──────────────────────────────────────────────── */
+function TCheck() {
+  return (
+    <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(0,184,122,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00B87A" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 12l5 5 9-11" />
+      </svg>
+    </div>
+  );
+}
+function TDash() {
+  return <span style={{ color: "#CFCFD4", fontWeight: 700, fontSize: 16, display: "block", textAlign: "center" }}>—</span>;
+}
+
+/* ─── FAQ Accordion ───────────────────────────────────────────────────── */
+const FAQ_ITEMS = [
+  {
+    q: "Is the Free plan really free forever?",
+    a: "Yes. No credit card required, no trial period. Your product listing stays live permanently on the Free plan.",
+  },
+  {
+    q: "What exactly is the Founder CRM?",
+    a: "When someone upvotes or follows your product, you see their name, profile, and can send one follow-up message. Users opt in to this at the point of engagement — so the data is clean and consent-based.",
+  },
+  {
+    q: "What is Hall of Fame placement?",
+    a: "The Hall of Fame is a dedicated section showcasing the best products on the platform. Unlike the trending feed which resets, Hall of Fame is permanent — giving you evergreen visibility that compounds over time.",
+  },
+  {
+    q: "Is Basic a one-time fee?",
+    a: "Yes. $19 is a one-time payment per product. No recurring charges, ever.",
+  },
+  {
+    q: "Can I switch between monthly and yearly on Core?",
+    a: "Yes. Start monthly at $79/month and switch to yearly at $9/month anytime. Savings apply immediately to your next billing cycle.",
+  },
+];
+
+function FaqAccordion() {
+  const [open, setOpen] = useState<number | null>(null);
+  return (
+    <div style={{ maxWidth: 720, margin: "0 auto" }}>
+      <h2 style={{ fontSize: 32, fontWeight: 800, letterSpacing: "-0.02em", textAlign: "center", margin: "0 0 32px", color: "#0f0f10" }}>Common questions</h2>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {FAQ_ITEMS.map((item, i) => (
+          <div
+            key={i}
+            style={{ border: "1px solid #e5e5e3", borderRadius: 12, overflow: "hidden" }}
+          >
+            <button
+              onClick={() => setOpen(open === i ? null : i)}
+              style={{
+                width: "100%", background: open === i ? "#fafaf9" : "#fff", border: "none",
+                padding: "20px 20px", display: "flex", justifyContent: "space-between",
+                alignItems: "center", cursor: "pointer", fontFamily: "inherit", textAlign: "left",
+              }}
+            >
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#0f0f10", paddingRight: 16 }}>{item.q}</span>
+              <span style={{ fontSize: 16, color: "#9090a0", flexShrink: 0, transform: open === i ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
+            </button>
+            {open === i && (
+              <div style={{ padding: "0 20px 20px", background: "#fafaf9" }}>
+                <p style={{ fontSize: 13, color: "#6b6b78", lineHeight: 1.65, margin: 0 }}>{item.a}</p>
               </div>
-              <span style={{ fontSize: 12, lineHeight: 1.4 }}>{label}</span>
-            </div>
-          ))}
-        </div>
-        <Link href={ctaHref} style={{ textDecoration: "none" }}>
-          <Btn variant={highlight ? "primary" : "ghost"} size="lg" full>{cta}</Btn>
-        </Link>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
-const FAQ_ITEMS = [
-  { q: "Can I switch plans?", a: "Yes, upgrade or downgrade anytime. Downgrades take effect at the next billing cycle." },
-  { q: "Is Basic a one-time fee?", a: "Yes — Basic is a one-time payment per product, not a subscription." },
-  { q: "What counts as a 'product' on Core?", a: "Any tool you've submitted to the platform. Core gives you unlimited listings under one subscription." },
-  { q: "Do you offer refunds?", a: "7-day refund on Basic. Core is month-to-month — cancel anytime, no refunds for partial months." },
-];
-
+/* ─── Main Page ───────────────────────────────────────────────────────── */
 export default function PricingPage() {
+  const [yearly, setYearly] = useState(false);
+  const corePrice = yearly ? "$9" : "$79";
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#F5F5F5" }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#F5F5F5", fontFamily: "Inter, sans-serif" }}>
       <TopNav />
 
-      {/* Hero */}
-      <div style={{ background: "#0A0B1A", color: "#fff", padding: "52px 32px 44px", textAlign: "center" }}>
-        <Pill color="orangeSolid" size="xs" style={{ marginBottom: 16 }}>Simple pricing</Pill>
-        <h1 style={{ fontSize: 32, fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 10px" }}>
-          Plans for every stage of building
-        </h1>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", margin: 0 }}>
-          Start free. Upgrade when interest starts compounding.
-        </p>
-      </div>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 32px 80px", width: "100%" }}>
 
-      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "40px 32px", width: "100%" }}>
-        {/* Pricing cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 18, alignItems: "end", marginBottom: 48 }}>
-          <PriceCard
-            tier="Free"
-            price="$0"
-            unit="/ forever"
-            features={[
-              ["List 1 product"],
-              ["Basic analytics (upvotes + views)"],
-              ["Public profile & badges"],
-              ["Newsletter distribution"],
-            ]}
-            cta="Get Started Free"
-            ctaHref="/auth/login"
-          />
-          <PriceCard
-            tier="Basic"
-            price="$29"
-            unit="/ one-time per product"
-            features={[
-              ["Everything in Free"],
-              ["Featured for 48h on launch"],
-              ["Build-in-public posts"],
-              ["Re-launch option"],
-              ["Hall of Fame eligibility"],
-              ["Priority review"],
-            ]}
-            cta="Upgrade to Basic"
-            ctaHref="/auth/login"
-          />
-          <PriceCard
-            tier="Core"
-            price="$79"
-            unit="/ month · unlimited"
-            headerBg="#FF6B35"
-            headerColor="#fff"
-            highlight
-            features={[
-              ["Everything in Basic"],
-              ["Founder CRM — see who's interested", true],
-              ["One follow-up per interested user", true],
-              ["Unlimited products", true],
-              ["Weekly digest placement", true],
-            ]}
-            cta="Upgrade to Core →"
-            ctaHref="/auth/login"
-          />
+        {/* ── Toggle ── */}
+        <Toggle yearly={yearly} onChange={setYearly} />
+
+        {/* ── Section header ── */}
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "#9090a0", marginBottom: 12 }}>PLANS &amp; PRICING</div>
+          <h1 style={{ fontSize: 38, fontWeight: 800, letterSpacing: "-0.025em", color: "#0f0f10", margin: "0 0 14px" }}>The right plan for every stage</h1>
+          <p style={{ fontSize: 16, color: "#6b6b78", margin: 0 }}>From your first launch to building serious traction.</p>
         </div>
 
-        {/* Feature comparison table */}
-        <div style={{ background: "#fff", border: "1px solid #CFCFD4", borderRadius: 12, overflow: "hidden", marginBottom: 32 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 100px 100px 100px", padding: "12px 20px", background: "#F5F5F5", borderBottom: "1px solid #CFCFD4" }}>
-            <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "#6B6B70" }}>Feature</span>
-            {["Free", "Basic", "Core"].map((t) => (
-              <span key={t} style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: t === "Core" ? "#FF6B35" : "#6B6B70", textAlign: "center" }}>{t}</span>
-            ))}
-          </div>
-          {[
-            ["Tool listings", "1", "1", "Unlimited"],
-            ["Analytics", "Basic", "Basic", "Full"],
-            ["Featured placement", "—", "48h", "48h"],
-            ["Build in Public posts", "—", "✓", "✓"],
-            ["Founder CRM", "—", "—", "✓"],
-            ["Follow-up users", "—", "—", "1 per user"],
-            ["Weekly digest", "—", "—", "✓"],
-            ["Priority review", "—", "✓", "✓"],
-          ].map(([feature, free, basic, core], i) => (
-            <div key={feature} style={{ display: "grid", gridTemplateColumns: "1fr 100px 100px 100px", padding: "11px 20px", borderBottom: i < 7 ? "1px solid #F5F5F5" : "none" }}>
-              <span style={{ fontSize: 11.5 }}>{feature}</span>
-              {[free, basic, core].map((val, j) => (
-                <span key={j} style={{ fontSize: 11, textAlign: "center", color: val === "—" ? "#CFCFD4" : val === "✓" ? "#00B87A" : "#1A1A1A", fontWeight: val === "✓" || val === "—" ? 700 : 500 }}>{val}</span>
+        {/* ── Three pricing cards ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 24, alignItems: "start" }}>
+
+          {/* FREE */}
+          <div style={{ background: "#f5f5f3", border: "1px solid #e5e5e3", borderRadius: 16, padding: 28, display: "flex", flexDirection: "column", gap: 0 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9090a0", marginBottom: 10 }}>FREE</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
+              <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: "-0.04em", color: "#0f0f10" }}>$0</span>
+            </div>
+            <div style={{ fontSize: 13, color: "#6b6b78", marginBottom: 16 }}>Forever free. No credit card needed.</div>
+            <p style={{ fontSize: 13, color: "#3a3a45", lineHeight: 1.6, marginBottom: 24, margin: "0 0 24px" }}>
+              Perfect for exploring the platform and sharing your first product with the world.
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+              {["List 1 product", "Lifetime free listing", "High authority backlink", "1 post on Build in Public wall", "Basic analytics (upvotes + comments)"].map((f) => (
+                <div key={f} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                  <Check />
+                  <span style={{ fontSize: 13, color: "#3a3a45", lineHeight: 1.45 }}>{f}</span>
+                </div>
               ))}
             </div>
-          ))}
-        </div>
+            <Link href="/auth/login" style={{ textDecoration: "none" }}>
+              <button style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "1.5px solid #d8d8d4", background: "transparent", fontSize: 14, fontWeight: 700, color: "#3a3a45", cursor: "pointer", fontFamily: "inherit" }}>
+                Get Started Free
+              </button>
+            </Link>
+          </div>
 
-        {/* FAQ */}
-        <div style={{ background: "#fff", border: "1px solid #CFCFD4", borderRadius: 12, padding: "6px 24px 12px" }}>
-          <div style={{ fontSize: 14, fontWeight: 800, padding: "16px 0 4px" }}>Common Questions</div>
-          {FAQ_ITEMS.map((item, i) => (
-            <div key={item.q} style={{ padding: "14px 0", borderTop: i > 0 ? "1px solid #F5F5F5" : "1px solid #F5F5F5" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>{item.q}</div>
-              <div style={{ fontSize: 11, color: "#6B6B70", lineHeight: 1.6 }}>{item.a}</div>
+          {/* BASIC */}
+          <div style={{ background: "#fff", border: "1px solid #e5e5e3", borderRadius: 16, padding: 28, display: "flex", flexDirection: "column" }}>
+            <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9090a0", marginBottom: 10 }}>BASIC</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
+              <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: "-0.04em", color: "#0f0f10" }}>$19</span>
             </div>
-          ))}
-          <div style={{ padding: "14px 0", borderTop: "1px solid #F5F5F5" }}>
-            <span style={{ fontSize: 11, color: "#6B6B70" }}>More questions? </span>
-            <Link href="/faq" style={{ fontSize: 11, color: "#FF6B35", fontWeight: 600 }}>Read the full FAQ →</Link>
+            <div style={{ fontSize: 13, color: "#6b6b78", marginBottom: 16 }}>One-time per product. Pay once, keep forever.</div>
+            <p style={{ fontSize: 13, color: "#3a3a45", lineHeight: 1.6, margin: "0 0 20px" }}>
+              For founders who want more visibility and a boost on launch day.
+            </p>
+            <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9090a0", marginBottom: 12 }}>EVERYTHING IN FREE, PLUS</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28, flex: 1 }}>
+              {["Featured for 48 hours on launch", "Featured in weekly newsletter (once)", "Re-launch option", "5 posts on Build in Public wall", "CSV export of your data"].map((f) => (
+                <div key={f} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                  <Check />
+                  <span style={{ fontSize: 13, color: "#3a3a45", lineHeight: 1.45 }}>{f}</span>
+                </div>
+              ))}
+            </div>
+            <Link href="/auth/login" style={{ textDecoration: "none" }}>
+              <button style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "1.5px solid #FF6B35", background: "transparent", fontSize: 14, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
+                Upgrade to Basic →
+              </button>
+            </Link>
+          </div>
+
+          {/* CORE */}
+          <div style={{ background: "#FF6B35", borderRadius: 16, padding: 28, display: "flex", flexDirection: "column", position: "relative" }}>
+            {/* Best value badge */}
+            <div style={{ position: "absolute", top: 20, right: 20, background: "#fff", color: "#FF6B35", fontSize: 11, fontWeight: 800, padding: "4px 12px", borderRadius: 999 }}>
+              ★ BEST VALUE
+            </div>
+            <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255,255,255,0.8)", marginBottom: 10 }}>CORE</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 4 }}>
+              <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: "-0.04em", color: "#fff" }}>{corePrice}</span>
+              <span style={{ fontSize: 15, color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>/month</span>
+            </div>
+            <div style={{ fontSize: 13, color: "#d1fae5", fontWeight: 600, marginBottom: 16 }}>
+              {yearly
+                ? "Billed as $108/year"
+                : "Or $9/month billed yearly — save $840/year."}
+            </div>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.9)", lineHeight: 1.6, margin: "0 0 20px" }}>
+              For serious builders turning discovery into real pipeline and traction.
+            </p>
+
+            {/* Core exclusives dark panel */}
+            <div style={{ background: "#0f0f10", borderRadius: 12, padding: "16px 18px", marginBottom: 20 }}>
+              <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255,255,255,0.5)", marginBottom: 14 }}>★ CORE EXCLUSIVES</div>
+              {[
+                { title: "Founder CRM", desc: "See exactly who upvoted or followed your product. Turn interest into pipeline." },
+                { title: "Hall of Fame Placement", desc: "Permanent evergreen visibility that compounds over time." },
+              ].map((ex) => (
+                <div key={ex.title} style={{ display: "flex", gap: 12, marginBottom: 12, alignItems: "flex-start" }}>
+                  <div style={{ width: 30, height: 30, borderRadius: 8, background: "#FF6B35", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 3s5 4 5 9a5 5 0 01-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3 1-5 1-8z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 2 }}>{ex.title}</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>{ex.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255,255,255,0.5)", marginBottom: 12 }}>EVERYTHING IN BASIC, PLUS</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28, flex: 1 }}>
+              {["One follow-up message per interested user", "Weekly newsletter placement", "Unlimited product listings", "Unlimited Build in Public posts", "1 featured blog post written about you"].map((f) => (
+                <div key={f} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                  <Check dark />
+                  <span style={{ fontSize: 13, color: "rgba(255,255,255,0.9)", lineHeight: 1.45 }}>{f}</span>
+                </div>
+              ))}
+            </div>
+            <Link href="/auth/login" style={{ textDecoration: "none" }}>
+              <button style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", background: "#fff", fontSize: 14, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
+                Upgrade to Core →
+              </button>
+            </Link>
           </div>
         </div>
+
+        {/* ── Guarantee ── */}
+        <div style={{ textAlign: "center", fontSize: 13, color: "#9090a0", marginBottom: 72 }}>
+          All plans include a 7-day money-back guarantee.{" "}
+          <span style={{ margin: "0 8px" }}>·</span>
+          <Link href="/contact" style={{ color: "#FF6B35", fontWeight: 600, textDecoration: "none" }}>Questions? Chat with us →</Link>
+        </div>
+
+        {/* ── Comparison table ── */}
+        <div style={{ marginBottom: 80 }}>
+          <h2 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", color: "#0f0f10", margin: "0 0 6px" }}>Compare plans in detail</h2>
+          <p style={{ fontSize: 14, color: "#6b6b78", margin: "0 0 28px" }}>See exactly what you get with each plan, side by side.</p>
+
+          <div style={{ background: "#fff", border: "1px solid #e5e5e3", borderRadius: 16, overflow: "hidden" }}>
+            {/* Header row */}
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderBottom: "2px solid #e5e5e3" }}>
+              <div style={{ padding: "20px 24px" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#0f0f10" }}>All plans compared</div>
+                <div style={{ fontSize: 12, color: "#9090a0", marginTop: 2 }}>Full feature breakdown</div>
+              </div>
+              {/* FREE col header */}
+              <div style={{ padding: "20px 16px", borderLeft: "1px solid #e5e5e3", textAlign: "center" }}>
+                <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4 }}>FREE</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: "#0f0f10", letterSpacing: "-0.03em", marginBottom: 2 }}>$0</div>
+                <div style={{ fontSize: 11, color: "#9090a0", marginBottom: 12 }}>forever</div>
+                <Link href="/auth/login" style={{ textDecoration: "none" }}>
+                  <button style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "1.5px solid #d8d8d4", background: "transparent", fontSize: 12, fontWeight: 700, color: "#3a3a45", cursor: "pointer", fontFamily: "inherit" }}>
+                    Get Started
+                  </button>
+                </Link>
+              </div>
+              {/* BASIC col header */}
+              <div style={{ padding: "20px 16px", borderLeft: "1px solid #e5e5e3", textAlign: "center" }}>
+                <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4 }}>BASIC</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: "#0f0f10", letterSpacing: "-0.03em", marginBottom: 2 }}>$19</div>
+                <div style={{ fontSize: 11, color: "#9090a0", marginBottom: 12 }}>one-time / product</div>
+                <Link href="/auth/login" style={{ textDecoration: "none" }}>
+                  <button style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "1.5px solid #FF6B35", background: "transparent", fontSize: 12, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
+                    Upgrade
+                  </button>
+                </Link>
+              </div>
+              {/* CORE col header */}
+              <div style={{ padding: "20px 16px", borderLeft: "1px solid #e5e5e3", textAlign: "center", background: "rgba(255,107,53,0.05)" }}>
+                <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "#FF6B35", marginBottom: 4 }}>CORE</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: "#0f0f10", letterSpacing: "-0.03em", marginBottom: 2 }}>{corePrice}</div>
+                <div style={{ fontSize: 11, color: "#9090a0", marginBottom: 12 }}>/month · unlimited</div>
+                <Link href="/auth/login" style={{ textDecoration: "none" }}>
+                  <button style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "none", background: "#FF6B35", fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
+                    Start Core
+                  </button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Rows */}
+            {[
+              {
+                section: "LISTING",
+                rows: [
+                  { feature: "Products listed", sub: null, free: "1", basic: "1", core: <span style={{ color: "#FF6B35", fontWeight: 800 }}>Unlimited</span> },
+                  { feature: "Lifetime free listing", sub: null, free: <TCheck />, basic: <TCheck />, core: <TCheck /> },
+                  { feature: "High authority backlink", sub: "DR 70+ dofollow link", free: <TCheck />, basic: <TCheck />, core: <TCheck /> },
+                ],
+              },
+              {
+                section: "DISCOVERY & VISIBILITY",
+                rows: [
+                  { feature: "Featured on homepage for 48 hours", sub: null, free: <TDash />, basic: <TCheck />, core: <TCheck /> },
+                  { feature: "Re-launch option", sub: "Fresh boost for major updates", free: <TDash />, basic: <TCheck />, core: <TCheck /> },
+                  { feature: <span><span style={{ color: "#FF6B35" }}>★ </span>Hall of Fame placement</span>, sub: "Permanent evergreen discoverability", free: <TDash />, basic: <TDash />, core: <TCheck /> },
+                ],
+              },
+              {
+                section: "NEWSLETTER (14,200+ SUBSCRIBERS)",
+                rows: [
+                  { feature: "One-time newsletter feature", sub: null, free: <TDash />, basic: <TCheck />, core: <TCheck /> },
+                  { feature: "Weekly newsletter placement", sub: "Recurring weekly slot", free: <TDash />, basic: <TDash />, core: <TCheck /> },
+                  { feature: "Featured blog post written about you", sub: null, free: <TDash />, basic: <TDash />, core: <TCheck /> },
+                ],
+              },
+              {
+                section: "BUILD IN PUBLIC WALL",
+                rows: [
+                  { feature: "Posts on Build in Public wall", sub: null, free: "1 post", basic: "5 posts", core: <span style={{ color: "#FF6B35", fontWeight: 800 }}>Unlimited</span> },
+                ],
+              },
+              {
+                section: "FOUNDER CRM",
+                sectionColor: "#FF6B35",
+                rows: [
+                  { feature: <span style={{ color: "#FF6B35" }}>★ See who upvoted or followed your product</span>, sub: "Names, profiles, contact — consent-based", free: <TDash />, basic: <TDash />, core: <TCheck /> },
+                  { feature: "One follow-up message per interested user", sub: null, free: <TDash />, basic: <TDash />, core: <TCheck /> },
+                ],
+              },
+              {
+                section: "ANALYTICS & DATA",
+                rows: [
+                  { feature: "Basic analytics", sub: "Upvotes and comments", free: <TCheck />, basic: <TCheck />, core: <TCheck /> },
+                  { feature: "CSV data export", sub: null, free: <TDash />, basic: <TCheck />, core: <TCheck /> },
+                ],
+              },
+            ].map((group, gi) => (
+              <div key={gi}>
+                {/* Section header */}
+                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", background: "#f9f9f7", borderTop: "1px solid #e5e5e3" }}>
+                  <div style={{ padding: "10px 24px", gridColumn: "1 / -1" }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: group.sectionColor || "#6b6b78" }}>
+                      {group.section}
+                    </span>
+                  </div>
+                </div>
+                {/* Feature rows */}
+                {group.rows.map((row, ri) => (
+                  <div key={ri} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid #f0f0ee" }}>
+                    <div style={{ padding: "14px 24px" }}>
+                      <div style={{ fontSize: 13, color: "#0f0f10", fontWeight: 500 }}>{row.feature}</div>
+                      {row.sub && <div style={{ fontSize: 11.5, color: "#9090a0", marginTop: 2 }}>{row.sub}</div>}
+                    </div>
+                    <div style={{ padding: "14px 16px", borderLeft: "1px solid #f0f0ee", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {typeof row.free === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "#3a3a45" }}>{row.free}</span> : row.free}
+                    </div>
+                    <div style={{ padding: "14px 16px", borderLeft: "1px solid #f0f0ee", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {typeof row.basic === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "#3a3a45" }}>{row.basic}</span> : row.basic}
+                    </div>
+                    <div style={{ padding: "14px 16px", borderLeft: "1px solid #f0f0ee", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,107,53,0.03)" }}>
+                      {typeof row.core === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "#3a3a45" }}>{row.core}</span> : row.core}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── FAQ ── */}
+        <FaqAccordion />
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ export default async function HallOfFamePage() {
   return (
     <main style={{ flex: 1, overflow: "auto", padding: "28px 32px" }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4 }}>Premium feature</div>
+        <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4 }}>Core feature</div>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0f0f10", letterSpacing: "-0.02em", margin: "0 0 4px" }}>🏆 Induct in Hall of Fame</h1>
         <p style={{ fontSize: 13, color: "#6b6b78", margin: 0 }}>A permanent, curated showcase of the best products on NextBigTool. Visible on the homepage forever.</p>
       </div>
@@ -97,7 +97,7 @@ export default async function HallOfFamePage() {
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 24,
           }}>🏆</div>
-          <div style={{ fontSize: 18, fontWeight: 800, color: "#0f0f10", marginBottom: 8 }}>Hall of Fame is a Premium feature</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "#0f0f10", marginBottom: 8 }}>Hall of Fame is a Core feature</div>
           <div style={{ fontSize: 13.5, color: "#6b6b78", maxWidth: 400, lineHeight: 1.6, marginBottom: 20 }}>
             Make your product stand out permanently. Homepage placement, badge on your listing, priority in newsletter features.
           </div>
@@ -106,7 +106,7 @@ export default async function HallOfFamePage() {
               background: "linear-gradient(90deg,#ff6a3d,#ff3d88)", borderRadius: 9,
               padding: "0 20px", height: 40, fontSize: 13.5, fontWeight: 700, color: "#fff",
               display: "inline-flex", alignItems: "center", textDecoration: "none",
-            }}>Upgrade to Premium</Link>
+            }}>Upgrade to Core — $79/mo</Link>
             <Link href="/dashboard/plan" style={{
               background: "transparent", border: "1px solid #d8d8d4", borderRadius: 9,
               padding: "0 16px", height: 40, fontSize: 13.5, fontWeight: 600, color: "#3a3a45",
@@ -114,7 +114,7 @@ export default async function HallOfFamePage() {
             }}>Talk to us</Link>
           </div>
           <div style={{ fontSize: 11.5, color: "#9090a0", fontFamily: "monospace" }}>
-            Starts at $49/mo · 7-day editorial review · unlimited duration
+            $79/mo · 7-day editorial review · unlimited duration
           </div>
         </div>
       </div>
