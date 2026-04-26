@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import TopNav from "../components/TopNav";
+import Footer from "../components/Footer";
 import Link from "next/link";
 
 /* ─── Toggle ──────────────────────────────────────────────────────────── */
@@ -389,6 +390,7 @@ export default function PricingPage() {
         {/* ── FAQ ── */}
         <FaqAccordion />
       </div>
+      <Footer />
     </div>
   );
 }
