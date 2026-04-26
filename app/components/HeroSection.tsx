@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Pill from "./Pill";
 import AuthModal from "./AuthModal";
+import SmartSearch from "./SmartSearch";
 import { createClient } from "@/utils/supabase/client";
 
 const STATS = [
@@ -168,26 +169,9 @@ export default function HeroSection() {
           Find the next big thing before it goes mainstream. Or launch your product to an audience that gets it.
         </p>
 
-        {/* Search box */}
-        <div
-          style={{
-            maxWidth: 460,
-            margin: "22px auto",
-            display: "flex",
-            background: "#fff",
-            borderRadius: 8,
-            padding: 4,
-            alignItems: "center",
-          }}
-        >
-          <span style={{ flex: 1, textAlign: "left", paddingLeft: 14, fontSize: 11, color: "#A8A8AD" }}>
-            Search 1,248 tools…
-          </span>
-          <a href="/discover" style={{ textDecoration: "none" }}>
-            <button style={{ background: "#FF6B35", color: "#fff", border: "none", borderRadius: 6, padding: "0 14px", height: 32, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
-              ⌕ Search
-            </button>
-          </a>
+        {/* Smart Search */}
+        <div style={{ maxWidth: 520, margin: "22px auto" }}>
+          <SmartSearch placeholder="Describe what you're looking for…" />
         </div>
 
         {/* CTA buttons replacing stats */}
