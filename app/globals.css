@@ -182,6 +182,35 @@ body {
   border-radius: 8px !important;
 }
 
+/* ── Smart Search animated rainbow border ───────────────────────────── */
+@keyframes smart-search-glow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.smart-search-wrap {
+  padding: 2px;
+  border-radius: 14px;
+  background: linear-gradient(270deg, #FF6B35, #FF3B6B, #7B2FFF, #3B7FFF, #00C2FF, #00B87A, #FF6B35);
+  background-size: 400% 400%;
+  animation: smart-search-glow 5s ease infinite;
+}
+.smart-search-wrap.ss-open {
+  border-radius: 14px 14px 0 0;
+}
+.smart-search-inner {
+  background: #fff;
+  border-radius: 12px;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  width: 100%;
+}
+.smart-search-wrap.ss-open .smart-search-inner {
+  border-radius: 12px 12px 0 0;
+}
+
+/* ── name hover ─────────────────────────────────────────────────────── */
 /* name hover */
 .bw-card-wrap:hover .product-name {
   color: #FF6B35;

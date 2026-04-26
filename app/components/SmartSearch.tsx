@@ -172,137 +172,104 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
 
   return (
     <div ref={wrapRef} style={{ position: "relative", width: "100%" }}>
-      {/* ── Label above ── */}
-      {!compact && (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 10 }}>
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 6,
-            background: "rgba(255,107,53,0.12)", border: "1px solid rgba(255,107,53,0.25)",
-            borderRadius: 20, padding: "4px 12px",
-          }}>
-            <SparkleIcon size={11} color="#FF6B35" />
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#FF6B35", letterSpacing: "0.04em" }}>
-              SMART SEARCH
-            </span>
-          </div>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} style={{ position: "relative" }}>
-        {/* Glow layer — only visible when focused */}
-        <div style={{
-          position: "absolute", inset: -2, borderRadius: showDropdown ? "14px 14px 0 0" : 14,
-          background: focused
-            ? "linear-gradient(135deg, rgba(255,107,53,0.5), rgba(255,61,136,0.4))"
-            : "transparent",
-          transition: "background 0.3s",
-          filter: "blur(6px)",
-          zIndex: 0,
-          opacity: focused ? 1 : 0,
-        }} />
-
-        <div style={{
-          position: "relative", zIndex: 1,
-          display: "flex", alignItems: "stretch",
-          background: "#fff",
-          borderRadius: showDropdown ? "12px 12px 0 0" : 12,
-          border: focused
-            ? "1.5px solid rgba(255,107,53,0.6)"
-            : "1.5px solid rgba(255,255,255,0.15)",
-          boxShadow: focused
-            ? "0 0 0 4px rgba(255,107,53,0.12), 0 8px 32px rgba(0,0,0,0.2)"
-            : "0 4px 28px rgba(0,0,0,0.22)",
-          overflow: "hidden",
-          transition: "border-color 0.2s, box-shadow 0.2s",
-        }}>
-          {/* Left icon area */}
-          <div style={{
-            display: "flex", alignItems: "center", paddingLeft: 16, gap: 8,
-            flexShrink: 0, color: focused ? "#FF6B35" : "#A8A8AD",
-            transition: "color 0.2s",
-          }}>
-            <SparkleIcon size={15} color={focused ? "#FF6B35" : "#A8A8AD"} />
-          </div>
-
-          {/* Input */}
-          <input
-            ref={inputRef}
-            value={query}
-            onChange={onChange}
-            onKeyDown={handleKey}
-            onFocus={() => { setFocused(true); if (results.length > 0) setOpen(true); }}
-            placeholder={focused && query.length === 0 ? placeholder : "Describe what you're looking for…"}
-            autoComplete="off"
-            spellCheck={false}
-            style={{
-              flex: 1,
-              border: "none", outline: "none",
-              padding: compact ? "11px 10px" : "15px 12px",
-              fontSize: compact ? 13 : 14,
-              color: "#0f0f10",
-              background: "transparent",
-              fontFamily: "inherit",
-              minWidth: 0,
-            }}
-          />
-
-          {/* Loading spinner */}
-          {loading && (
-            <div style={{ display: "flex", alignItems: "center", paddingRight: 10, color: "#FF6B35", flexShrink: 0 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83">
-                  <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.7s" repeatCount="indefinite"/>
-                </path>
-              </svg>
+      <form onSubmit={handleSubmit}>
+        {/* Rainbow border wrapper */}
+        <div className={`smart-search-wrap${showDropdown ? " ss-open" : ""}`}>
+          <div className="smart-search-inner">
+            {/* Left sparkle icon */}
+            <div style={{
+              display: "flex", alignItems: "center", paddingLeft: 14, gap: 8,
+              flexShrink: 0, color: focused ? "#FF6B35" : "#B0B0BA",
+              transition: "color 0.2s",
+            }}>
+              <SparkleIcon size={14} color={focused ? "#FF6B35" : "#B0B0BA"} />
             </div>
-          )}
 
-          {/* Clear */}
-          {!loading && query.length > 0 && (
-            <button type="button" onClick={() => { setQuery(""); setResults([]); setOpen(false); setSearched(false); inputRef.current?.focus(); }}
-              style={{ display: "flex", alignItems: "center", padding: "0 8px", background: "none", border: "none", cursor: "pointer", color: "#C0C0C8", fontSize: 18, lineHeight: 1, flexShrink: 0 }}>
-              ×
+            {/* Input */}
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={onChange}
+              onKeyDown={handleKey}
+              onFocus={() => { setFocused(true); if (results.length > 0) setOpen(true); }}
+              onBlur={() => setFocused(false)}
+              placeholder={focused && query.length === 0 ? placeholder : "Describe what you're looking for…"}
+              autoComplete="off"
+              spellCheck={false}
+              style={{
+                flex: 1,
+                border: "none", outline: "none",
+                padding: compact ? "11px 10px" : "14px 12px",
+                fontSize: compact ? 13 : 13.5,
+                color: "#0f0f10",
+                background: "transparent",
+                fontFamily: "inherit",
+                minWidth: 0,
+              }}
+            />
+
+            {/* Loading spinner */}
+            {loading && (
+              <div style={{ display: "flex", alignItems: "center", paddingRight: 10, color: "#FF6B35", flexShrink: 0 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83">
+                    <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.7s" repeatCount="indefinite"/>
+                  </path>
+                </svg>
+              </div>
+            )}
+
+            {/* Clear */}
+            {!loading && query.length > 0 && (
+              <button type="button"
+                onClick={() => { setQuery(""); setResults([]); setOpen(false); setSearched(false); inputRef.current?.focus(); }}
+                style={{ display: "flex", alignItems: "center", padding: "0 8px", background: "none", border: "none", cursor: "pointer", color: "#C0C0C8", fontSize: 18, lineHeight: 1, flexShrink: 0 }}>
+                ×
+              </button>
+            )}
+
+            {/* Smart Search button — dark fill, like launch-btn-inner */}
+            <button type="submit" style={{
+              background: "#0A0B1A",
+              color: "#fff", border: "none",
+              padding: compact ? "0 16px" : "0 22px",
+              fontSize: compact ? 11.5 : 12.5,
+              fontWeight: 700,
+              cursor: "pointer", fontFamily: "inherit",
+              display: "flex", alignItems: "center", gap: 7,
+              flexShrink: 0, letterSpacing: "0.03em",
+              transition: "background 0.15s",
+              whiteSpace: "nowrap",
+            }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#12132a"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#0A0B1A"; }}
+            >
+              <SparkleIcon size={12} color="#fff" />
+              Smart Search
             </button>
-          )}
-
-          {/* Search button */}
-          <button type="submit" style={{
-            background: "linear-gradient(135deg, #FF6B35, #ff3d88)",
-            color: "#fff", border: "none",
-            padding: compact ? "0 18px" : "0 24px",
-            fontSize: compact ? 12 : 13, fontWeight: 700,
-            cursor: "pointer", fontFamily: "inherit",
-            display: "flex", alignItems: "center", gap: 7,
-            flexShrink: 0, letterSpacing: "0.02em",
-            transition: "opacity 0.15s",
-          }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.88"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
-            Search
-          </button>
+          </div>
         </div>
       </form>
 
       {/* ── Hint below ── */}
       {!compact && !showDropdown && (
-        <div style={{ textAlign: "center", marginTop: 10, fontSize: 11, color: "rgba(255,255,255,0.35)", letterSpacing: "0.01em" }}>
+        <div style={{ textAlign: "center", marginTop: 10, fontSize: 11, color: "rgba(255,255,255,0.3)", letterSpacing: "0.01em" }}>
           Try: &ldquo;email automation&rdquo; · &ldquo;AI writing assistant&rdquo; · &ldquo;no-code database&rdquo;
         </div>
       )}
 
-      {/* ── Dropdown ── */}
+      {/* ── Dropdown — offset by 2px to align with outer gradient border ── */}
       {showDropdown && (
         <div style={{
-          position: "absolute", top: "100%", left: 0, right: 0, zIndex: 900,
+          position: "absolute", top: "calc(100% - 2px)", left: 0, right: 0, zIndex: 900,
           background: "#fff",
           borderRadius: "0 0 12px 12px",
-          border: "1.5px solid rgba(255,107,53,0.3)",
-          borderTop: "1px solid #f0f0ee",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+          border: "2px solid transparent",
+          borderTop: "none",
+          backgroundImage: "linear-gradient(#fff,#fff), linear-gradient(270deg,#FF6B35,#FF3B6B,#7B2FFF,#3B7FFF,#00C2FF,#00B87A,#FF6B35)",
+          backgroundOrigin: "border-box",
+          backgroundClip: "padding-box, border-box",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
           overflow: "hidden",
         }}>
 
