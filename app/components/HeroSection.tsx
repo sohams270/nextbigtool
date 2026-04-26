@@ -139,7 +139,7 @@ export default function HeroSection() {
       {/* Content */}
       <div style={{ position: "relative", zIndex: 1 }}>
         <Pill color="orangeSolid" size="xs" style={{ marginBottom: 18 }}>
-          ✦ 1,200+ tools and growing every day
+          ✦ Built for indie founders to go live
         </Pill>
 
         <h1
