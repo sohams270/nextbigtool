@@ -170,8 +170,8 @@ export default function HeroSection() {
         </p>
 
         {/* Smart Search */}
-        <div style={{ maxWidth: 520, margin: "22px auto" }}>
-          <SmartSearch placeholder="Describe what you're looking for…" />
+        <div style={{ maxWidth: 520, margin: "16px auto 8px" }}>
+          <SmartSearch />
         </div>
 
         {/* CTA buttons replacing stats */}

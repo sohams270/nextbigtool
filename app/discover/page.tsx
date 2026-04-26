@@ -149,7 +149,7 @@ export default async function DiscoverPage({
 
         {/* Search bar in header */}
         <div style={{ maxWidth: 540, margin: "0 auto 0", padding: "0 24px 28px" }}>
-          <SmartSearch placeholder={searchQuery || "Search or describe what you need…"} />
+          <SmartSearch compact />
         </div>
       </div>
 
