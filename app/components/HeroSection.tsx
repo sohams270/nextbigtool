@@ -144,7 +144,7 @@ export default function HeroSection() {
 
         <h1
           style={{
-            fontSize: 35,
+            fontSize: 42,
             fontWeight: 800,
             letterSpacing: "-0.02em",
             lineHeight: 1.15,
