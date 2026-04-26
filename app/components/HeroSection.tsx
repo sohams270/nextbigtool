@@ -175,7 +175,7 @@ export default function HeroSection() {
         </div>
 
         {/* CTA buttons replacing stats */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 32 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginTop: 24, marginBottom: 32 }}>
           <div className="launch-btn-wrap" onClick={handleLaunchClick} style={{ cursor: "pointer" }}>
             <div className="launch-btn-inner" style={{ pointerEvents: "none" }}>
               <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
