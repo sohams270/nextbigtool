@@ -79,7 +79,7 @@ export default function Sidebar() {
       </Link>
 
       {/* Nav */}
-      <nav style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+      <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {NAV.map((item) => {
           const active = pathname === item.href;
           const Icon = item.icon;
@@ -126,51 +126,50 @@ export default function Sidebar() {
             </Link>
           );
         })}
-      </nav>
 
-      {/* Bottom extras */}
-      <div style={{ marginTop: 24, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column", gap: 8 }}>
+        {/* Divider */}
+        <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "10px 0 8px" }} />
 
-        {/* Go back to homepage */}
+        {/* Go back to homepage — smaller than nav items */}
         <Link href="/" style={{ textDecoration: "none" }}>
           <div style={{
-            display: "flex", alignItems: "center", gap: 9,
-            padding: "9px 12px", borderRadius: 9,
-            background: "rgba(255,255,255,0.07)",
-            border: "1px solid rgba(255,255,255,0.12)",
+            display: "flex", alignItems: "center", gap: 8,
+            padding: "6px 10px", borderRadius: 7,
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(255,255,255,0.1)",
             cursor: "pointer", transition: "background 0.15s",
           }}
-            onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.12)"}
-            onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.07)"}
+            onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.11)"}
+            onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.06)"}
           >
-            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5M12 5l-7 7 7 7"/>
             </svg>
-            <span style={{ fontSize: 12.5, fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>
+            <span style={{ fontSize: 11.5, fontWeight: 500, color: "rgba(255,255,255,0.65)" }}>
               Go back to homepage
             </span>
           </div>
         </Link>
 
-        {/* Current plan — non-clickable */}
+        {/* Current plan — non-clickable, smaller */}
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "9px 12px", borderRadius: 9,
+          padding: "6px 10px", borderRadius: 7,
           background: planBg,
           border: `1px solid ${planBorder}`,
           cursor: "default",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke={planColor} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+            <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke={planColor} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
             </svg>
-            <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>Current plan</span>
+            <span style={{ fontSize: 11, fontWeight: 500, color: "rgba(255,255,255,0.55)" }}>Current plan</span>
           </div>
-          <span style={{ fontSize: 12, fontWeight: 800, color: planColor, letterSpacing: "0.02em" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: planColor, letterSpacing: "0.02em" }}>
             {planLabel}
           </span>
         </div>
-      </div>
+      </nav>
     </aside>
   );
 }
