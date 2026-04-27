@@ -243,10 +243,15 @@ function RailDropBtn({
 
 /* ─── TopNav ─────────────────────────────────────────────────────────── */
 export default function TopNav({ dark }: { dark?: boolean }) {
+  const router = useRouter();
   const [showAuth, setShowAuth] = useState(false);
   const [authMessage, setAuthMessage] = useState<{ title: string; subtitle: string } | null>(null);
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
   const [userInitial, setUserInitial] = useState<string>("");
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data: { user } }) => {
@@ -258,6 +263,26 @@ export default function TopNav({ dark }: { dark?: boolean }) {
     });
   }, []);
 
+  useEffect(() => {
+    function onDown(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
+
+  async function handleSignOut() {
+    setSigningOut(true);
+    await createClient().auth.signOut();
+    setShowSignOutConfirm(false);
+    setUserId(null);
+    setSigningOut(false);
+    router.push("/");
+    router.refresh();
+  }
+
   function openAuthModal(title: string, subtitle: string) {
     setAuthMessage({ title, subtitle });
     setShowAuth(true);
@@ -265,7 +290,7 @@ export default function TopNav({ dark }: { dark?: boolean }) {
 
   function handleSubmitClick() {
     if (userId) {
-      window.location.href = "/dashboard/submit";
+      window.location.href = "/dashboard/products";
     } else {
       openAuthModal(
         "Launch your product",
@@ -319,29 +344,77 @@ export default function TopNav({ dark }: { dark?: boolean }) {
           {/* ── Actions (right zone, flex:1, right-aligned) ── */}
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, flexShrink: 0 }}>
             {isSignedIn ? (
-              /* Signed-in: show avatar + Dashboard link */
-              <>
-                <Link href="/dashboard" style={{ textDecoration: "none" }}>
-                  <button style={{
-                    padding: "8px 16px", borderRadius: 999,
+              /* Signed-in: avatar dropdown */
+              <div ref={userMenuRef} style={{ position: "relative" }}>
+                <button
+                  onClick={() => setUserMenuOpen(v => !v)}
+                  style={{
+                    padding: "6px 14px 6px 7px", borderRadius: 999,
                     border: `1px solid ${dark ? "rgba(255,255,255,0.2)" : "#e3e3e0"}`,
                     background: dark ? "rgba(255,255,255,0.08)" : "#fff",
                     fontWeight: 500, fontSize: 13,
                     color: dark ? "rgba(255,255,255,0.9)" : "#0f0f10",
                     whiteSpace: "nowrap" as const, cursor: "pointer", fontFamily: "inherit",
                     display: "inline-flex", alignItems: "center", gap: 7,
-                    transition: "background .15s, border-color .15s",
+                    transition: "background .15s",
                   }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-alt)"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--surface)"; }}
-                  >
-                    <div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,#ff6a3d,#ff3d88)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#fff" }}>
-                      {userInitial}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-alt)"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = userMenuOpen ? "var(--surface-alt)" : (dark ? "rgba(255,255,255,0.08)" : "#fff"); }}
+                >
+                  <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#ff6a3d,#ff3d88)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#fff" }}>
+                    {userInitial}
+                  </div>
+                  Dashboard
+                  <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                    style={{ opacity: 0.5, transform: userMenuOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </button>
+
+                {userMenuOpen && (
+                  <div style={{
+                    position: "absolute", top: "calc(100% + 8px)", right: 0,
+                    background: "var(--surface)", border: "1px solid var(--border)",
+                    borderRadius: 12, padding: 6, minWidth: 180,
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 300,
+                  }}>
+                    <Link href="/dashboard" onClick={() => setUserMenuOpen(false)} style={{ textDecoration: "none" }}>
+                      <div style={{
+                        display: "flex", alignItems: "center", gap: 9,
+                        padding: "9px 12px", borderRadius: 8, cursor: "pointer",
+                        fontSize: 13, fontWeight: 600, color: "var(--ink)",
+                      }}
+                        onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = "var(--surface-alt)"}
+                        onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = "transparent"}
+                      >
+                        <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                        Dashboard
+                      </div>
+                    </Link>
+
+                    <div style={{ height: 1, background: "var(--border-faint)", margin: "4px 6px" }} />
+
+                    <div
+                      onClick={() => { setUserMenuOpen(false); setShowSignOutConfirm(true); }}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 9,
+                        padding: "9px 12px", borderRadius: 8, cursor: "pointer",
+                        fontSize: 13, fontWeight: 600, color: "#dc2626",
+                      }}
+                      onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = "rgba(220,38,38,0.06)"}
+                      onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = "transparent"}
+                    >
+                      <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+                      </svg>
+                      Sign out
                     </div>
-                    Dashboard
-                  </button>
-                </Link>
-              </>
+                  </div>
+                )}
+              </div>
             ) : (
               /* Signed-out: Sign in button */
               <button
@@ -397,6 +470,62 @@ export default function TopNav({ dark }: { dark?: boolean }) {
           subtitle={authMessage?.subtitle}
           defaultMode="signup"
         />
+      )}
+
+      {/* ── Sign-out confirmation ── */}
+      {showSignOutConfirm && (
+        <>
+          <div
+            onClick={() => setShowSignOutConfirm(false)}
+            style={{ position: "fixed", inset: 0, background: "rgba(10,11,26,0.5)", zIndex: 1000 }}
+          />
+          <div style={{
+            position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)",
+            zIndex: 1001, width: "min(90vw, 380px)",
+            background: "var(--surface)", borderRadius: 16,
+            padding: "32px 28px", textAlign: "center",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
+          }}>
+            <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(220,38,38,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+              <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+              </svg>
+            </div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: "var(--ink)", marginBottom: 8 }}>
+              Are you sure about signing out?
+            </div>
+            <div style={{ fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: 24 }}>
+              You can always sign back in to access your dashboard and products.
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                onClick={() => setShowSignOutConfirm(false)}
+                style={{
+                  flex: 1, padding: "10px 0", borderRadius: 9,
+                  border: "1px solid var(--border)", background: "var(--surface)",
+                  fontSize: 13, fontWeight: 600, color: "var(--ink)",
+                  cursor: "pointer", fontFamily: "inherit",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSignOut}
+                disabled={signingOut}
+                style={{
+                  flex: 1, padding: "10px 0", borderRadius: 9,
+                  border: "none", background: "#dc2626",
+                  fontSize: 13, fontWeight: 700, color: "#fff",
+                  cursor: signingOut ? "not-allowed" : "pointer",
+                  fontFamily: "inherit", opacity: signingOut ? 0.7 : 1,
+                  transition: "opacity 0.15s",
+                }}
+              >
+                {signingOut ? "Signing out…" : "Yes, sign out"}
+              </button>
+            </div>
+          </div>
+        </>
       )}
     </>
   );
