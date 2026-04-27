@@ -219,6 +219,7 @@ export default function AddYourToolPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
 
   const [form, setForm] = useState({
     website_url: "",
@@ -668,6 +669,34 @@ export default function AddYourToolPage() {
           </div>
         )}
 
+        {/* Confirmation checkbox */}
+        <label style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer", marginBottom: 20, padding: "14px 16px", borderRadius: 10, border: `1.5px solid ${confirmed ? "#ff6a3d" : "var(--border)"}`, background: confirmed ? "var(--orange-soft)" : "var(--surface)", transition: "all 0.15s" }}>
+          <div style={{ position: "relative", flexShrink: 0, marginTop: 1 }}>
+            <input
+              type="checkbox"
+              checked={confirmed}
+              onChange={e => setConfirmed(e.target.checked)}
+              style={{ position: "absolute", opacity: 0, width: 0, height: 0 }}
+            />
+            <div style={{
+              width: 18, height: 18, borderRadius: 5,
+              border: `2px solid ${confirmed ? "#ff6a3d" : "var(--border)"}`,
+              background: confirmed ? "#ff6a3d" : "var(--surface)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              transition: "all 0.15s",
+            }}>
+              {confirmed && (
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12l5 5 9-11"/>
+                </svg>
+              )}
+            </div>
+          </div>
+          <span style={{ fontSize: 13, color: "var(--ink)", lineHeight: 1.5 }}>
+            I confirm I am the founder or authorised representative of this product and that the information provided is accurate.
+          </span>
+        </label>
+
         {/* Submit */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 48 }}>
           <Link href="/dashboard" style={{ fontSize: 13, color: "var(--ink-muted)", textDecoration: "none", fontWeight: 500 }}>
@@ -675,13 +704,14 @@ export default function AddYourToolPage() {
           </Link>
           <button
             onClick={handleSubmit}
-            disabled={submitting}
+            disabled={submitting || !confirmed}
             style={{
-              background: submitting ? "var(--border)" : "linear-gradient(90deg,#ff6a3d,#ff3d88)",
+              background: (!confirmed || submitting) ? "var(--border)" : "linear-gradient(90deg,#ff6a3d,#ff3d88)",
               border: "none", borderRadius: 10, padding: "0 28px", height: 44,
-              fontSize: 14, fontWeight: 700, color: "#fff", cursor: submitting ? "not-allowed" : "pointer",
+              fontSize: 14, fontWeight: 700, color: (!confirmed || submitting) ? "var(--ink-muted)" : "#fff",
+              cursor: (!confirmed || submitting) ? "not-allowed" : "pointer",
               display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "inherit",
-              transition: "opacity 0.15s",
+              transition: "all 0.2s",
             }}
           >
             {submitting ? (
