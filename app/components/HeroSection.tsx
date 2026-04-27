@@ -55,9 +55,8 @@ function useTypewriter(phrases: string[]) {
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [glowPos, setGlowPos]   = useState({ x: 420, y: -80 });
+  const glowRef      = useRef<HTMLDivElement>(null);
   const [gridOff, setGridOff]   = useState({ x: 0, y: 0 });
-  const [entered, setEntered]   = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [userId, setUserId]     = useState<string | null | undefined>(undefined);
 
@@ -80,12 +79,15 @@ export default function HeroSection() {
     if (!rect) return;
     const rx = e.clientX - rect.left;
     const ry = e.clientY - rect.top;
-    setGlowPos({ x: rx, y: ry });
+    // Direct DOM write — no React re-render, zero lag
+    if (glowRef.current) {
+      glowRef.current.style.transform = `translate(${rx - 280}px, ${ry - 280}px)`;
+      glowRef.current.style.opacity = "1";
+    }
     setGridOff({
       x: ((rx / rect.width)  - 0.5) * 28,
       y: ((ry / rect.height) - 0.5) * 28,
     });
-    if (!entered) setEntered(true);
   }
 
   return (
@@ -120,6 +122,7 @@ export default function HeroSection() {
 
       {/* Cursor-following orange glow */}
       <div
+        ref={glowRef}
         style={{
           position: "absolute",
           top: 0,
@@ -129,8 +132,8 @@ export default function HeroSection() {
           borderRadius: "50%",
           background:
             "radial-gradient(circle, rgba(255,107,53,0.42) 0%, rgba(255,107,53,0.12) 40%, transparent 70%)",
-          transform: `translate(${glowPos.x - 280}px, ${glowPos.y - 280}px)`,
-          transition: entered ? "transform 0.07s ease-out" : "none",
+          transform: "translate(140px, -280px)",
+          opacity: 0,
           pointerEvents: "none",
           willChange: "transform",
         }}
