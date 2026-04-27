@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import ThemeProvider from "./components/ThemeProvider";
 import ThemeToggle from "./components/ThemeToggle";
+import OnboardingGate from "./components/OnboardingGate";
 
 export const metadata: Metadata = {
   title: "Next Big Tool — Where Builders Launch. Where Buyers Discover.",
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           {children}
           <ThemeToggle />
+          <OnboardingGate />
         </ThemeProvider>
       </body>
     </html>
