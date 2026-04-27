@@ -132,8 +132,7 @@ export default function ProfilePage() {
       avatarUrl = null;
     }
 
-    await supabase.from("profiles").upsert({
-      id: userId,
+    const { error: saveErr } = await supabase.from("profiles").update({
       full_name:    profile.full_name?.trim() ?? "",
       username:     profile.username?.trim().toLowerCase() ?? "",
       company:      profile.company?.trim() ?? "",
@@ -144,7 +143,14 @@ export default function ProfilePage() {
       linkedin_url: profile.linkedin_url?.trim() || null,
       github_url:   profile.github_url?.trim() || null,
       avatar_url:   avatarUrl,
-    });
+    }).eq("id", userId);
+
+    if (saveErr) {
+      console.error("Profile save error:", saveErr);
+      setErrors({ save: saveErr.message });
+      setSaving(false);
+      return;
+    }
 
     setProfile(p => ({ ...p, avatar_url: avatarUrl ?? undefined }));
     setAvatarFile(null);
@@ -202,6 +208,12 @@ export default function ProfilePage() {
           </button>
         </div>
       </div>
+
+      {errors.save && (
+        <div style={{ marginBottom: 16, padding: "10px 14px", borderRadius: 9, background: "rgba(220,38,38,.08)", border: "1px solid rgba(220,38,38,.2)", fontSize: 13, color: "#dc2626", fontWeight: 600 }}>
+          Save failed: {errors.save}
+        </div>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20 }}>
         {/* ── Form ── */}
