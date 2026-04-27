@@ -179,33 +179,44 @@ export default async function HomePage({
     }
   }
 
-  // ── Recent posts ──────────────────────────────────────────────────────
-  const { data: recentPosts, error: postsError } = await supabase
+  // ── Recent posts — two separate queries to avoid any join-related RLS failures ──
+  // Step 1: fetch raw posts (no joins)
+  const { data: rawPosts } = await supabase
     .from("posts")
-    .select(`
-      id, type, content, metric_label, metric_value, likes_count, comments_count, created_at,
-      profiles ( full_name, username, avatar_url, company, role ),
-      tools ( name )
-    `)
+    .select("id, type, content, metric_label, metric_value, likes_count, comments_count, created_at, author_id, tool_id")
     .order("created_at", { ascending: false })
     .limit(3);
 
-  // Fallback: if the join failed (e.g. company/role columns not yet migrated), fetch without them
-  let resolvedPosts = recentPosts;
-  if (postsError || !recentPosts) {
-    const { data: fallbackPosts } = await supabase
-      .from("posts")
-      .select(`
-        id, type, content, metric_label, metric_value, likes_count, comments_count, created_at,
-        profiles ( full_name, username, avatar_url ),
-        tools ( name )
-      `)
-      .order("created_at", { ascending: false })
-      .limit(3);
-    resolvedPosts = fallbackPosts;
-  }
+  // Step 2: enrich with profile + tool data
+  let posts: PostRow[] = [];
+  if (rawPosts && rawPosts.length > 0) {
+    // Fetch profiles for all authors
+    const authorIds = [...new Set(rawPosts.map((p: Record<string, unknown>) => p.author_id as string))];
+    const toolIds   = [...new Set(rawPosts.map((p: Record<string, unknown>) => p.tool_id as string).filter(Boolean))];
 
-  const posts = (resolvedPosts ?? []) as unknown as PostRow[];
+    const [{ data: profileRows }, { data: toolRows }] = await Promise.all([
+      supabase.from("profiles").select("id, full_name, username, avatar_url, company, role").in("id", authorIds),
+      toolIds.length > 0
+        ? supabase.from("tools").select("id, name").in("id", toolIds)
+        : Promise.resolve({ data: [] }),
+    ]);
+
+    const profileMap = Object.fromEntries((profileRows ?? []).map((p: Record<string, unknown>) => [p.id, p]));
+    const toolMap    = Object.fromEntries((toolRows ?? []).map((t: Record<string, unknown>) => [t.id, t]));
+
+    posts = rawPosts.map((p: Record<string, unknown>) => ({
+      id:            p.id as string,
+      type:          p.type as string,
+      content:       p.content as string,
+      metric_label:  p.metric_label as string | null,
+      metric_value:  p.metric_value as string | null,
+      likes_count:   p.likes_count as number,
+      comments_count: p.comments_count as number,
+      created_at:    p.created_at as string,
+      profiles:      profileMap[p.author_id as string] as PostRow["profiles"] ?? null,
+      tools:         p.tool_id ? toolMap[p.tool_id as string] as PostRow["tools"] ?? null : null,
+    }));
+  }
 
   let userLikedPostIds: string[] = [];
   if (user && posts.length > 0) {
