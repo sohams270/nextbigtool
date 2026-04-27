@@ -1,7 +1,11 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 import NBTWordmark from "./NBTWordmark";
+
+const ADMIN_EMAIL = "sohams270@gmail.com";
 
 const NAV = [
   { id: "overview",        label: "Overview",          href: "/dashboard",                   icon: GridIcon },
@@ -17,6 +21,22 @@ const NAV = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [userPlan, setUserPlan] = useState<string>("free");
+
+  useEffect(() => {
+    const client = createClient();
+    client.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      if (user.email === ADMIN_EMAIL) { setUserPlan("core"); return; }
+      client.from("profiles").select("plan").eq("id", user.id).single()
+        .then(({ data }) => { if (data?.plan) setUserPlan(data.plan); });
+    });
+  }, []);
+
+  const planLabel = userPlan.charAt(0).toUpperCase() + userPlan.slice(1);
+  const planColor = userPlan === "core" ? "#ff6a3d" : userPlan === "basic" ? "#3b7fff" : "rgba(255,255,255,0.45)";
+  const planBg    = userPlan === "core" ? "rgba(255,106,61,0.15)" : userPlan === "basic" ? "rgba(59,127,255,0.15)" : "rgba(255,255,255,0.06)";
+  const planBorder = userPlan === "core" ? "rgba(255,106,61,0.35)" : userPlan === "basic" ? "rgba(59,127,255,0.35)" : "rgba(255,255,255,0.1)";
 
   return (
     <aside style={{
@@ -108,31 +128,48 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Plan card */}
-      <div style={{
-        marginTop: 16,
-        background: "rgba(255,255,255,0.06)",
-        border: "1px solid rgba(255,255,255,0.1)",
-        borderRadius: 12,
-        padding: "12px 14px",
-      }}>
-        <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>
-          Current plan
-        </div>
-        <div style={{ fontSize: 13, fontWeight: 800, color: "#fff", marginBottom: 2 }}>Free</div>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginBottom: 10 }}>
-          1 post / mo · 3 products
-        </div>
-        <Link href="/dashboard/plan" style={{ textDecoration: "none" }}>
+      {/* Bottom extras */}
+      <div style={{ marginTop: 24, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column", gap: 8 }}>
+
+        {/* Go back to homepage */}
+        <Link href="/" style={{ textDecoration: "none" }}>
           <div style={{
-            background: "linear-gradient(90deg,#ff6a3d,#ff3d88)",
-            borderRadius: 7, padding: "7px 12px",
-            textAlign: "center", fontSize: 11, fontWeight: 700, color: "#fff",
-            cursor: "pointer",
-          }}>
-            Upgrade plan →
+            display: "flex", alignItems: "center", gap: 9,
+            padding: "9px 12px", borderRadius: 9,
+            background: "rgba(255,255,255,0.07)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            cursor: "pointer", transition: "background 0.15s",
+          }}
+            onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.12)"}
+            onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.07)"}
+          >
+            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>
+              Go back to homepage
+            </span>
           </div>
         </Link>
+
+        {/* Current plan — non-clickable */}
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "9px 12px", borderRadius: 9,
+          background: planBg,
+          border: `1px solid ${planBorder}`,
+          cursor: "default",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke={planColor} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>Current plan</span>
+          </div>
+          <span style={{ fontSize: 12, fontWeight: 800, color: planColor, letterSpacing: "0.02em" }}>
+            {planLabel}
+          </span>
+        </div>
       </div>
     </aside>
   );
