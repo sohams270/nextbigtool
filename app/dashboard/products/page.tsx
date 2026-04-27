@@ -221,6 +221,7 @@ export default function AddYourToolPage() {
   const [done, setDone] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [yearly, setYearly] = useState(false);
 
   const [form, setForm] = useState({
     website_url: "",
@@ -761,100 +762,114 @@ export default function AddYourToolPage() {
           <div onClick={() => setShowUpgrade(false)} style={{ position: "fixed", inset: 0, background: "rgba(10,11,26,0.6)", zIndex: 1000 }} />
           <div style={{
             position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)",
-            zIndex: 1001, width: "min(92vw, 680px)",
+            zIndex: 1001, width: "min(94vw, 700px)", maxHeight: "90vh", overflowY: "auto",
             background: "var(--surface)", borderRadius: 18,
             boxShadow: "0 24px 80px rgba(0,0,0,0.22)",
-            overflow: "hidden",
           }}>
-            {/* Modal header */}
+            {/* Header */}
             <div style={{ padding: "24px 28px 0", position: "relative" }}>
               <button onClick={() => setShowUpgrade(false)} style={{ position: "absolute", top: 18, right: 20, background: "none", border: "none", fontSize: 18, color: "var(--ink-muted)", cursor: "pointer", lineHeight: 1, padding: 4 }}>✕</button>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "#ff6a3d", marginBottom: 4 }}>
-                ⚡ Priority Review
-              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "#ff6a3d", marginBottom: 4 }}>⚡ Priority Review</div>
               <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ink)", marginBottom: 6 }}>Upgrade for faster visibility</div>
-              <div style={{ fontSize: 13, color: "var(--ink-muted)", marginBottom: 24 }}>
-                Free submissions are reviewed within 48 hours. Upgrade to skip the queue and get featured placement.
+              <div style={{ fontSize: 13, color: "var(--ink-muted)", marginBottom: 20 }}>Free submissions are reviewed within 48h. Upgrade to skip the queue and get featured placement.</div>
+
+              {/* Monthly / Yearly toggle */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 24 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: yearly ? "var(--ink-muted)" : "var(--ink)" }}>Monthly</span>
+                <button onClick={() => setYearly(v => !v)} style={{
+                  width: 44, height: 24, borderRadius: 999, border: "none", cursor: "pointer", padding: 3,
+                  background: "#FF6B35", position: "relative", transition: "background 0.2s", flexShrink: 0,
+                }}>
+                  <div style={{
+                    width: 18, height: 18, borderRadius: "50%", background: "#fff",
+                    position: "absolute", top: 3, left: yearly ? "calc(100% - 21px)" : 3,
+                    transition: "left 0.2s",
+                  }} />
+                </button>
+                <span style={{ fontSize: 13, fontWeight: 600, color: yearly ? "var(--ink)" : "var(--ink-muted)" }}>Yearly</span>
+                <span style={{ background: "#d1fae5", color: "#065f46", fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 999 }}>Save 38%</span>
               </div>
             </div>
 
-            {/* Plans */}
+            {/* Plan cards */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, padding: "0 28px 28px" }}>
-              {[
-                {
-                  name: "Basic",
-                  price: "$49",
-                  period: "one-time",
-                  badge: null,
-                  color: "#ff6a3d",
-                  perks: [
-                    "✓ Priority review (within 6h)",
-                    "✓ Featured Today placement",
-                    "✓ Rainbow border highlight",
-                    "✓ Newsletter mention to 14k+ subscribers",
-                    "✓ Homepage sidebar spotlight (7 days)",
-                  ],
-                },
-                {
-                  name: "Core",
-                  price: "$149",
-                  period: "one-time",
-                  badge: "BEST VALUE",
-                  color: "#FFD700",
-                  perks: [
-                    "✓ Everything in Basic",
-                    "✓ Permanent Hall of Fame listing",
-                    "✓ See who upvoted your product",
-                    "✓ Upvoter emails & company data",
-                    "✓ Priority support — talk to the founder",
-                  ],
-                },
-              ].map(plan => (
-                <div key={plan.name} style={{
-                  border: `2px solid ${plan.name === "Core" ? "rgba(255,215,0,0.5)" : "var(--border)"}`,
-                  borderRadius: 14, padding: "20px 18px",
-                  background: plan.name === "Core"
-                    ? "linear-gradient(135deg,rgba(255,215,0,0.06),rgba(255,165,0,0.04))"
-                    : "var(--surface-alt)",
-                  position: "relative",
-                }}>
-                  {plan.badge && (
-                    <div style={{
-                      position: "absolute", top: -11, left: "50%", transform: "translateX(-50%)",
-                      background: "linear-gradient(90deg,#FFD700,#FFA500)",
-                      color: "#0A0B1A", fontSize: 9, fontWeight: 800,
-                      padding: "2px 10px", borderRadius: 20, letterSpacing: "0.06em", whiteSpace: "nowrap" as const,
-                    }}>{plan.badge}</div>
-                  )}
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)", marginBottom: 2 }}>{plan.name}</div>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 14 }}>
-                    <span style={{ fontSize: 26, fontWeight: 800, color: plan.color }}>{plan.price}</span>
-                    <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>{plan.period}</span>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 18 }}>
-                    {plan.perks.map(p => (
-                      <div key={p} style={{ fontSize: 12, color: "var(--ink)", lineHeight: 1.4 }}>{p}</div>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => setShowUpgrade(false)}
-                    style={{
-                      width: "100%", padding: "10px 0", borderRadius: 9, border: "none",
-                      background: plan.name === "Core"
-                        ? "linear-gradient(90deg,#FFD700,#FFA500)"
-                        : "linear-gradient(90deg,#ff6a3d,#ff3d88)",
-                      color: plan.name === "Core" ? "#0A0B1A" : "#fff",
-                      fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-                    }}
-                  >
-                    Upgrade to {plan.name} →
-                  </button>
+
+              {/* Basic */}
+              <div style={{ border: "1px solid var(--border)", borderRadius: 14, padding: "20px 18px", background: "var(--surface-alt)", display: "flex", flexDirection: "column" }}>
+                <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "var(--ink-muted)", marginBottom: 8 }}>BASIC</div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 2 }}>
+                  <span style={{ fontSize: 32, fontWeight: 900, color: "var(--ink)", letterSpacing: "-0.03em" }}>$19</span>
                 </div>
-              ))}
+                <div style={{ fontSize: 12, color: "var(--ink-muted)", marginBottom: 8 }}>One-time per product. Pay once, keep forever.</div>
+                <div style={{ fontSize: 12, color: "var(--ink)", lineHeight: 1.5, marginBottom: 16 }}>For founders who want more visibility and a boost on launch day.</div>
+                <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "var(--ink-muted)", marginBottom: 10 }}>EVERYTHING IN FREE, PLUS</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1, marginBottom: 18 }}>
+                  {["Featured for 48 hours on launch", "Featured in weekly newsletter (once)", "Re-launch option", "5 posts on Build in Public wall", "CSV export of your data"].map(f => (
+                    <div key={f} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                      <div style={{ width: 16, height: 16, borderRadius: "50%", background: "rgba(0,184,122,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#00B87A" strokeWidth="3"><path d="M5 12l5 5 9-11"/></svg>
+                      </div>
+                      <span style={{ fontSize: 12, color: "var(--ink)", lineHeight: 1.4 }}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+                <button style={{ width: "100%", padding: "10px 0", borderRadius: 9, border: "1.5px solid #FF6B35", background: "transparent", fontSize: 13, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
+                  Upgrade to Basic →
+                </button>
+              </div>
+
+              {/* Core */}
+              <div style={{ background: "#FF6B35", borderRadius: 14, padding: "20px 18px", display: "flex", flexDirection: "column", position: "relative" }}>
+                <div style={{ position: "absolute", top: -10, right: 14, background: "#fff", color: "#FF6B35", fontSize: 9, fontWeight: 800, padding: "3px 10px", borderRadius: 999 }}>★ BEST VALUE</div>
+                <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "rgba(255,255,255,0.8)", marginBottom: 8 }}>CORE</div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 2 }}>
+                  <span style={{ fontSize: 32, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>{yearly ? "$49" : "$79"}</span>
+                  <span style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>/month</span>
+                </div>
+                <div style={{ fontSize: 12, color: "#d1fae5", fontWeight: 600, marginBottom: 8 }}>
+                  {yearly ? "Billed as $588/year" : "Or $49/month billed yearly — save $360/year."}
+                </div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.9)", lineHeight: 1.5, marginBottom: 14 }}>For serious builders turning discovery into real pipeline and traction.</div>
+
+                {/* Core exclusives panel */}
+                <div style={{ background: "#0f0f10", borderRadius: 10, padding: "12px 14px", marginBottom: 14 }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "rgba(255,255,255,0.5)", marginBottom: 10 }}>★ CORE EXCLUSIVES</div>
+                  {[
+                    { title: "Founder CRM", desc: "See exactly who upvoted or followed your product. Turn interest into pipeline." },
+                    { title: "Hall of Fame Placement", desc: "Permanent evergreen visibility that compounds over time." },
+                  ].map(ex => (
+                    <div key={ex.title} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
+                      <div style={{ width: 26, height: 26, borderRadius: 7, background: "#FF6B35", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M12 3s5 4 5 9a5 5 0 01-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3 1-5 1-8z"/></svg>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#fff", marginBottom: 1 }}>{ex.title}</div>
+                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", lineHeight: 1.4 }}>{ex.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "rgba(255,255,255,0.5)", marginBottom: 10 }}>EVERYTHING IN BASIC, PLUS</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1, marginBottom: 18 }}>
+                  {["One follow-up message per interested user", "Weekly newsletter placement", "Unlimited product listings", "Unlimited Build in Public posts", "1 featured blog post written about you"].map(f => (
+                    <div key={f} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                      <div style={{ width: 16, height: 16, borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3"><path d="M5 12l5 5 9-11"/></svg>
+                      </div>
+                      <span style={{ fontSize: 12, color: "rgba(255,255,255,0.9)", lineHeight: 1.4 }}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+                <button style={{ width: "100%", padding: "10px 0", borderRadius: 9, border: "none", background: "#fff", fontSize: 13, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
+                  Upgrade to Core →
+                </button>
+              </div>
             </div>
 
             <div style={{ textAlign: "center", padding: "0 28px 20px", fontSize: 11, color: "var(--ink-muted)" }}>
-              Payments processed securely. Questions? <a href="mailto:hello@nextbigtool.com" style={{ color: "#ff6a3d", textDecoration: "none" }}>Contact us</a>
+              All plans include a 7-day money-back guarantee. Questions?{" "}
+              <a href="mailto:hello@nextbigtool.com" style={{ color: "#ff6a3d", textDecoration: "none" }}>Contact us</a>
             </div>
           </div>
         </>
