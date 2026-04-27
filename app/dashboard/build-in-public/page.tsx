@@ -311,6 +311,7 @@ export default function BuildInPublicPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [draftSaved, setDraftSaved]   = useState(false);
   const [hasDraft, setHasDraft]       = useState(false);
+  const [postError, setPostError]     = useState<string | null>(null);
 
   const [activeTab, setActiveTab]   = useState<"mine" | "wall">("mine");
   const [perfRange, setPerfRange]   = useState<"7d" | "30d" | "1y">("30d");
@@ -461,63 +462,90 @@ export default function BuildInPublicPage() {
   async function handlePost() {
     if (!text.trim() || !userId || !canPost) return;
     setSubmitting(true);
+    setPostError(null);
 
     const postType = selectedTags.length > 0 ? (TAG_TO_TYPE[selectedTags[0]] ?? "update") : "update";
 
-    const { data, error } = await supabase
+    // Try insert with tags first; if it fails due to missing column, retry without
+    let data: Record<string, unknown> | null = null;
+    let error: { message?: string; code?: string } | null = null;
+
+    const insertPayload = {
+      author_id: userId,
+      tool_id:   selectedTool || null,
+      content:   text.trim(),
+      type:      postType,
+      tags:      selectedTags,
+    };
+
+    ({ data, error } = await supabase
       .from("posts")
-      .insert({
-        author_id: userId,
-        tool_id:   selectedTool || null,
-        content:   text.trim(),
-        tags:      selectedTags,
-        type:      postType,
-      })
+      .insert(insertPayload)
       .select()
-      .single();
+      .single() as unknown as { data: Record<string, unknown> | null; error: { message?: string; code?: string } | null });
+
+    // Graceful fallback: if tags column doesn't exist yet, retry without it
+    if (error && (error.message?.includes("tags") || error.code === "42703")) {
+      const { tags: _tags, ...payloadWithoutTags } = insertPayload;
+      void _tags;
+      ({ data, error } = await supabase
+        .from("posts")
+        .insert(payloadWithoutTags)
+        .select()
+        .single() as unknown as { data: Record<string, unknown> | null; error: { message?: string; code?: string } | null });
+    }
 
     setSubmitting(false);
     setShowConfirm(false);
 
-    if (!error && data) {
-      // Clear draft
-      localStorage.removeItem(draftKey(userId));
-      setHasDraft(false);
-
-      const newPost = data as unknown as MyPost;
-
-      // Add to my posts feed
-      setMyPosts(prev => [newPost, ...prev]);
-
-      // Add to wall posts feed (construct PostRow from profile)
-      const wallPost: PostRow = {
-        id:            newPost.id,
-        type:          postType,
-        content:       newPost.content,
-        metric_label:  null,
-        metric_value:  null,
-        likes_count:   0,
-        comments_count: 0,
-        created_at:    newPost.created_at,
-        profiles: {
-          full_name:  profile?.full_name  ?? null,
-          username:   null,
-          avatar_url: profile?.avatar_url ?? null,
-          company:    profile?.company    ?? null,
-          role:       profile?.role       ?? null,
-        },
-        tools: selectedTool
-          ? { name: tools.find(t => t.id === selectedTool)?.name ?? "" }
-          : null,
-      };
-      setWallPosts(prev => [wallPost, ...prev]);
-
-      // Reset composer
-      setText("");
-      setSelectedTags([]);
-      // Switch to "My posts" to show the new post
-      setActiveTab("mine");
+    if (error || !data) {
+      const msg = error?.message ?? "Unknown error";
+      // Surface a friendly message
+      if (msg.includes("row-level security") || msg.includes("violates row-level security") || msg.includes("new row violates")) {
+        setPostError("Permission denied — make sure you're signed in. If this persists, the admin needs to run the supabase/posts_v2.sql migration.");
+      } else {
+        setPostError(`Failed to post: ${msg}`);
+      }
+      return;
     }
+
+    // Clear draft
+    localStorage.removeItem(draftKey(userId));
+    setHasDraft(false);
+
+    const newPost = data as unknown as MyPost;
+
+    // Add to my posts feed instantly
+    setMyPosts(prev => [newPost, ...prev]);
+
+    // Add to wall posts feed (construct PostRow from profile)
+    const wallPost: PostRow = {
+      id:            String(newPost.id),
+      type:          postType,
+      content:       String(newPost.content),
+      metric_label:  null,
+      metric_value:  null,
+      likes_count:   0,
+      comments_count: 0,
+      created_at:    String(newPost.created_at),
+      profiles: {
+        full_name:  profile?.full_name  ?? null,
+        username:   null,
+        avatar_url: profile?.avatar_url ?? null,
+        company:    profile?.company    ?? null,
+        role:       profile?.role       ?? null,
+      },
+      tools: selectedTool
+        ? { name: tools.find(t => t.id === selectedTool)?.name ?? "" }
+        : null,
+    };
+    setWallPosts(prev => [wallPost, ...prev]);
+
+    // Reset composer
+    setText("");
+    setSelectedTags([]);
+    // Switch to "My posts" to show the new post
+    setActiveTab("mine");
   }
 
   /* ── Plan badge ─────────────────────────────────────────────────── */
@@ -576,6 +604,25 @@ export default function BuildInPublicPage() {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20 }}>
         {/* ── Left column ─────────────────────────────────────────── */}
         <div>
+          {/* Post error banner */}
+          {postError && (
+            <div style={{
+              display: "flex", alignItems: "flex-start", justifyContent: "space-between",
+              padding: "10px 14px", borderRadius: 10, marginBottom: 12,
+              background: "rgba(220,38,38,0.07)", border: "1px solid rgba(220,38,38,0.25)",
+              fontSize: 12.5, gap: 8,
+            }}>
+              <span style={{ color: "#dc2626", display: "flex", alignItems: "flex-start", gap: 7, flex: 1 }}>
+                <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                {postError}
+              </span>
+              <button
+                onClick={() => setPostError(null)}
+                style={{ background: "none", border: "none", fontSize: 14, color: "#dc2626", cursor: "pointer", padding: 0, flexShrink: 0 }}
+              >✕</button>
+            </div>
+          )}
+
           {/* Draft restored banner */}
           {hasDraft && !draftSaved && (
             <div style={{
