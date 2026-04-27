@@ -11,6 +11,7 @@ import Btn from "./components/Btn";
 import Logo from "./components/Logo";
 import Footer from "./components/Footer";
 import FilterBar from "./components/FilterBar";
+import SubmissionNudge, { type NudgeSubmission } from "./components/SubmissionNudge";
 
 const CATEGORIES = [
   { name: "AI Tools",     count: 142, icon: <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg> },
@@ -141,6 +142,41 @@ export default async function HomePage({
     userUpvotedIds = (votes ?? []).map((v: { tool_id: string }) => v.tool_id);
   }
 
+  // ── User's own submissions (for nudge banner) ─────────────────────────
+  let userSubmissions: NudgeSubmission[] = [];
+  if (user) {
+    const { data: myTools } = await supabase
+      .from("tools")
+      .select("id, name, slug, status, upvote_count, logo_url")
+      .eq("submitter_id", user.id)
+      .in("status", ["approved", "pending"])
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    if (myTools && myTools.length > 0) {
+      // Fetch today's upvote counts for the user's tools
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const myToolIds = myTools.map((t: { id: string }) => t.id);
+
+      const { data: todayVotes } = await supabase
+        .from("upvotes")
+        .select("tool_id")
+        .in("tool_id", myToolIds)
+        .gte("created_at", todayStart.toISOString());
+
+      const todayByTool = (todayVotes ?? []).reduce<Record<string, number>>((acc, v: { tool_id: string }) => {
+        acc[v.tool_id] = (acc[v.tool_id] ?? 0) + 1;
+        return acc;
+      }, {});
+
+      userSubmissions = myTools.map((t: { id: string; name: string; slug: string; status: string; upvote_count: number; logo_url: string | null }) => ({
+        ...t,
+        todayUpvotes: todayByTool[t.id] ?? 0,
+      }));
+    }
+  }
+
   // ── Recent posts ──────────────────────────────────────────────────────
   const { data: recentPosts } = await supabase
     .from("posts")
@@ -238,6 +274,9 @@ export default async function HomePage({
                 )}
               </div>
             )}
+
+            {/* Founder nudge — only shown to signed-in users with submissions */}
+            <SubmissionNudge submissions={userSubmissions} />
 
             <ProductShowcase
               tools={sortedTools}
