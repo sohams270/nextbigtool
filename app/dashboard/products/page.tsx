@@ -220,6 +220,7 @@ export default function AddYourToolPage() {
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   const [form, setForm] = useState({
     website_url: "",
@@ -275,8 +276,16 @@ export default function AddYourToolPage() {
 
   async function handleSubmit() {
     if (!userId) return;
-    if (!form.name || !form.tagline || !form.website_url || !form.category || !form.about) {
-      setError("Please fill in all required fields.");
+    const missing: string[] = [];
+    if (!form.website_url) missing.push("Website URL");
+    if (!form.name)        missing.push("Product Name");
+    if (!form.tagline)     missing.push("One-line Description");
+    if (!logoFile)         missing.push("Brand Logo");
+    if (!form.category)    missing.push("Category");
+    if (!form.about)       missing.push("About the Tool");
+    if (screenshots.length === 0) missing.push("at least 1 Product Screenshot");
+    if (missing.length > 0) {
+      setError(`Please complete the following required fields: ${missing.join(", ")}.`);
       return;
     }
     setSubmitting(true);
@@ -443,7 +452,7 @@ export default function AddYourToolPage() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 24, marginBottom: 18 }}>
-            <Field label="Brand Logo" hint="PNG or JPG, min 200×200px">
+            <Field label="Brand Logo" required hint="PNG or JPG, min 200×200px">
               <div
                 onClick={() => {
                   const input = document.createElement("input");
@@ -512,7 +521,7 @@ export default function AddYourToolPage() {
           </div>
 
           {/* Screenshots */}
-          <Field label="Product Screenshots" hint={`Upload up to 5 screenshots (PNG or JPG) — ${screenshots.length}/5`}>
+          <Field label="Product Screenshots" required hint={`Upload up to 5 screenshots (PNG or JPG) — ${screenshots.length}/5`}>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10 }}>
               {screenshots.map((s, i) => (
                 <div key={i} style={{ position: "relative", aspectRatio: "16/10", borderRadius: 8, overflow: "hidden", border: "1px solid var(--border)" }}>
@@ -697,32 +706,159 @@ export default function AddYourToolPage() {
           </span>
         </label>
 
-        {/* Submit */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 48 }}>
+        {/* Submit row */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 48, gap: 12, flexWrap: "wrap" as const }}>
           <Link href="/dashboard" style={{ fontSize: 13, color: "var(--ink-muted)", textDecoration: "none", fontWeight: 500 }}>
             ← Back to dashboard
           </Link>
-          <button
-            onClick={handleSubmit}
-            disabled={submitting || !confirmed}
-            style={{
-              background: (!confirmed || submitting) ? "var(--border)" : "linear-gradient(90deg,#ff6a3d,#ff3d88)",
-              border: "none", borderRadius: 10, padding: "0 28px", height: 44,
-              fontSize: 14, fontWeight: 700, color: (!confirmed || submitting) ? "var(--ink-muted)" : "#fff",
-              cursor: (!confirmed || submitting) ? "not-allowed" : "pointer",
-              display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "inherit",
-              transition: "all 0.2s",
-            }}
-          >
-            {submitting ? (
-              <>
-                <span style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
-                Submitting…
-              </>
-            ) : "🚀 Submit for Review"}
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {/* Priority review button */}
+            <button
+              onClick={() => setShowUpgrade(true)}
+              style={{
+                padding: "0 16px", height: 44, borderRadius: 10,
+                border: "1.5px solid rgba(255,200,0,0.45)",
+                background: "rgba(255,200,0,0.07)",
+                color: "#b8860b", fontSize: 12, fontWeight: 700,
+                cursor: "pointer", fontFamily: "inherit",
+                display: "inline-flex", alignItems: "center", gap: 6,
+                whiteSpace: "nowrap" as const, transition: "all 0.15s",
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,200,0,0.14)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,200,0,0.7)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,200,0,0.07)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,200,0,0.45)"; }}
+            >
+              ⚡ Want priority review?
+            </button>
+
+            {/* Submit */}
+            <button
+              onClick={handleSubmit}
+              disabled={submitting || !confirmed}
+              style={{
+                background: (!confirmed || submitting) ? "var(--border)" : "linear-gradient(90deg,#ff6a3d,#ff3d88)",
+                border: "none", borderRadius: 10, padding: "0 28px", height: 44,
+                fontSize: 14, fontWeight: 700,
+                color: (!confirmed || submitting) ? "var(--ink-muted)" : "#fff",
+                cursor: (!confirmed || submitting) ? "not-allowed" : "pointer",
+                display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "inherit",
+                transition: "all 0.2s",
+              }}
+            >
+              {submitting ? (
+                <>
+                  <span style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
+                  Submitting…
+                </>
+              ) : "🚀 Submit for Review"}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* ── Upgrade modal ── */}
+      {showUpgrade && (
+        <>
+          <div onClick={() => setShowUpgrade(false)} style={{ position: "fixed", inset: 0, background: "rgba(10,11,26,0.6)", zIndex: 1000 }} />
+          <div style={{
+            position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)",
+            zIndex: 1001, width: "min(92vw, 680px)",
+            background: "var(--surface)", borderRadius: 18,
+            boxShadow: "0 24px 80px rgba(0,0,0,0.22)",
+            overflow: "hidden",
+          }}>
+            {/* Modal header */}
+            <div style={{ padding: "24px 28px 0", position: "relative" }}>
+              <button onClick={() => setShowUpgrade(false)} style={{ position: "absolute", top: 18, right: 20, background: "none", border: "none", fontSize: 18, color: "var(--ink-muted)", cursor: "pointer", lineHeight: 1, padding: 4 }}>✕</button>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "#ff6a3d", marginBottom: 4 }}>
+                ⚡ Priority Review
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ink)", marginBottom: 6 }}>Upgrade for faster visibility</div>
+              <div style={{ fontSize: 13, color: "var(--ink-muted)", marginBottom: 24 }}>
+                Free submissions are reviewed within 48 hours. Upgrade to skip the queue and get featured placement.
+              </div>
+            </div>
+
+            {/* Plans */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, padding: "0 28px 28px" }}>
+              {[
+                {
+                  name: "Basic",
+                  price: "$49",
+                  period: "one-time",
+                  badge: null,
+                  color: "#ff6a3d",
+                  perks: [
+                    "✓ Priority review (within 6h)",
+                    "✓ Featured Today placement",
+                    "✓ Rainbow border highlight",
+                    "✓ Newsletter mention to 14k+ subscribers",
+                    "✓ Homepage sidebar spotlight (7 days)",
+                  ],
+                },
+                {
+                  name: "Core",
+                  price: "$149",
+                  period: "one-time",
+                  badge: "BEST VALUE",
+                  color: "#FFD700",
+                  perks: [
+                    "✓ Everything in Basic",
+                    "✓ Permanent Hall of Fame listing",
+                    "✓ See who upvoted your product",
+                    "✓ Upvoter emails & company data",
+                    "✓ Priority support — talk to the founder",
+                  ],
+                },
+              ].map(plan => (
+                <div key={plan.name} style={{
+                  border: `2px solid ${plan.name === "Core" ? "rgba(255,215,0,0.5)" : "var(--border)"}`,
+                  borderRadius: 14, padding: "20px 18px",
+                  background: plan.name === "Core"
+                    ? "linear-gradient(135deg,rgba(255,215,0,0.06),rgba(255,165,0,0.04))"
+                    : "var(--surface-alt)",
+                  position: "relative",
+                }}>
+                  {plan.badge && (
+                    <div style={{
+                      position: "absolute", top: -11, left: "50%", transform: "translateX(-50%)",
+                      background: "linear-gradient(90deg,#FFD700,#FFA500)",
+                      color: "#0A0B1A", fontSize: 9, fontWeight: 800,
+                      padding: "2px 10px", borderRadius: 20, letterSpacing: "0.06em", whiteSpace: "nowrap" as const,
+                    }}>{plan.badge}</div>
+                  )}
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)", marginBottom: 2 }}>{plan.name}</div>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 14 }}>
+                    <span style={{ fontSize: 26, fontWeight: 800, color: plan.color }}>{plan.price}</span>
+                    <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>{plan.period}</span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 18 }}>
+                    {plan.perks.map(p => (
+                      <div key={p} style={{ fontSize: 12, color: "var(--ink)", lineHeight: 1.4 }}>{p}</div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setShowUpgrade(false)}
+                    style={{
+                      width: "100%", padding: "10px 0", borderRadius: 9, border: "none",
+                      background: plan.name === "Core"
+                        ? "linear-gradient(90deg,#FFD700,#FFA500)"
+                        : "linear-gradient(90deg,#ff6a3d,#ff3d88)",
+                      color: plan.name === "Core" ? "#0A0B1A" : "#fff",
+                      fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                    }}
+                  >
+                    Upgrade to {plan.name} →
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ textAlign: "center", padding: "0 28px 20px", fontSize: 11, color: "var(--ink-muted)" }}>
+              Payments processed securely. Questions? <a href="mailto:hello@nextbigtool.com" style={{ color: "#ff6a3d", textDecoration: "none" }}>Contact us</a>
+            </div>
+          </div>
+        </>
+      )}
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </main>
