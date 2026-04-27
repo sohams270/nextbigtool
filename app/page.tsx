@@ -1,5 +1,7 @@
 import { Suspense } from "react";
 import { cookies } from "next/headers";
+
+export const dynamic = "force-dynamic";
 import { createClient } from "@/utils/supabase/server";
 import TopNav from "./components/TopNav";
 import ProductShowcase from "./components/ProductShowcase";

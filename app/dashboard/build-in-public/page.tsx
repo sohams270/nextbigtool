@@ -546,6 +546,10 @@ export default function BuildInPublicPage() {
     setSelectedTags([]);
     // Switch to "My posts" to show the new post
     setActiveTab("mine");
+
+    // Tell Next.js to revalidate server component data so the homepage
+    // wall picks up the new post immediately on next navigation
+    router.refresh();
   }
 
   /* ── Plan badge ─────────────────────────────────────────────────── */
