@@ -241,37 +241,106 @@ function RailDropBtn({
   );
 }
 
+/* ─── Notification types ──────────────────────────────────────────────── */
+type NotifItem = { id: string; icon: string; text: string; time: string; ts: number };
+
 /* ─── TopNav ─────────────────────────────────────────────────────────── */
 export default function TopNav({ dark }: { dark?: boolean }) {
   const router = useRouter();
-  const [showAuth, setShowAuth] = useState(false);
+  const [showAuth, setShowAuth]   = useState(false);
   const [authMessage, setAuthMessage] = useState<{ title: string; subtitle: string } | null>(null);
-  const [userId, setUserId] = useState<string | null | undefined>(undefined);
+  const [userId, setUserId]       = useState<string | null | undefined>(undefined);
   const [userInitial, setUserInitial] = useState<string>("");
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [userName, setUserName]   = useState<string>("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  // dropdowns
+  const [notifOpen, setNotifOpen]       = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const notifTimer   = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const settingsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // notifications
+  const [notifications, setNotifications] = useState<NotifItem[]>([]);
+  const [notifLoading, setNotifLoading]   = useState(false);
+  const [notifFetched, setNotifFetched]   = useState(false);
+  const [unreadCount, setUnreadCount]     = useState(0);
+
+  // sign-out
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
-  const [signingOut, setSigningOut] = useState(false);
-  const userMenuRef = useRef<HTMLDivElement>(null);
+  const [signingOut, setSigningOut]                 = useState(false);
 
   useEffect(() => {
-    createClient().auth.getUser().then(({ data: { user } }) => {
+    const client = createClient();
+    client.auth.getUser().then(({ data: { user } }) => {
       setUserId(user?.id ?? null);
-      if (user) {
-        const name = user.user_metadata?.full_name || user.email || "";
-        setUserInitial(name[0]?.toUpperCase() || "U");
-      }
+      if (!user) return;
+      const name = user.user_metadata?.full_name || user.email || "";
+      setUserInitial(name[0]?.toUpperCase() || "U");
+      setUserName(name);
+      client.from("profiles").select("avatar_url, full_name").eq("id", user.id).single()
+        .then(({ data }) => {
+          if (data?.avatar_url) setAvatarUrl(data.avatar_url);
+          if (data?.full_name)  setUserName(data.full_name);
+        });
     });
   }, []);
 
   useEffect(() => {
-    function onDown(e: MouseEvent) {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
-        setUserMenuOpen(false);
-      }
+    if (notifOpen && !notifFetched) fetchNotifications();
+  }, [notifOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function fetchNotifications() {
+    setNotifLoading(true);
+    const client = createClient();
+    const since  = new Date(Date.now() - 7 * 86400000).toISOString();
+    const items: NotifItem[] = [];
+
+    const [toolsRes, upvotesRes, postsRes] = await Promise.allSettled([
+      client.from("tools").select("id, name, created_at").eq("status", "approved")
+        .gte("created_at", since).order("created_at", { ascending: false }).limit(6),
+      client.from("upvotes").select("created_at, tool_id, tools(name)")
+        .gte("created_at", since).order("created_at", { ascending: false }).limit(6),
+      client.from("posts").select("id, content, created_at, type")
+        .gte("created_at", since).order("created_at", { ascending: false }).limit(6),
+    ]);
+
+    if (toolsRes.status === "fulfilled") {
+      (toolsRes.value.data ?? []).forEach((t: { id: string; name: string; created_at: string }) => {
+        items.push({ id: `tool-${t.id}`, icon: "🚀", text: `${t.name} just launched on NextBigTool`, time: t.created_at, ts: new Date(t.created_at).getTime() });
+      });
     }
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, []);
+    if (upvotesRes.status === "fulfilled") {
+      (upvotesRes.value.data ?? []).forEach((u: { created_at: string; tool_id: string; tools: { name: string }[] | { name: string } | null }) => {
+        const toolsField = u.tools;
+        const toolName = Array.isArray(toolsField) ? (toolsField[0]?.name ?? "a product") : (toolsField?.name ?? "a product");
+        items.push({ id: `upvote-${u.tool_id}-${u.created_at}`, icon: "▲", text: `${toolName} received a new upvote`, time: u.created_at, ts: new Date(u.created_at).getTime() });
+      });
+    }
+    if (postsRes.status === "fulfilled") {
+      (postsRes.value.data ?? []).forEach((p: { id: string; content: string; created_at: string; type: string }) => {
+        const typeLabel = p.type === "milestone" ? "shared a milestone" : p.type === "funding" ? "announced funding" : p.type === "launch" ? "launched" : "posted an update";
+        items.push({ id: `post-${p.id}`, icon: "📝", text: `A founder ${typeLabel} on the Build in Public wall`, time: p.created_at, ts: new Date(p.created_at).getTime() });
+      });
+    }
+
+    const sorted = items.sort((a, b) => b.ts - a.ts).slice(0, 10);
+    setNotifications(sorted);
+    setUnreadCount(sorted.length);
+    setNotifFetched(true);
+    setNotifLoading(false);
+  }
+
+  function timeAgo(iso: string) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const m = Math.floor(diff / 60000);
+    const h = Math.floor(diff / 3600000);
+    const d = Math.floor(diff / 86400000);
+    if (m < 1) return "just now";
+    if (m < 60) return `${m}m ago`;
+    if (h < 24) return `${h}h ago`;
+    return `${d}d ago`;
+  }
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -292,11 +361,16 @@ export default function TopNav({ dark }: { dark?: boolean }) {
     if (userId) {
       window.location.href = "/dashboard/products";
     } else {
-      openAuthModal(
-        "Launch your product",
-        "Sign up in seconds and submit your tool to thousands of early adopters."
-      );
+      openAuthModal("Launch your product", "Sign up in seconds and submit your tool to thousands of early adopters.");
     }
+  }
+
+  function hoverEnter(set: (v: boolean) => void, timer: React.MutableRefObject<ReturnType<typeof setTimeout> | null>) {
+    if (timer.current) clearTimeout(timer.current);
+    set(true);
+  }
+  function hoverLeave(set: (v: boolean) => void, timer: React.MutableRefObject<ReturnType<typeof setTimeout> | null>) {
+    timer.current = setTimeout(() => set(false), 180);
   }
 
   const isSignedIn = userId != null && userId !== undefined;
@@ -344,77 +418,209 @@ export default function TopNav({ dark }: { dark?: boolean }) {
           {/* ── Actions (right zone, flex:1, right-aligned) ── */}
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, flexShrink: 0 }}>
             {isSignedIn ? (
-              /* Signed-in: avatar dropdown */
-              <div ref={userMenuRef} style={{ position: "relative" }}>
-                <button
-                  onClick={() => setUserMenuOpen(v => !v)}
-                  style={{
-                    padding: "6px 14px 6px 7px", borderRadius: 999,
-                    border: `1px solid ${dark ? "rgba(255,255,255,0.2)" : "#e3e3e0"}`,
-                    background: dark ? "rgba(255,255,255,0.08)" : "#fff",
-                    fontWeight: 500, fontSize: 13,
-                    color: dark ? "rgba(255,255,255,0.9)" : "#0f0f10",
-                    whiteSpace: "nowrap" as const, cursor: "pointer", fontFamily: "inherit",
-                    display: "inline-flex", alignItems: "center", gap: 7,
+              /* Signed-in: Dashboard + Bell + Settings */
+              <>
+                {/* 1. Dashboard */}
+                <Link href="/dashboard" style={{ textDecoration: "none" }}>
+                  <button style={{
+                    padding: "7px 15px", borderRadius: 999,
+                    border: "1px solid var(--border)", background: "var(--surface)",
+                    fontWeight: 600, fontSize: 13, color: "var(--ink)",
+                    cursor: "pointer", fontFamily: "inherit",
+                    display: "inline-flex", alignItems: "center", gap: 6,
                     transition: "background .15s",
                   }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-alt)"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = userMenuOpen ? "var(--surface-alt)" : (dark ? "rgba(255,255,255,0.08)" : "#fff"); }}
+                    onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-alt)"}
+                    onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = "var(--surface)"}
+                  >
+                    <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                      <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    Dashboard
+                  </button>
+                </Link>
+
+                {/* 2. Notifications bell */}
+                <div
+                  style={{ position: "relative" }}
+                  onMouseEnter={() => hoverEnter(setNotifOpen, notifTimer)}
+                  onMouseLeave={() => hoverLeave(setNotifOpen, notifTimer)}
                 >
-                  <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#ff6a3d,#ff3d88)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#fff" }}>
-                    {userInitial}
-                  </div>
-                  Dashboard
-                  <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                    style={{ opacity: 0.5, transform: userMenuOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
-                    <path d="M6 9l6 6 6-6"/>
-                  </svg>
-                </button>
-
-                {userMenuOpen && (
-                  <div style={{
-                    position: "absolute", top: "calc(100% + 8px)", right: 0,
-                    background: "var(--surface)", border: "1px solid var(--border)",
-                    borderRadius: 12, padding: 6, minWidth: 180,
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 300,
-                  }}>
-                    <Link href="/dashboard" onClick={() => setUserMenuOpen(false)} style={{ textDecoration: "none" }}>
+                  <button style={{
+                    width: 36, height: 36, borderRadius: "50%",
+                    border: "1px solid var(--border)", background: "var(--surface)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    cursor: "pointer", position: "relative", transition: "background .15s",
+                  }}
+                    onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-alt)"}
+                    onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = "var(--surface)"}
+                  >
+                    <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="var(--ink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>
+                    </svg>
+                    {unreadCount > 0 && (
                       <div style={{
-                        display: "flex", alignItems: "center", gap: 9,
-                        padding: "9px 12px", borderRadius: 8, cursor: "pointer",
-                        fontSize: 13, fontWeight: 600, color: "var(--ink)",
-                      }}
-                        onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = "var(--surface-alt)"}
-                        onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = "transparent"}
-                      >
-                        <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-                          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-                        </svg>
-                        Dashboard
+                        position: "absolute", top: -2, right: -2,
+                        width: 16, height: 16, borderRadius: "50%",
+                        background: "#ff3d88", border: "2px solid var(--surface)",
+                        fontSize: 9, fontWeight: 800, color: "#fff",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>
+                        {unreadCount > 9 ? "9+" : unreadCount}
                       </div>
-                    </Link>
+                    )}
+                  </button>
 
-                    <div style={{ height: 1, background: "var(--border-faint)", margin: "4px 6px" }} />
+                  {notifOpen && (
+                    <div style={{
+                      position: "absolute", top: "calc(100% + 10px)", right: 0,
+                      width: 340, background: "var(--surface)",
+                      border: "1px solid var(--border)", borderRadius: 16,
+                      boxShadow: "0 20px 50px rgba(15,15,16,.18)", zIndex: 400,
+                      overflow: "hidden",
+                    }}>
+                      <div style={{ padding: "14px 16px 10px", borderBottom: "1px solid var(--border-faint)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)" }}>Alerts</div>
+                        {unreadCount > 0 && (
+                          <button onClick={() => setUnreadCount(0)} style={{ fontSize: 11, color: "#ff6a3d", fontWeight: 600, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+                            Mark all read
+                          </button>
+                        )}
+                      </div>
 
-                    <div
-                      onClick={() => { setUserMenuOpen(false); setShowSignOutConfirm(true); }}
-                      style={{
-                        display: "flex", alignItems: "center", gap: 9,
-                        padding: "9px 12px", borderRadius: 8, cursor: "pointer",
-                        fontSize: 13, fontWeight: 600, color: "#dc2626",
-                      }}
-                      onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = "rgba(220,38,38,0.06)"}
-                      onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = "transparent"}
-                    >
-                      <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
-                      </svg>
-                      Sign out
+                      <div style={{ maxHeight: 320, overflowY: "auto" }}>
+                        {notifLoading ? (
+                          <div style={{ padding: "24px 16px", textAlign: "center", color: "var(--ink-muted)", fontSize: 13 }}>
+                            Loading…
+                          </div>
+                        ) : notifications.length === 0 ? (
+                          <div style={{ padding: "28px 16px", textAlign: "center" }}>
+                            <div style={{ fontSize: 24, marginBottom: 8 }}>🔔</div>
+                            <div style={{ fontSize: 13, color: "var(--ink-muted)" }}>No new alerts this week</div>
+                          </div>
+                        ) : notifications.map((n, i) => (
+                          <div key={n.id} style={{
+                            display: "flex", gap: 10, padding: "11px 16px",
+                            borderBottom: i < notifications.length - 1 ? "1px solid var(--border-faint)" : "none",
+                            transition: "background .12s",
+                          }}
+                            onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = "var(--surface-alt)"}
+                            onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = "transparent"}
+                          >
+                            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface-alt)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>
+                              {n.icon}
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 12.5, color: "var(--ink)", lineHeight: 1.4 }}>{n.text}</div>
+                              <div style={{ fontSize: 11, color: "var(--ink-muted)", marginTop: 3 }}>{timeAgo(n.time)}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+
+                {/* 3. Settings / profile */}
+                <div
+                  style={{ position: "relative" }}
+                  onMouseEnter={() => hoverEnter(setSettingsOpen, settingsTimer)}
+                  onMouseLeave={() => hoverLeave(setSettingsOpen, settingsTimer)}
+                >
+                  <button style={{
+                    width: 36, height: 36, borderRadius: "50%",
+                    border: "1px solid var(--border)", background: "var(--surface)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    cursor: "pointer", overflow: "hidden", padding: 0, transition: "background .15s",
+                  }}>
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : (
+                      <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg,#ff6a3d,#ff3d88)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#fff" }}>
+                        {userInitial}
+                      </div>
+                    )}
+                  </button>
+
+                  {settingsOpen && (
+                    <div style={{
+                      position: "absolute", top: "calc(100% + 10px)", right: 0,
+                      width: 230, background: "var(--surface)",
+                      border: "1px solid var(--border)", borderRadius: 16,
+                      boxShadow: "0 20px 50px rgba(15,15,16,.18)", zIndex: 400,
+                      overflow: "hidden",
+                    }}>
+                      {/* Profile card */}
+                      <div style={{ padding: "16px 16px 12px", borderBottom: "1px solid var(--border-faint)", display: "flex", gap: 10, alignItems: "center" }}>
+                        <div style={{ width: 40, height: 40, borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "2px solid var(--border)" }}>
+                          {avatarUrl ? (
+                            <img src={avatarUrl} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          ) : (
+                            <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg,#ff6a3d,#ff3d88)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#fff" }}>
+                              {userInitial}
+                            </div>
+                          )}
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {userName || "My Account"}
+                          </div>
+                          <div style={{ fontSize: 11, color: "var(--ink-muted)", marginTop: 1 }}>Free plan</div>
+                        </div>
+                      </div>
+
+                      {/* My Profile */}
+                      <div style={{ padding: "6px 6px 4px" }}>
+                        <Link href="/dashboard/profile" style={{ textDecoration: "none" }}>
+                          <div style={{
+                            display: "flex", alignItems: "center", gap: 9,
+                            padding: "9px 10px", borderRadius: 9, cursor: "pointer",
+                            fontSize: 13, fontWeight: 600, color: "var(--ink)", transition: "background .12s",
+                          }}
+                            onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = "var(--surface-alt)"}
+                            onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = "transparent"}
+                          >
+                            <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                            </svg>
+                            My Profile
+                          </div>
+                        </Link>
+
+                        <div style={{ height: 1, background: "var(--border-faint)", margin: "4px 4px" }} />
+
+                        {/* Sign out */}
+                        <div
+                          onClick={() => { setSettingsOpen(false); setShowSignOutConfirm(true); }}
+                          style={{
+                            display: "flex", alignItems: "center", gap: 9,
+                            padding: "9px 10px", borderRadius: 9, cursor: "pointer",
+                            fontSize: 13, fontWeight: 600, color: "#dc2626", transition: "background .12s",
+                          }}
+                          onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = "rgba(220,38,38,0.06)"}
+                          onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = "transparent"}
+                        >
+                          <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+                          </svg>
+                          Sign out
+                        </div>
+                      </div>
+
+                      {/* FAQs small link */}
+                      <div style={{ padding: "6px 16px 10px", borderTop: "1px solid var(--border-faint)" }}>
+                        <Link href="/faq" style={{ fontSize: 11, color: "var(--ink-muted)", textDecoration: "none", fontWeight: 500 }}
+                          onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = "#ff6a3d"}
+                          onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = "var(--ink-muted)"}
+                        >
+                          FAQs & Help →
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
               /* Signed-out: Sign in button */
               <button
