@@ -250,9 +250,11 @@ export default function TopNav({ dark }: { dark?: boolean }) {
   const [showAuth, setShowAuth]   = useState(false);
   const [authMessage, setAuthMessage] = useState<{ title: string; subtitle: string } | null>(null);
   const [userId, setUserId]       = useState<string | null | undefined>(undefined);
+  const [userEmail, setUserEmail] = useState<string>("");
   const [userInitial, setUserInitial] = useState<string>("");
   const [userName, setUserName]   = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [userPlan, setUserPlan]   = useState<string>("free");
 
   // dropdowns
   const [notifOpen, setNotifOpen]       = useState(false);
@@ -270,6 +272,18 @@ export default function TopNav({ dark }: { dark?: boolean }) {
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [signingOut, setSigningOut]                 = useState(false);
 
+  const ADMIN_EMAIL_NAV = "sohams270@gmail.com";
+
+  async function fetchProfile(uid: string, email: string) {
+    const client = createClient();
+    const { data } = await client.from("profiles").select("avatar_url, full_name, plan").eq("id", uid).single();
+    if (data?.avatar_url) setAvatarUrl(`${data.avatar_url}?t=${Date.now()}`);
+    else setAvatarUrl(null);
+    if (data?.full_name) setUserName(data.full_name);
+    const plan = email === ADMIN_EMAIL_NAV ? "core" : (data?.plan ?? "free");
+    setUserPlan(plan);
+  }
+
   useEffect(() => {
     const client = createClient();
     client.auth.getUser().then(({ data: { user } }) => {
@@ -278,13 +292,19 @@ export default function TopNav({ dark }: { dark?: boolean }) {
       const name = user.user_metadata?.full_name || user.email || "";
       setUserInitial(name[0]?.toUpperCase() || "U");
       setUserName(name);
-      client.from("profiles").select("avatar_url, full_name").eq("id", user.id).single()
-        .then(({ data }) => {
-          if (data?.avatar_url) setAvatarUrl(data.avatar_url);
-          if (data?.full_name)  setUserName(data.full_name);
-        });
+      setUserEmail(user.email ?? "");
+      fetchProfile(user.id, user.email ?? "");
     });
-  }, []);
+
+    // Re-fetch profile when user saves changes on the profile page
+    const handler = () => {
+      createClient().auth.getUser().then(({ data: { user } }) => {
+        if (user) fetchProfile(user.id, user.email ?? "");
+      });
+    };
+    window.addEventListener("profileUpdated", handler);
+    return () => window.removeEventListener("profileUpdated", handler);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (notifOpen && !notifFetched) fetchNotifications();
@@ -583,7 +603,9 @@ export default function TopNav({ dark }: { dark?: boolean }) {
                           <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                             {userName || "My Account"}
                           </div>
-                          <div style={{ fontSize: 11, color: "var(--ink-muted)", marginTop: 1 }}>Free plan</div>
+                          <div style={{ fontSize: 11, marginTop: 1, fontWeight: 700, color: userPlan === "core" ? "#ff6a3d" : userPlan === "basic" ? "#3b7fff" : "var(--ink-muted)" }}>
+                            {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)} plan
+                          </div>
                         </div>
                       </div>
 

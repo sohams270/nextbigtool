@@ -149,6 +149,7 @@ export default function ProfilePage() {
     setProfile(p => ({ ...p, avatar_url: avatarUrl ?? undefined }));
     setAvatarFile(null);
     setSaving(false); setSaved(true);
+    window.dispatchEvent(new Event("profileUpdated"));
     setTimeout(() => setSaved(false), 2500);
   }
 
