@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import TopNav from "./components/TopNav";
@@ -9,6 +10,7 @@ import Pill from "./components/Pill";
 import Btn from "./components/Btn";
 import Logo from "./components/Logo";
 import Footer from "./components/Footer";
+import FilterBar from "./components/FilterBar";
 
 const CATEGORIES = [
   { name: "AI Tools",     count: 142, icon: <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg> },
@@ -26,9 +28,6 @@ const LEADERBOARD = [
   ["🥉", "Linear",     251],
 ] as const;
 
-const FILTER_TABS = ["Trending", "New Today", "Top All Time", "Activity", "Hall of Fame"];
-const PRICE_TABS  = ["All", "Free", "Freemium", "Paid"];
-
 type ToolRow = {
   id: string;
   slug: string;
@@ -41,12 +40,108 @@ type ToolRow = {
   tool_tags: { tags: { name: string } | null }[];
 };
 
-export default async function HomePage() {
+type SearchParams = Promise<{ sort?: string; price?: string; category?: string }>;
+
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const { sort = "trending", price = "all", category = "" } = await searchParams;
+
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
   const { data: { user } } = await supabase.auth.getUser();
 
+  // ── Fetch tags for the category dropdown ──────────────────────────────
+  const { data: tagsData } = await supabase
+    .from("tags")
+    .select("name")
+    .order("name");
+  const categories = (tagsData ?? []).map((t: { name: string }) => t.name);
+
+  // ── Build tools query ─────────────────────────────────────────────────
+  let toolQuery = supabase
+    .from("tools")
+    .select(`
+      id, slug, name, tagline, logo_url, pricing, upvote_count, featured,
+      tool_tags ( tags ( name ) )
+    `)
+    .eq("status", "approved");
+
+  // Price filter
+  if (price && price !== "all") {
+    toolQuery = toolQuery.eq("pricing", price);
+  }
+
+  // Category filter: look up tag → get matching tool IDs
+  if (category) {
+    const { data: tagRow } = await supabase
+      .from("tags")
+      .select("id")
+      .eq("name", category)
+      .maybeSingle();
+
+    if (tagRow) {
+      const { data: toolTagRows } = await supabase
+        .from("tool_tags")
+        .select("tool_id")
+        .eq("tag_id", tagRow.id);
+      const ids = (toolTagRows ?? []).map((r: { tool_id: string }) => r.tool_id);
+      if (ids.length > 0) {
+        toolQuery = toolQuery.in("id", ids);
+      } else {
+        // No tools in this category — force empty result
+        toolQuery = toolQuery.in("id", ["00000000-0000-0000-0000-000000000000"]);
+      }
+    }
+  }
+
+  // Sort order
+  switch (sort) {
+    case "new":
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      toolQuery = toolQuery
+        .gte("created_at", today.toISOString())
+        .order("created_at", { ascending: false });
+      break;
+    case "activity":
+      toolQuery = toolQuery.order("created_at", { ascending: false });
+      break;
+    case "top":
+    case "hof":
+    case "trending":
+    default:
+      toolQuery = toolQuery.order("upvote_count", { ascending: false });
+      break;
+  }
+
+  const { data: allTools } = await toolQuery.limit(12);
+  const tools = (allTools ?? []) as unknown as ToolRow[];
+
+  // For non-hof sorts, put featured tools first
+  const sortedTools = sort === "hof"
+    ? tools
+    : [
+        ...tools.filter((t) => t.featured),
+        ...tools.filter((t) => !t.featured),
+      ];
+
+  const displayedIds = tools.map((t) => t.id);
+
+  let userUpvotedIds: string[] = [];
+  if (user && displayedIds.length > 0) {
+    const { data: votes } = await supabase
+      .from("upvotes")
+      .select("tool_id")
+      .eq("user_id", user.id)
+      .in("tool_id", displayedIds);
+    userUpvotedIds = (votes ?? []).map((v: { tool_id: string }) => v.tool_id);
+  }
+
+  // ── Recent posts ──────────────────────────────────────────────────────
   const { data: recentPosts } = await supabase
     .from("posts")
     .select(`
@@ -70,66 +165,16 @@ export default async function HomePage() {
     userLikedPostIds = (likes ?? []).map((l: { post_id: string }) => l.post_id);
   }
 
-  const { data: allTools } = await supabase
-    .from("tools")
-    .select(`
-      id, slug, name, tagline, logo_url, pricing, upvote_count, featured,
-      tool_tags ( tags ( name ) )
-    `)
-    .eq("status", "approved")
-    .order("upvote_count", { ascending: false })
-    .limit(9);
-
-  const tools = (allTools ?? []) as unknown as ToolRow[];
-  const displayedIds = tools.map((t) => t.id);
-
-  let userUpvotedIds: string[] = [];
-  if (user && displayedIds.length > 0) {
-    const { data: votes } = await supabase
-      .from("upvotes")
-      .select("tool_id")
-      .eq("user_id", user.id)
-      .in("tool_id", displayedIds);
-    userUpvotedIds = (votes ?? []).map((v: { tool_id: string }) => v.tool_id);
-  }
-
-  // Sort: featured tool first, then by upvote_count desc
-  const sortedTools = [
-    ...tools.filter((t) => t.featured),
-    ...tools.filter((t) => !t.featured),
-  ];
-
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
       <TopNav />
 
       <HeroSection />
 
-      {/* Filter bar */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "10px 40px",
-          borderBottom: "1px solid var(--border)",
-          background: "var(--surface)",
-        }}
-      >
-        <div style={{ display: "flex", gap: 6 }}>
-          {FILTER_TABS.map((t, i) => (
-            <Pill key={t} color={i === 0 ? "orangeSolid" : "gray"} size="sm">{t}</Pill>
-          ))}
-        </div>
-        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-          {PRICE_TABS.map((t, i) => (
-            <Pill key={t} color={i === 0 ? "outline" : "gray"} size="sm">{t}</Pill>
-          ))}
-          <div style={{ width: 1, background: "#CFCFD4", height: 16, margin: "0 4px" }} />
-          <Btn variant="ghostMuted" size="sm">Category ▾</Btn>
-          <Btn variant="ghostMuted" size="sm">Audience ▾</Btn>
-        </div>
-      </div>
+      {/* Filter bar — client component, needs Suspense for useSearchParams */}
+      <Suspense fallback={<FilterBarSkeleton />}>
+        <FilterBar categories={categories} />
+      </Suspense>
 
       {/* Main content */}
       <div style={{ flex: 1, overflow: "auto", padding: "24px 40px 0" }}>
@@ -142,8 +187,58 @@ export default async function HomePage() {
             margin: "0 auto",
           }}
         >
-          {/* Feed — new editorial leaderboard design */}
+          {/* Feed */}
           <div>
+            {/* Hall of Fame heading */}
+            {sort === "hof" && (
+              <div style={{
+                display: "flex", alignItems: "center", gap: 10,
+                marginBottom: 16, padding: "12px 16px",
+                background: "linear-gradient(135deg,#0D0E22,#1A0D2E)",
+                borderRadius: 12, border: "1px solid rgba(255,215,0,0.2)",
+              }}>
+                <span style={{ fontSize: 22 }}>🏆</span>
+                <div>
+                  <div style={{
+                    fontSize: 15, fontWeight: 800,
+                    background: "linear-gradient(90deg,#FFD700,#FFA500)",
+                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                  }}>Hall of Fame</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>
+                    All-time top products by community upvotes
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Active filters summary */}
+            {(category || price !== "all") && (
+              <div style={{
+                display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap",
+              }}>
+                {category && (
+                  <span style={{
+                    display: "inline-flex", alignItems: "center", gap: 5,
+                    padding: "3px 10px", borderRadius: 20,
+                    background: "var(--orange-soft)", border: "1px solid rgba(255,107,53,0.3)",
+                    fontSize: 11, fontWeight: 700, color: "#FF6B35",
+                  }}>
+                    Category: {category}
+                  </span>
+                )}
+                {price !== "all" && (
+                  <span style={{
+                    display: "inline-flex", alignItems: "center", gap: 5,
+                    padding: "3px 10px", borderRadius: 20,
+                    background: "var(--surface-alt)", border: "1px solid var(--border)",
+                    fontSize: 11, fontWeight: 700, color: "var(--ink-2)",
+                  }}>
+                    Pricing: {price.charAt(0).toUpperCase() + price.slice(1)}
+                  </span>
+                )}
+              </div>
+            )}
+
             <ProductShowcase
               tools={sortedTools}
               userId={user?.id ?? null}
@@ -232,7 +327,6 @@ export default async function HomePage() {
               padding: "18px 16px 16px",
               border: "1px solid rgba(255,215,80,0.2)",
             }}>
-              {/* Star field dots */}
               {[
                 { top: "12%", left: "8%", size: 2 }, { top: "22%", left: "88%", size: 1.5 },
                 { top: "55%", left: "92%", size: 2 }, { top: "75%", left: "6%",  size: 1.5 },
@@ -245,27 +339,19 @@ export default async function HomePage() {
                   background: "rgba(255,215,80,0.6)", pointerEvents: "none",
                 }} />
               ))}
-
-              {/* Gold ambient glow */}
               <div style={{
                 position: "absolute", top: -30, right: -30,
                 width: 130, height: 130, borderRadius: "50%",
                 background: "radial-gradient(circle, rgba(255,180,0,0.18) 0%, transparent 70%)",
                 pointerEvents: "none",
               }} />
-
-              {/* Trophy icon */}
               <div style={{
                 width: 38, height: 38, borderRadius: 10,
                 background: "linear-gradient(135deg, rgba(255,215,80,0.2), rgba(255,140,0,0.15))",
                 border: "1px solid rgba(255,215,80,0.35)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 marginBottom: 10, fontSize: 18,
-              }}>
-                🏆
-              </div>
-
-              {/* Title with gold gradient */}
+              }}>🏆</div>
               <div style={{
                 fontSize: 12, fontWeight: 800, marginBottom: 6, lineHeight: 1.3,
                 background: "linear-gradient(90deg, #FFD700, #FFA500, #FFD700)",
@@ -274,12 +360,9 @@ export default async function HomePage() {
               }}>
                 Place your product in Hall of Fame
               </div>
-
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", marginBottom: 14, lineHeight: 1.5 }}>
                 Make your product stand out from the crowd — at all times.
               </div>
-
-              {/* Talk To Us button — gold bordered */}
               <a href="/contact" style={{ textDecoration: "none", display: "block" }}>
                 <button style={{
                   width: "100%",
@@ -289,7 +372,6 @@ export default async function HomePage() {
                   fontSize: 11, fontWeight: 700,
                   color: "#FFD700", cursor: "pointer",
                   fontFamily: "inherit", letterSpacing: "0.02em",
-                  transition: "background 0.2s, border-color 0.2s",
                 }}
                 className="hof-talk-btn"
                 >
@@ -312,7 +394,6 @@ export default async function HomePage() {
             border: "1px solid rgba(255,107,53,0.2)",
           }}
         >
-          {/* Grid texture */}
           <div style={{
             position: "absolute", inset: 0,
             backgroundImage:
@@ -321,15 +402,12 @@ export default async function HomePage() {
             backgroundSize: "40px 40px",
             pointerEvents: "none",
           }} />
-
-          {/* Ambient glow top-right */}
           <div style={{
             position: "absolute", top: -60, right: -60,
             width: 300, height: 300, borderRadius: "50%",
             background: "radial-gradient(circle, rgba(255,107,53,0.18) 0%, transparent 65%)",
             pointerEvents: "none",
           }} />
-          {/* Ambient glow bottom-left */}
           <div style={{
             position: "absolute", bottom: -40, left: -40,
             width: 220, height: 220, borderRadius: "50%",
@@ -338,10 +416,8 @@ export default async function HomePage() {
           }} />
 
           <div style={{ position: "relative", zIndex: 1, padding: "22px 24px 0" }}>
-            {/* Header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                {/* Live pulse dot */}
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <div className="pulse" style={{ width: 7, height: 7, borderRadius: "50%", background: "#00B87A", flexShrink: 0 }} />
                   <span style={{ fontSize: 9, fontWeight: 700, color: "#00B87A", textTransform: "uppercase", letterSpacing: "0.1em" }}>Live</span>
@@ -365,7 +441,6 @@ export default async function HomePage() {
               </span>
             </div>
 
-            {/* Posts or empty state */}
             {posts.length === 0 ? (
               <div style={{ textAlign: "center", padding: "48px 0 40px" }}>
                 <div style={{
@@ -395,7 +470,6 @@ export default async function HomePage() {
             )}
           </div>
 
-          {/* Footer CTA — guests only */}
           {!user && (
             <div style={{
               position: "relative", zIndex: 1,
@@ -418,6 +492,27 @@ export default async function HomePage() {
         </div>
 
         <Footer />
+      </div>
+    </div>
+  );
+}
+
+function FilterBarSkeleton() {
+  return (
+    <div style={{
+      display: "flex", alignItems: "center", justifyContent: "space-between",
+      padding: "8px 40px", borderBottom: "1px solid var(--border)",
+      background: "var(--surface)", height: 45,
+    }}>
+      <div style={{ display: "flex", gap: 4 }}>
+        {[80, 72, 90, 68, 110].map((w, i) => (
+          <div key={i} style={{ width: w, height: 28, borderRadius: 20, background: "var(--surface-alt)" }} />
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 4 }}>
+        {[40, 50, 72, 44, 88].map((w, i) => (
+          <div key={i} style={{ width: w, height: 28, borderRadius: 20, background: "var(--surface-alt)" }} />
+        ))}
       </div>
     </div>
   );
