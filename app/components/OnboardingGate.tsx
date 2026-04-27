@@ -13,16 +13,33 @@ export default function OnboardingGate() {
     const client = createClient();
 
     async function check(userId: string, email: string) {
-      const { data } = await client
+      // Only query columns that are guaranteed to exist.
+      // We infer "onboarding done" from mandatory fields being filled rather
+      // than relying on an onboarding_completed column that may not exist yet.
+      const { data, error } = await client
         .from("profiles")
-        .select("onboarding_completed")
+        .select("full_name, username, company, role")
         .eq("id", userId)
         .single();
-      if (data && data.onboarding_completed === false) {
+
+      // Query error (e.g. no row yet) → treat as new user, show modal
+      if (error || !data) {
         setUserId(userId);
         setUserEmail(email);
         setShow(true);
+        return;
       }
+
+      // All mandatory fields filled → profile already complete, skip
+      const fullName = (data.full_name ?? "").trim();
+      const [first, ...rest] = fullName.split(" ");
+      const lastName = rest.join(" ").trim();
+      if (first && lastName && data.username && data.company && data.role) return;
+
+      // Incomplete profile → show onboarding
+      setUserId(userId);
+      setUserEmail(email);
+      setShow(true);
     }
 
     client.auth.getUser().then(({ data: { user } }) => {

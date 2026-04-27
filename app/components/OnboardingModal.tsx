@@ -114,6 +114,9 @@ export default function OnboardingModal({ userId, userEmail, onComplete }: {
     setSaving(true);
     const client = createClient();
     const fullName = `${fields.first_name.trim()} ${fields.last_name.trim()}`.trim();
+
+    // Save all profile fields (excluding onboarding_completed in case the column
+    // doesn't exist yet — we detect completion via field presence instead)
     const { error: e } = await client.from("profiles").upsert({
       id: userId,
       full_name: fullName,
@@ -124,10 +127,21 @@ export default function OnboardingModal({ userId, userEmail, onComplete }: {
       website_url: fields.website_url.trim() || null,
       twitter_url: fields.twitter_url.trim() || null,
       linkedin_url: fields.linkedin_url.trim() || null,
-      onboarding_completed: true,
     });
+
+    if (e) {
+      setSaving(false);
+      setError("Something went wrong. Please try again.");
+      return;
+    }
+
+    // Best-effort: mark onboarding_completed = true (silently ignored if column missing)
+    await client
+      .from("profiles")
+      .update({ onboarding_completed: true })
+      .eq("id", userId);
+
     setSaving(false);
-    if (e) { setError("Something went wrong. Please try again."); return; }
     onComplete();
   }
 
