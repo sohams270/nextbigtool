@@ -37,13 +37,38 @@ const btnPrimary: React.CSSProperties = {
   display: "inline-flex", alignItems: "center", gap: 6,
   textDecoration: "none",
 };
-const btnOutline: React.CSSProperties = {
-  background: "transparent", border: "1px solid var(--border)",
-  borderRadius: 9, padding: "0 14px", height: 34,
-  fontSize: 12, fontWeight: 600, color: "var(--ink-2)" as string, cursor: "pointer",
-  display: "inline-flex", alignItems: "center", gap: 6,
-  textDecoration: "none",
-};
+
+function timeAgo(isoString: string): string {
+  const diff = Date.now() - new Date(isoString).getTime();
+  const mins  = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days  = Math.floor(diff / 86400000);
+  if (mins  < 1)   return "just now";
+  if (mins  < 60)  return `${mins}m ago`;
+  if (hours < 24)  return `${hours}h ago`;
+  if (days  < 30)  return `${days}d ago`;
+  return new Date(isoString).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function buildChartPath(buckets: number[], viewBox = { w: 600, h: 160 }): { line: string; area: string } {
+  const n    = buckets.length;
+  const maxV = Math.max(...buckets, 1);
+  const PAD  = { t: 10, b: 20 };
+  const chartH = viewBox.h - PAD.t - PAD.b;
+
+  const points = buckets.map((v, i) => {
+    const x = n === 1 ? viewBox.w / 2 : (i / (n - 1)) * viewBox.w;
+    const y = PAD.t + chartH * (1 - v / maxV);
+    return [x, y] as [number, number];
+  });
+
+  const d = points.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+  const last = points[points.length - 1];
+  const first = points[0];
+  const area = `${d} L${last[0].toFixed(1)},${viewBox.h} L${first[0].toFixed(1)},${viewBox.h} Z`;
+
+  return { line: d, area };
+}
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -58,20 +83,67 @@ export default async function DashboardPage() {
     .eq("submitter_id", user.id)
     .order("upvote_count", { ascending: false });
 
-  const myTools = (toolsData ?? []) as Tool[];
+  const myTools    = (toolsData ?? []) as Tool[];
   const totalUpvotes = myTools.reduce((s, t) => s + (t.upvote_count ?? 0), 0);
   const totalViews   = myTools.reduce((s, t) => s + (t.view_count ?? 0), 0);
   const liveTools    = myTools.filter(t => t.status === "approved").length;
+  const myToolIds    = myTools.map(t => t.id);
+
+  /* ── upvote history (14 days) for chart ── */
+  const DAYS = 14;
+  const buckets: number[] = Array(DAYS).fill(0);
+
+  const dayLabels: string[] = [];
+  for (let i = DAYS - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    dayLabels.push(d.toLocaleDateString("en-US", { month: "short", day: "numeric" }));
+  }
+
+  let recentUpvotes: { created_at: string; tool_id: string }[] = [];
+
+  if (myToolIds.length > 0) {
+    const since = new Date();
+    since.setDate(since.getDate() - (DAYS - 1));
+    since.setHours(0, 0, 0, 0);
+
+    const { data: histData } = await supabase
+      .from("upvotes")
+      .select("created_at, tool_id")
+      .in("tool_id", myToolIds)
+      .gte("created_at", since.toISOString());
+
+    (histData ?? []).forEach(row => {
+      const daysAgo = Math.floor(
+        (Date.now() - new Date(row.created_at).getTime()) / 86400000
+      );
+      const idx = DAYS - 1 - daysAgo;
+      if (idx >= 0 && idx < DAYS) buckets[idx]++;
+    });
+
+    const { data: recentData } = await supabase
+      .from("upvotes")
+      .select("created_at, tool_id")
+      .in("tool_id", myToolIds)
+      .order("created_at", { ascending: false })
+      .limit(8);
+
+    recentUpvotes = recentData ?? [];
+  }
+
+  const { line: chartLine, area: chartArea } = buildChartPath(buckets);
+
+  const toolMap = Object.fromEntries(myTools.map(t => [t.id, t.name]));
 
   const displayName = user.user_metadata?.full_name?.split(" ")[0]
     || user.email?.split("@")[0]
     || "there";
 
   const kpis = [
-    { label: "Total Upvotes",  value: totalUpvotes.toLocaleString(), delta: "across all products",  color: "#ff6a3d" },
-    { label: "Profile Views",  value: totalViews.toLocaleString(),   delta: "all-time",             color: "#3b7fff" },
-    { label: "Live Products",  value: liveTools.toString(),          delta: `of ${myTools.length} submitted`, color: "#00b87a" },
-    { label: "Followers",      value: "—",                           delta: "coming soon",           color: "var(--ink-muted)" },
+    { label: "Total Upvotes", value: totalUpvotes.toLocaleString(), delta: "across all products", color: "#ff6a3d" },
+    { label: "Profile Views", value: totalViews.toLocaleString(),   delta: "all-time",            color: "#3b7fff" },
+    { label: "Live Products", value: liveTools.toString(),          delta: `of ${myTools.length} submitted`, color: "#00b87a" },
+    { label: "Followers",     value: "—",                          delta: "coming soon",          color: "var(--ink-muted)" },
   ];
 
   return (
@@ -104,63 +176,72 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Chart placeholder + activity */}
+      {/* Chart + activity */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 16, marginBottom: 20 }}>
         <div style={card}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>Engagement over time</div>
-              <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2 }}>Upvotes, views, and comments across all products</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>Upvotes over time</div>
+              <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2 }}>Daily upvotes received across all your products — last 14 days</div>
             </div>
-            <div style={{ display: "flex", gap: 12, fontSize: 11, color: "var(--ink-muted)" }}>
-              <span style={{ display: "flex", gap: 5, alignItems: "center" }}>
-                <span style={{ width: 8, height: 8, borderRadius: 2, background: "#ff6a3d", display: "inline-block" }}/>Upvotes
-              </span>
-              <span style={{ display: "flex", gap: 5, alignItems: "center" }}>
-                <span style={{ width: 8, height: 8, borderRadius: 2, background: "#ff3d88", display: "inline-block" }}/>Views
-              </span>
-              <span style={{ display: "flex", gap: 5, alignItems: "center" }}>
-                <span style={{ width: 8, height: 8, borderRadius: 2, background: "#0e0e10", display: "inline-block" }}/>Comments
-              </span>
+            <div style={{ display: "flex", gap: 5, alignItems: "center", fontSize: 11, color: "var(--ink-muted)" }}>
+              <span style={{ width: 8, height: 8, borderRadius: 2, background: "#ff6a3d", display: "inline-block" }}/>Upvotes
             </div>
           </div>
-          <svg viewBox="0 0 600 160" preserveAspectRatio="none" style={{ width: "100%", height: 160 }}>
+
+          {/* Chart */}
+          <svg viewBox="0 0 600 160" preserveAspectRatio="none" style={{ width: "100%", height: 140 }}>
             <defs>
               <linearGradient id="gOrange" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0" stopColor="#ff6a3d" stopOpacity=".25"/>
+                <stop offset="0" stopColor="#ff6a3d" stopOpacity=".28"/>
                 <stop offset="1" stopColor="#ff6a3d" stopOpacity="0"/>
               </linearGradient>
             </defs>
-            <path d="M0,140 L60,120 L120,130 L180,90 L240,100 L300,70 L360,80 L420,50 L480,60 L540,30 L600,40 L600,160 L0,160 Z" fill="url(#gOrange)"/>
-            <path d="M0,140 L60,120 L120,130 L180,90 L240,100 L300,70 L360,80 L420,50 L480,60 L540,30 L600,40" fill="none" stroke="#ff6a3d" strokeWidth="2"/>
-            <path d="M0,150 L60,142 L120,147 L180,125 L240,133 L300,115 L360,120 L420,100 L480,108 L540,88 L600,92" fill="none" stroke="#ff3d88" strokeWidth="2" strokeDasharray="4 4"/>
-            <path d="M0,155 L60,150 L120,152 L180,142 L240,147 L300,136 L360,140 L420,128 L480,132 L540,120 L600,124" fill="none" stroke="#0e0e10" strokeWidth="1.5" strokeDasharray="2 3"/>
+            {/* Zero-state flat line at bottom when no data */}
+            {buckets.every(v => v === 0) ? (
+              <>
+                <path d="M0,140 L600,140 L600,160 L0,160 Z" fill="url(#gOrange)" opacity="0.4"/>
+                <path d="M0,140 L600,140" fill="none" stroke="#ff6a3d" strokeWidth="2" opacity="0.5"/>
+              </>
+            ) : (
+              <>
+                <path d={chartArea} fill="url(#gOrange)"/>
+                <path d={chartLine} fill="none" stroke="#ff6a3d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </>
+            )}
           </svg>
+
+          {/* X-axis labels: first, middle, last */}
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "var(--ink-muted)", marginTop: 6, paddingTop: 4, borderTop: "1px solid var(--border-faint)" }}>
+            <span>{dayLabels[0]}</span>
+            <span>{dayLabels[Math.floor(DAYS / 2)]}</span>
+            <span>{dayLabels[DAYS - 1]}</span>
+          </div>
         </div>
 
+        {/* Activity feed */}
         <div style={card}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>Activity</div>
             <span style={{ fontSize: 12, color: "var(--ink-muted)" }}>Recent</span>
           </div>
-          {myTools.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "20px 0", color: "var(--ink-muted)", fontSize: 12 }}>
-              No activity yet — submit your first product!
+          {recentUpvotes.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "20px 0", color: "var(--ink-muted)", fontSize: 12, lineHeight: 1.6 }}>
+              {myTools.length === 0
+                ? "Submit your first product to start seeing activity here."
+                : "No upvotes yet — share your product to get started!"}
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {[
-                { label: `${totalUpvotes} total upvotes on your products`, time: "All time" },
-                { label: `${totalViews.toLocaleString()} profile views`, time: "All time" },
-                { label: `${myTools.length} product${myTools.length !== 1 ? "s" : ""} submitted`, time: "Lifetime" },
-              ].map((a, i) => (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {recentUpvotes.map((ev, i) => (
                 <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#ff6a3d,#ff3d88)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
-                    {i + 1}
+                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#ff6a3d,#ff3d88)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>
+                    ▲
                   </div>
-                  <div style={{ fontSize: 13 }}>
-                    {a.label}
-                    <div style={{ fontSize: 11, color: "var(--ink-muted)", marginTop: 2 }}>{a.time}</div>
+                  <div style={{ fontSize: 12.5, lineHeight: 1.4, minWidth: 0 }}>
+                    <span style={{ color: "var(--ink)" }}>New upvote on </span>
+                    <span style={{ fontWeight: 700, color: "var(--ink)" }}>{toolMap[ev.tool_id] ?? "your product"}</span>
+                    <div style={{ fontSize: 11, color: "var(--ink-muted)", marginTop: 2 }}>{timeAgo(ev.created_at)}</div>
                   </div>
                 </div>
               ))}
@@ -190,7 +271,7 @@ export default async function DashboardPage() {
               <div key={t.id} style={{
                 display: "flex", alignItems: "center", gap: 14,
                 padding: "14px 0",
-                borderBottom: i < Math.min(myTools.length, 3) - 1 ? "1px solid #ececea" : "none",
+                borderBottom: i < Math.min(myTools.length, 3) - 1 ? "1px solid var(--border-faint)" : "none",
               }}>
                 <div style={{
                   width: 40, height: 40, borderRadius: 10, flexShrink: 0,
@@ -216,8 +297,8 @@ export default async function DashboardPage() {
                 </div>
                 <div style={{
                   padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700,
-                  background: t.status === "approved" ? "#e6f9f1" : t.status === "pending" ? "#fff5ec" : "#f1f1ee",
-                  color: t.status === "approved" ? "#0a7a4f" : t.status === "pending" ? "#b05a00" : "#6b6b78",
+                  background: t.status === "approved" ? "rgba(0,184,122,0.12)" : t.status === "pending" ? "rgba(255,106,61,0.12)" : "var(--surface-alt)",
+                  color: t.status === "approved" ? "#00b87a" : t.status === "pending" ? "#b05a00" : "var(--ink-muted)",
                 }}>
                   {t.status === "approved" ? "Live" : t.status === "pending" ? "Pending" : "Draft"}
                 </div>

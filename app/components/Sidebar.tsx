@@ -5,7 +5,7 @@ import NBTWordmark from "./NBTWordmark";
 
 const NAV = [
   { id: "overview",        label: "Overview",          href: "/dashboard",                   icon: GridIcon },
-  { id: "products",        label: "My Products",        href: "/dashboard/products",          icon: BoxIcon,     badge: null },
+  { id: "products",        label: "Add Your Tool",      href: "/dashboard/products",          icon: BoxIcon,     badge: null },
   { id: "interested",      label: "Interested Users",   href: "/dashboard/interested",        icon: UsersIcon,   locked: true },
   { id: "bip",             label: "Build In Public",    href: "/dashboard/build-in-public",   icon: EditIcon },
   { id: "newsletter",      label: "Newsletter",          href: "/dashboard/newsletter",        icon: MailIcon },
