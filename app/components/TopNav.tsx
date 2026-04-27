@@ -416,36 +416,36 @@ export default function TopNav({ dark }: { dark?: boolean }) {
           </div>
 
           {/* ── Actions (right zone, flex:1, right-aligned) ── */}
+          <style>{`
+            @keyframes rainbowSpin {
+              0%   { background-position: 0% 50%; }
+              100% { background-position: 200% 50%; }
+            }
+            .dash-btn-wrap {
+              position: relative;
+              border-radius: 999px;
+              padding: 2px;
+              background: linear-gradient(90deg,#ff6a3d,#ff3d88,#a855f7,#3b82f6,#06b6d4,#00b87a,#ff6a3d,#ff3d88);
+              background-size: 200% 200%;
+              animation: rainbowSpin 2.4s linear infinite;
+              box-shadow: 0 0 14px 2px rgba(168,85,247,0.35), 0 0 28px 4px rgba(255,61,136,0.2);
+            }
+            .dash-btn-inner {
+              display: inline-flex; align-items: center; gap: 6px;
+              padding: 6px 14px; border-radius: 999px;
+              background: var(--surface);
+              font-weight: 700; font-size: 13px; color: var(--ink);
+              cursor: pointer; font-family: inherit; border: none;
+              white-space: nowrap;
+              transition: background .15s;
+            }
+            .dash-btn-inner:hover { background: var(--surface-alt); }
+          `}</style>
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, flexShrink: 0 }}>
             {isSignedIn ? (
               /* Signed-in: Dashboard + Bell + Settings */
               <>
                 {/* 1. Dashboard — rainbow glow */}
-                <style>{`
-                  @keyframes rainbowSpin {
-                    0%   { background-position: 0% 50%; }
-                    100% { background-position: 200% 50%; }
-                  }
-                  .dash-btn-wrap {
-                    position: relative;
-                    border-radius: 999px;
-                    padding: 2px;
-                    background: linear-gradient(90deg,#ff6a3d,#ff3d88,#a855f7,#3b82f6,#06b6d4,#00b87a,#ff6a3d,#ff3d88);
-                    background-size: 200% 200%;
-                    animation: rainbowSpin 2.4s linear infinite;
-                    box-shadow: 0 0 14px 2px rgba(168,85,247,0.35), 0 0 28px 4px rgba(255,61,136,0.2);
-                  }
-                  .dash-btn-inner {
-                    display: inline-flex; align-items: center; gap: 6px;
-                    padding: 6px 14px; border-radius: 999px;
-                    background: var(--surface);
-                    font-weight: 700; font-size: 13px; color: var(--ink);
-                    cursor: pointer; font-family: inherit; border: none;
-                    white-space: nowrap;
-                    transition: background .15s;
-                  }
-                  .dash-btn-inner:hover { background: var(--surface-alt); }
-                `}</style>
                 <Link href="/dashboard" style={{ textDecoration: "none" }}>
                   <div className="dash-btn-wrap">
                     <button className="dash-btn-inner">
@@ -639,23 +639,31 @@ export default function TopNav({ dark }: { dark?: boolean }) {
                 </div>
               </>
             ) : (
-              /* Signed-out: Sign in button */
-              <button
-                onClick={() => openAuthModal("Welcome back", "Sign in to your NextBigTool account.")}
-                style={{
-                  padding: "8px 16px", borderRadius: 999,
-                  border: "1px solid var(--border)",
-                  background: "var(--surface)",
-                  fontWeight: 500, fontSize: 13,
-                  color: "var(--ink)",
-                  whiteSpace: "nowrap" as const, cursor: "pointer", fontFamily: "inherit",
-                  transition: "background .15s, border-color .15s",
-                }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = dark ? "rgba(255,255,255,0.13)" : "#f6f6f4"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = dark ? "rgba(255,255,255,0.08)" : "#fff"; }}
-              >
-                Sign in
-              </button>
+              /* Signed-out: Sign in + Submit Your Tool (rainbow) */
+              <>
+                <button
+                  onClick={() => openAuthModal("Welcome back", "Sign in to your NextBigTool account.")}
+                  style={{
+                    padding: "8px 16px", borderRadius: 999,
+                    border: "1px solid var(--border)",
+                    background: "var(--surface)",
+                    fontWeight: 500, fontSize: 13,
+                    color: "var(--ink)",
+                    whiteSpace: "nowrap" as const, cursor: "pointer", fontFamily: "inherit",
+                    transition: "background .15s, border-color .15s",
+                  }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = dark ? "rgba(255,255,255,0.13)" : "#f6f6f4"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = dark ? "rgba(255,255,255,0.08)" : "#fff"; }}
+                >
+                  Sign in
+                </button>
+                <div className="dash-btn-wrap" onClick={handleSubmitClick} style={{ cursor: "pointer" }}>
+                  <button className="dash-btn-inner" style={{ gap: 7 }}>
+                    <IconRocket />
+                    Submit Your Tool
+                  </button>
+                </div>
+              </>
             )}
 
           </div>
