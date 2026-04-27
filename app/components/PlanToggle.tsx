@@ -35,7 +35,7 @@ type Plan = {
   isCore?: boolean;
 };
 
-const PLANS: Plan[] = [
+const BASE_PLANS: Plan[] = [
   {
     id: "free",
     label: "FREE",
@@ -52,7 +52,6 @@ const PLANS: Plan[] = [
     ],
     cta: "Current plan",
     ctaHref: "/dashboard/plan",
-    isCurrent: true,
   },
   {
     id: "basic",
@@ -110,8 +109,19 @@ const COMPARISON = [
   { feature: "Basic analytics",            free: "✓",         basic: "✓",       core: "✓" },
 ];
 
-export default function PlanToggle() {
+export default function PlanToggle({ currentPlan = "free" }: { currentPlan?: "free" | "basic" | "core" }) {
   const [yearly, setYearly] = useState(false);
+
+  const PLANS = BASE_PLANS.map(p => ({
+    ...p,
+    isCurrent: p.id === currentPlan,
+    // Hide upgrade CTAs for plans the user is already on or below
+    cta: p.id === currentPlan
+      ? "Current plan"
+      : (currentPlan === "core" && p.id !== "core") ? "Included in your plan"
+      : (currentPlan === "basic" && p.id === "free") ? "Included in your plan"
+      : p.cta,
+  }));
 
   return (
     <div>
@@ -209,9 +219,9 @@ export default function PlanToggle() {
                 ))}
               </div>
 
-              {plan.isCurrent ? (
+              {plan.isCurrent || plan.cta === "Included in your plan" ? (
                 <button disabled style={{ width: "100%", padding: "10px 0", borderRadius: 9, border: "1.5px solid #e5e5e3", background: "#f1f1ee", fontSize: 13, fontWeight: 700, color: "#9090a0", cursor: "default", fontFamily: "inherit" }}>
-                  Current plan
+                  {plan.cta}
                 </button>
               ) : plan.isCore ? (
                 <Link href={plan.ctaHref} style={{ textDecoration: "none" }}>
