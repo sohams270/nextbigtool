@@ -180,7 +180,7 @@ export default async function HomePage({
   }
 
   // ── Recent posts ──────────────────────────────────────────────────────
-  const { data: recentPosts } = await supabase
+  const { data: recentPosts, error: postsError } = await supabase
     .from("posts")
     .select(`
       id, type, content, metric_label, metric_value, likes_count, comments_count, created_at,
@@ -190,7 +190,22 @@ export default async function HomePage({
     .order("created_at", { ascending: false })
     .limit(3);
 
-  const posts = (recentPosts ?? []) as unknown as PostRow[];
+  // Fallback: if the join failed (e.g. company/role columns not yet migrated), fetch without them
+  let resolvedPosts = recentPosts;
+  if (postsError || !recentPosts) {
+    const { data: fallbackPosts } = await supabase
+      .from("posts")
+      .select(`
+        id, type, content, metric_label, metric_value, likes_count, comments_count, created_at,
+        profiles ( full_name, username, avatar_url ),
+        tools ( name )
+      `)
+      .order("created_at", { ascending: false })
+      .limit(3);
+    resolvedPosts = fallbackPosts;
+  }
+
+  const posts = (resolvedPosts ?? []) as unknown as PostRow[];
 
   let userLikedPostIds: string[] = [];
   if (user && posts.length > 0) {
