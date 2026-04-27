@@ -6,7 +6,7 @@ import NBTWordmark from "./NBTWordmark";
 const NAV = [
   { id: "overview",        label: "Overview",          href: "/dashboard",                   icon: GridIcon },
   { id: "products",        label: "Add Your Tool",      href: "/dashboard/products",          icon: BoxIcon,     badge: null },
-  { id: "interested",      label: "Interested Users",   href: "/dashboard/interested",        icon: UsersIcon,   locked: true },
+  { id: "interested",      label: "Founder's CRM",      href: "/dashboard/interested",        icon: UsersIcon,   prime: true },
   { id: "bip",             label: "Build In Public",    href: "/dashboard/build-in-public",   icon: EditIcon },
   { id: "newsletter",      label: "Newsletter",          href: "/dashboard/newsletter",        icon: MailIcon },
   { id: "hof",             label: "Hall of Fame",        href: "/dashboard/hall-of-fame",      icon: TrophyIcon,  locked: true },
@@ -31,6 +31,28 @@ export default function Sidebar() {
       position: "sticky",
       top: 0,
     }}>
+      <style>{`
+        @keyframes crmPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(255,106,61,0), 0 0 8px 2px rgba(255,61,136,0.25); }
+          50%       { box-shadow: 0 0 0 3px rgba(255,106,61,0.12), 0 0 16px 4px rgba(255,61,136,0.45); }
+        }
+        @keyframes crmShimmer {
+          0%   { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        .crm-nav-item {
+          border-radius: 8px;
+          padding: 8px 10px;
+          background: linear-gradient(90deg,rgba(255,106,61,0.18),rgba(255,61,136,0.18),rgba(168,85,247,0.18),rgba(255,106,61,0.18));
+          background-size: 300% 100%;
+          animation: crmShimmer 3s linear infinite, crmPulse 2.5s ease-in-out infinite;
+          cursor: pointer;
+          display: flex; align-items: center; gap: 10;
+          transition: opacity 0.15s;
+        }
+        .crm-nav-item:hover { opacity: 0.85; }
+      `}</style>
+
       {/* Logo */}
       <Link href="/" style={{ display: "flex", alignItems: "center", marginBottom: 28, padding: "0 8px", textDecoration: "none" }}>
         <NBTWordmark height={20} dark priority />
@@ -41,6 +63,21 @@ export default function Sidebar() {
         {NAV.map((item) => {
           const active = pathname === item.href;
           const Icon = item.icon;
+          if ((item as { prime?: boolean }).prime) {
+            return (
+              <Link key={item.id} href={item.href} style={{ textDecoration: "none" }}>
+                <div className="crm-nav-item" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <Icon size={15} color={active ? "#ff6a3d" : "#ff9f7a"} />
+                  <span style={{ flex: 1, fontSize: 12.5, fontWeight: 700, color: "#fff", letterSpacing: "-0.01em" }}>
+                    {item.label}
+                  </span>
+                  <span style={{ fontSize: 9, fontWeight: 800, color: "#ff6a3d", background: "rgba(255,106,61,0.2)", border: "1px solid rgba(255,106,61,0.4)", borderRadius: 4, padding: "1px 5px", letterSpacing: "0.04em" }}>
+                    CORE
+                  </span>
+                </div>
+              </Link>
+            );
+          }
           return (
             <Link key={item.id} href={item.href} style={{ textDecoration: "none" }}>
               <div style={{
@@ -62,7 +99,7 @@ export default function Sidebar() {
                 }}>
                   {item.label}
                 </span>
-                {item.locked && (
+                {(item as { locked?: boolean }).locked && (
                   <LockIcon size={12} color="rgba(255,255,255,0.3)" />
                 )}
               </div>
