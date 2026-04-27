@@ -56,7 +56,7 @@ function useTypewriter(phrases: string[]) {
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const glowRef      = useRef<HTMLDivElement>(null);
-  const [gridOff, setGridOff]   = useState({ x: 0, y: 0 });
+  const gridRef      = useRef<HTMLDivElement>(null);
   const [showAuth, setShowAuth] = useState(false);
   const [userId, setUserId]     = useState<string | null | undefined>(undefined);
 
@@ -64,6 +64,28 @@ export default function HeroSection() {
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data: { user } }) => setUserId(user?.id ?? null));
+  }, []);
+
+  // Native event listener — bypasses React synthetic events and state updates entirely
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    function onMove(e: MouseEvent) {
+      const rect = el!.getBoundingClientRect();
+      const rx = e.clientX - rect.left;
+      const ry = e.clientY - rect.top;
+      if (glowRef.current) {
+        glowRef.current.style.transform = `translate(${rx - 280}px, ${ry - 280}px)`;
+        glowRef.current.style.opacity = "1";
+      }
+      if (gridRef.current) {
+        const gx = ((rx / rect.width)  - 0.5) * 28;
+        const gy = ((ry / rect.height) - 0.5) * 28;
+        gridRef.current.style.backgroundPosition = `${gx}px ${gy}px`;
+      }
+    }
+    el.addEventListener("mousemove", onMove);
+    return () => el.removeEventListener("mousemove", onMove);
   }, []);
 
   function handleLaunchClick() {
@@ -74,27 +96,10 @@ export default function HeroSection() {
     }
   }
 
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const rx = e.clientX - rect.left;
-    const ry = e.clientY - rect.top;
-    // Direct DOM write — no React re-render, zero lag
-    if (glowRef.current) {
-      glowRef.current.style.transform = `translate(${rx - 280}px, ${ry - 280}px)`;
-      glowRef.current.style.opacity = "1";
-    }
-    setGridOff({
-      x: ((rx / rect.width)  - 0.5) * 28,
-      y: ((ry / rect.height) - 0.5) * 28,
-    });
-  }
-
   return (
     <>
     <div
       ref={containerRef}
-      onMouseMove={handleMouseMove}
       style={{
         position: "relative",
         background: "#0A0B1A",
@@ -107,6 +112,7 @@ export default function HeroSection() {
     >
       {/* Moving grid */}
       <div
+        ref={gridRef}
         style={{
           position: "absolute",
           inset: "-40px",
@@ -114,8 +120,7 @@ export default function HeroSection() {
             "linear-gradient(rgba(255,255,255,0.032) 1px, transparent 1px)," +
             "linear-gradient(90deg, rgba(255,255,255,0.032) 1px, transparent 1px)",
           backgroundSize: "46px 46px",
-          backgroundPosition: `${gridOff.x}px ${gridOff.y}px`,
-          transition: "background-position 0.1s ease-out",
+          backgroundPosition: "0px 0px",
           pointerEvents: "none",
         }}
       />
