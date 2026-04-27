@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 
-const card: React.CSSProperties = { background: "#fff", border: "1px solid #ececea", borderRadius: 14, padding: 20 };
+const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 20 };
 
 function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -17,7 +17,7 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
     >
       <div style={{
         position: "absolute", top: 3, left: on ? 19 : 3,
-        width: 16, height: 16, borderRadius: "50%", background: "#fff",
+        width: 16, height: 16, borderRadius: "50%", background: "var(--surface)",
         transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
       }} />
     </div>
@@ -28,8 +28,8 @@ function Row({ title, sub, right }: { title: string; sub?: string; right: React.
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid #f5f5f3" }}>
       <div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "#0f0f10" }}>{title}</div>
-        {sub && <div style={{ fontSize: 12, color: "#9090a0", marginTop: 2 }}>{sub}</div>}
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>{title}</div>
+        {sub && <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2 }}>{sub}</div>}
       </div>
       <div style={{ flexShrink: 0, marginLeft: 12 }}>{right}</div>
     </div>
@@ -38,7 +38,7 @@ function Row({ title, sub, right }: { title: string; sub?: string; right: React.
 
 const btnOutline: React.CSSProperties = {
   padding: "5px 12px", borderRadius: 7, border: "1px solid #d8d8d4",
-  background: "transparent", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "#3a3a45",
+  background: "transparent", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "var(--ink-2)",
 };
 
 export default function SettingsPage() {
@@ -66,9 +66,9 @@ export default function SettingsPage() {
   return (
     <main style={{ flex: 1, overflow: "auto", padding: "28px 32px" }}>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4 }}>Account</div>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0f0f10", letterSpacing: "-0.02em", margin: "0 0 4px" }}>Settings</h1>
-        <p style={{ fontSize: 13, color: "#6b6b78", margin: 0 }}>Notifications, privacy, and account preferences.</p>
+        <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>Account</div>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.02em", margin: "0 0 4px" }}>Settings</h1>
+        <p style={{ fontSize: 13, color: "var(--ink-muted)", margin: 0 }}>Notifications, privacy, and account preferences.</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
@@ -76,8 +76,8 @@ export default function SettingsPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {/* Notifications */}
           <div style={card}>
-            <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0f0f10", margin: "0 0 4px" }}>Notifications</h2>
-            <p style={{ fontSize: 12.5, color: "#9090a0", margin: "0 0 12px" }}>Choose what we email you about.</p>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", margin: "0 0 4px" }}>Notifications</h2>
+            <p style={{ fontSize: 12.5, color: "var(--ink-muted)", margin: "0 0 12px" }}>Choose what we email you about.</p>
             <Row title="New upvotes on my products" sub="Get a daily digest of upvote activity."
               right={<Toggle on={notifs.upvotes} onChange={(v) => setNotifs(p => ({ ...p, upvotes: v }))} />} />
             <Row title="Comments on my products or posts" sub="Notified immediately when someone replies."
@@ -94,7 +94,7 @@ export default function SettingsPage() {
 
           {/* Privacy */}
           <div style={card}>
-            <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0f0f10", margin: "0 0 12px" }}>Privacy</h2>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", margin: "0 0 12px" }}>Privacy</h2>
             <Row title="Public profile" sub={`Show your profile at nextbigtool.com/@user`}
               right={<Toggle on={privacy.publicProfile} onChange={(v) => setPrivacy(p => ({ ...p, publicProfile: v }))} />} />
             <Row title="Show email on profile" sub="Only visible to logged-in users."
@@ -107,7 +107,7 @@ export default function SettingsPage() {
 
           {/* Security */}
           <div style={card}>
-            <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0f0f10", margin: "0 0 12px" }}>Security</h2>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", margin: "0 0 12px" }}>Security</h2>
             <Row title="Password" sub="Last changed 3 months ago."
               right={<button style={btnOutline}>Change</button>} />
             <Row title="Two-factor authentication" sub="Protect your account with an authenticator app."
@@ -115,7 +115,7 @@ export default function SettingsPage() {
             <div style={{ borderBottom: "none" }}>
               <Row title="Active sessions" sub="Sign out all devices"
                 right={
-                  <button onClick={handleSignOut} disabled={signingOut} style={{ ...btnOutline, color: signingOut ? "#9090a0" : "#3a3a45" }}>
+                  <button onClick={handleSignOut} disabled={signingOut} style={{ ...btnOutline, color: signingOut ? "var(--ink-muted)" : "var(--ink-2)" }}>
                     {signingOut ? "Signing out…" : "Sign out all"}
                   </button>
                 } />
@@ -127,42 +127,42 @@ export default function SettingsPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {/* Connected accounts */}
           <div style={card}>
-            <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0f0f10", margin: "0 0 12px" }}>Connected accounts</h2>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", margin: "0 0 12px" }}>Connected accounts</h2>
             {[
               { icon: "𝕏", bg: "#0e0e10", name: "X / Twitter",  sub: "Not connected",            action: "Connect" },
               { icon: "in", bg: "#2867b2", name: "LinkedIn",     sub: "Not connected",            action: "Connect" },
-              { icon: "G",  bg: "#fff",    name: "Google",       sub: userEmail || "Connected",   action: "Disconnect", border: "1px solid #ececea" },
+              { icon: "G",  bg: "#fff",    name: "Google",       sub: userEmail || "Connected",   action: "Disconnect", border: "1px solid var(--border)" },
               { icon: "GH", bg: "#24292e", name: "GitHub",       sub: "Not connected",            action: "Connect" },
             ].map((acc) => (
               <div key={acc.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid #f5f5f3" }}>
                 <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: acc.bg, color: acc.bg === "#fff" ? "#0f0f10" : "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, border: acc.border, flexShrink: 0 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: acc.bg, color: acc.bg === "#fff" ? "var(--ink)" : "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, border: acc.border, flexShrink: 0 }}>
                     {acc.icon}
                   </div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#0f0f10" }}>{acc.name}</div>
-                    <div style={{ fontSize: 12, color: "#9090a0" }}>{acc.sub}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>{acc.name}</div>
+                    <div style={{ fontSize: 12, color: "var(--ink-muted)" }}>{acc.sub}</div>
                   </div>
                 </div>
-                <button style={{ ...btnOutline, color: acc.action === "Disconnect" ? "#6b6b78" : "#3a3a45" }}>{acc.action}</button>
+                <button style={{ ...btnOutline, color: acc.action === "Disconnect" ? "var(--ink-muted)" : "var(--ink-2)" }}>{acc.action}</button>
               </div>
             ))}
           </div>
 
           {/* Preferences */}
           <div style={card}>
-            <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0f0f10", margin: "0 0 12px" }}>Preferences</h2>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", margin: "0 0 12px" }}>Preferences</h2>
             <Row title="Theme" sub="System, light, or dark"
               right={
-                <div style={{ display: "flex", background: "#f1f1ee", borderRadius: 8, padding: 3 }}>
+                <div style={{ display: "flex", background: "var(--surface-alt)", borderRadius: 8, padding: 3 }}>
                   {["Light", "Dark", "Auto"].map((t, i) => (
-                    <div key={t} style={{ padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: i === 0 ? "#fff" : "transparent", color: i === 0 ? "#0f0f10" : "#6b6b78" }}>{t}</div>
+                    <div key={t} style={{ padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: i === 0 ? "#fff" : "transparent", color: i === 0 ? "var(--ink)" : "var(--ink-muted)" }}>{t}</div>
                   ))}
                 </div>
               } />
             <Row title="Timezone" sub=""
               right={
-                <select style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #ececea", fontSize: 12, background: "#fff", fontFamily: "inherit" }}>
+                <select style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid var(--border)", fontSize: 12, background: "var(--surface)", fontFamily: "inherit" }}>
                   <option>UTC</option>
                   <option>Asia / Kolkata (UTC+5:30)</option>
                   <option>America / New_York (UTC-5)</option>
@@ -171,7 +171,7 @@ export default function SettingsPage() {
             <div style={{ borderBottom: "none" }}>
               <Row title="Language" sub=""
                 right={
-                  <select style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #ececea", fontSize: 12, background: "#fff", fontFamily: "inherit" }}>
+                  <select style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid var(--border)", fontSize: 12, background: "var(--surface)", fontFamily: "inherit" }}>
                     <option>English</option>
                   </select>
                 } />

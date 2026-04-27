@@ -20,7 +20,31 @@
       "Bash(sips -z 180 180 /Users/sohams17/NextBigTool/public/favicon-source.png --out /Users/sohams17/NextBigTool/public/apple-touch-icon.png)",
       "Bash(pip3 install *)",
       "Bash(git remote *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(git -C /Users/sohams17/NextBigTool/.claude/worktrees/focused-gagarin-b1f7e6 status --short)",
+      "Bash(sed -i '' -e 's/background: activeTab === t ? \"var\\(--surface\\)\" : \"transparent\"/background: activeTab === t ? \"var\\(--surface\\)\" : \"transparent\"/g' app/dashboard/build-in-public/page.tsx)",
+      "Bash(sed -i '' -e 's/background: i === 0 ? \"#fff0eb\" : \"var\\(--surface\\)\"/background: i === 0 ? \"var\\(--orange-soft\\)\" : \"var\\(--surface\\)\"/g' app/dashboard/build-in-public/page.tsx)",
+      "Bash(sed -i '' -e 's/background: done ? \"#00B87A\" : cur ? \"#FF6B35\" : \"var\\(--surface\\)\"/background: done ? \"#00B87A\" : cur ? \"#FF6B35\" : \"var\\(--surface-alt\\)\"/g' app/dashboard/submit/page.tsx)",
+      "Bash(sed -i '' -e 's/cursor: \"pointer\", background: selected ? \"#FFF8F5\" : \"var\\(--surface\\)\"/cursor: \"pointer\", background: selected ? \"var\\(--orange-soft\\)\" : \"var\\(--surface\\)\"/g' app/dashboard/submit/page.tsx)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git -C /Users/sohams17/NextBigTool/.claude/worktrees/focused-gagarin-b1f7e6 push origin HEAD:main 2>&1 || true",
+            "if": "Bash(git commit *)",
+            "statusMessage": "Pushing to GitHub..."
+          }
+        ]
+      }
     ]
   }
 }

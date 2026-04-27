@@ -21,7 +21,7 @@ export default function Sidebar() {
   return (
     <aside style={{
       width: 224,
-      background: "#0e0e10",
+      background: "var(--sidebar-bg)",
       color: "#fff",
       display: "flex",
       flexDirection: "column",

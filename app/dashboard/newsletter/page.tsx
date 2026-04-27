@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 
-const card: React.CSSProperties = { background: "#fff", border: "1px solid #ececea", borderRadius: 14, padding: 20 };
+const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 20 };
 
 type Issue = {
   id: string;
@@ -44,15 +44,15 @@ export default async function NewsletterPage() {
   const statusStyle = (s: string) =>
     s === "sent"      ? { bg: "#e6f9f1", fg: "#0a7a4f" } :
     s === "scheduled" ? { bg: "#fff5ec", fg: "#b05a00" } :
-                        { bg: "#f1f1ee", fg: "#6b6b78" };
+                        { bg: "var(--surface-alt)", fg: "var(--ink-muted)" };
 
   return (
     <main style={{ flex: 1, overflow: "auto", padding: "28px 32px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4 }}>Weekly Digest</div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0f0f10", letterSpacing: "-0.02em", margin: "0 0 4px" }}>Newsletter</h1>
-          <p style={{ fontSize: 13, color: "#6b6b78", margin: 0 }}>Track newsletters sent by the NextBigTool team — and submit updates to be included.</p>
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>Weekly Digest</div>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.02em", margin: "0 0 4px" }}>Newsletter</h1>
+          <p style={{ fontSize: 13, color: "var(--ink-muted)", margin: 0 }}>Track newsletters sent by the NextBigTool team — and submit updates to be included.</p>
         </div>
         <button style={{
           background: "linear-gradient(90deg,#ff6a3d,#ff3d88)", border: "none", borderRadius: 9,
@@ -73,9 +73,9 @@ export default async function NewsletterPage() {
           { label: "Your mentions", value: "3", delta: "across 2 issues" },
         ].map((k) => (
           <div key={k.label} style={{ ...card, padding: 16 }}>
-            <div style={{ fontSize: 11, color: "#9090a0", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.07em", marginBottom: 8 }}>{k.label}</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: "#0f0f10", letterSpacing: "-0.03em", lineHeight: 1 }}>{k.value}</div>
-            <div style={{ fontSize: 11.5, color: k.delta.startsWith("▲") ? "#0a7a4f" : "#9090a0", marginTop: 6 }}>{k.delta}</div>
+            <div style={{ fontSize: 11, color: "var(--ink-muted)", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.07em", marginBottom: 8 }}>{k.label}</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.03em", lineHeight: 1 }}>{k.value}</div>
+            <div style={{ fontSize: 11.5, color: k.delta.startsWith("▲") ? "#0a7a4f" : "var(--ink-muted)", marginTop: 6 }}>{k.delta}</div>
           </div>
         ))}
       </div>
@@ -84,10 +84,10 @@ export default async function NewsletterPage() {
         {/* Issues list */}
         <div style={{ ...card, padding: 0, overflow: "hidden" }}>
           <div style={{ padding: "16px 20px", borderBottom: "1px solid #ececea", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0f0f10", margin: 0 }}>Recent issues</h2>
-            <div style={{ display: "flex", background: "#f1f1ee", borderRadius: 9, padding: 3 }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Recent issues</h2>
+            <div style={{ display: "flex", background: "var(--surface-alt)", borderRadius: 9, padding: 3 }}>
               {["All", "Included me"].map((t, i) => (
-                <div key={t} style={{ padding: "4px 12px", borderRadius: 7, fontSize: 11, fontWeight: 600, cursor: "pointer", background: i === 0 ? "#fff" : "transparent", color: i === 0 ? "#0f0f10" : "#6b6b78" }}>{t}</div>
+                <div key={t} style={{ padding: "4px 12px", borderRadius: 7, fontSize: 11, fontWeight: 600, cursor: "pointer", background: i === 0 ? "#fff" : "transparent", color: i === 0 ? "var(--ink)" : "var(--ink-muted)" }}>{t}</div>
               ))}
             </div>
           </div>
@@ -100,17 +100,17 @@ export default async function NewsletterPage() {
             return (
               <div key={issue.id} style={{ padding: "16px 20px", borderBottom: "1px solid #f5f5f3", display: "flex", alignItems: "center", gap: 16 }}>
                 <div style={{ width: 40, flexShrink: 0, textAlign: "center" }}>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0f0f10", lineHeight: 1 }}>{day ?? "–"}</div>
-                  <div style={{ fontSize: 10, color: "#9090a0", fontWeight: 600, textTransform: "uppercase" as const }}>{month ?? ""}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", lineHeight: 1 }}>{day ?? "–"}</div>
+                  <div style={{ fontSize: 10, color: "var(--ink-muted)", fontWeight: 600, textTransform: "uppercase" as const }}>{month ?? ""}</div>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                    <b style={{ fontSize: 14, color: "#0f0f10" }}>{issue.title}</b>
+                    <b style={{ fontSize: 14, color: "var(--ink)" }}>{issue.title}</b>
                     <span style={{ padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: sc.bg, color: sc.fg }}>
                       {issue.status === "sent" ? "Sent" : issue.status === "scheduled" ? "Scheduled" : "Draft"}
                     </span>
                   </div>
-                  <div style={{ fontSize: 12, color: "#9090a0" }}>
+                  <div style={{ fontSize: 12, color: "var(--ink-muted)" }}>
                     {issue.status === "sent" && issue.subscribers_count ? (
                       <>Sent to {issue.subscribers_count.toLocaleString()} subscribers · {issue.open_rate}% open</>
                     ) : issue.status === "scheduled" ? (
@@ -120,7 +120,7 @@ export default async function NewsletterPage() {
                 </div>
                 <div style={{ flexShrink: 0 }}>
                   {issue.status === "sent" && issue.live_url ? (
-                    <a href={issue.live_url} target="_blank" rel="noreferrer" style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid #d8d8d4", fontSize: 11.5, fontWeight: 600, color: "#3a3a45", textDecoration: "none" }}>
+                    <a href={issue.live_url} target="_blank" rel="noreferrer" style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid #d8d8d4", fontSize: 11.5, fontWeight: 600, color: "var(--ink-2)", textDecoration: "none" }}>
                       Live link ↗
                     </a>
                   ) : issue.status === "scheduled" ? (
@@ -137,30 +137,30 @@ export default async function NewsletterPage() {
         {/* Sidebar */}
         <aside style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div style={card}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#0f0f10", margin: "0 0 4px" }}>Submit an update</h3>
-            <p style={{ fontSize: 12.5, color: "#9090a0", margin: "0 0 16px", lineHeight: 1.5 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", margin: "0 0 4px" }}>Submit an update</h3>
+            <p style={{ fontSize: 12.5, color: "var(--ink-muted)", margin: "0 0 16px", lineHeight: 1.5 }}>
               Got a launch, milestone, or story? The NBT editorial team will review for the next issue.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <div>
-                <label style={{ fontSize: 11.5, fontWeight: 600, color: "#3a3a45", display: "block", marginBottom: 5 }}>Related product</label>
-                <select style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1.5px solid #ececea", fontSize: 13, color: "#0f0f10", background: "#fff", fontFamily: "inherit" }}>
+                <label style={{ fontSize: 11.5, fontWeight: 600, color: "var(--ink-2)", display: "block", marginBottom: 5 }}>Related product</label>
+                <select style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1.5px solid #ececea", fontSize: 13, color: "var(--ink)", background: "var(--surface)", fontFamily: "inherit" }}>
                   <option>Select a product…</option>
                 </select>
               </div>
               <div>
-                <label style={{ fontSize: 11.5, fontWeight: 600, color: "#3a3a45", display: "block", marginBottom: 5 }}>Headline</label>
-                <input placeholder="e.g. PromptCraft hits 1,000 DAUs" style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1.5px solid #ececea", fontSize: 13, color: "#0f0f10", fontFamily: "inherit", outline: "none" }} />
+                <label style={{ fontSize: 11.5, fontWeight: 600, color: "var(--ink-2)", display: "block", marginBottom: 5 }}>Headline</label>
+                <input placeholder="e.g. PromptCraft hits 1,000 DAUs" style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1.5px solid #ececea", fontSize: 13, color: "var(--ink)", fontFamily: "inherit", outline: "none" }} />
               </div>
               <div>
-                <label style={{ fontSize: 11.5, fontWeight: 600, color: "#3a3a45", display: "block", marginBottom: 5 }}>
-                  Story <span style={{ color: "#9090a0", fontWeight: 400 }}>· 2–3 sentences</span>
+                <label style={{ fontSize: 11.5, fontWeight: 600, color: "var(--ink-2)", display: "block", marginBottom: 5 }}>
+                  Story <span style={{ color: "var(--ink-muted)", fontWeight: 400 }}>· 2–3 sentences</span>
                 </label>
-                <textarea rows={3} placeholder="Why is this interesting to NextBigTool readers?" style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1.5px solid #ececea", fontSize: 13, color: "#0f0f10", fontFamily: "inherit", outline: "none", resize: "vertical" as const }} />
+                <textarea rows={3} placeholder="Why is this interesting to NextBigTool readers?" style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1.5px solid #ececea", fontSize: 13, color: "var(--ink)", fontFamily: "inherit", outline: "none", resize: "vertical" as const }} />
               </div>
               <div>
-                <label style={{ fontSize: 11.5, fontWeight: 600, color: "#3a3a45", display: "block", marginBottom: 5 }}>Link (optional)</label>
-                <input placeholder="https://…" style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1.5px solid #ececea", fontSize: 13, color: "#0f0f10", fontFamily: "inherit", outline: "none" }} />
+                <label style={{ fontSize: 11.5, fontWeight: 600, color: "var(--ink-2)", display: "block", marginBottom: 5 }}>Link (optional)</label>
+                <input placeholder="https://…" style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1.5px solid #ececea", fontSize: 13, color: "var(--ink)", fontFamily: "inherit", outline: "none" }} />
               </div>
               <button style={{ width: "100%", background: "linear-gradient(90deg,#ff6a3d,#ff3d88)", border: "none", borderRadius: 9, padding: "10px 0", fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer" }}>
                 Submit for review
@@ -169,8 +169,8 @@ export default async function NewsletterPage() {
           </div>
 
           <div style={card}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#0f0f10", margin: "0 0 12px" }}>How featuring works</h3>
-            <ol style={{ paddingLeft: 18, margin: 0, fontSize: 13, color: "#6b6b78", lineHeight: 1.7 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", margin: "0 0 12px" }}>How featuring works</h3>
+            <ol style={{ paddingLeft: 18, margin: 0, fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.7 }}>
               <li>Submit by Wednesday 6pm PT</li>
               <li>Editorial review within 48h</li>
               <li>Included in Thursday&apos;s issue if approved</li>

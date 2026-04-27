@@ -71,7 +71,7 @@ export default async function CRMPage() {
           padding: "14px 24px",
           display: "flex",
           gap: 10,
-          background: "#fff",
+          background: "var(--surface)",
           borderBottom: "1px solid #CFCFD4",
           alignItems: "center",
         }}
@@ -87,7 +87,7 @@ export default async function CRMPage() {
             border: "1px solid #CFCFD4",
             borderRadius: 6,
             padding: "8px 10px",
-            background: "#fff",
+            background: "var(--surface)",
             width: 240,
             height: 36,
           }}
@@ -123,7 +123,7 @@ export default async function CRMPage() {
         ) : (
           <div
             style={{
-              background: "#fff",
+              background: "var(--surface)",
               borderRadius: 10,
               border: "1px solid #CFCFD4",
               marginTop: 16,

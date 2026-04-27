@@ -5,11 +5,11 @@ type BtnVariant = "primary" | "ghost" | "ghostMuted" | "dark" | "invert";
 type BtnSize = "sm" | "md" | "lg";
 
 const variants: Record<BtnVariant, { bg: string; color: string; border: string }> = {
-  primary:   { bg: "#FF6B35", color: "#fff",    border: "#FF6B35" },
-  ghost:     { bg: "transparent", color: "#1A1A1A", border: "#1A1A1A" },
-  ghostMuted:{ bg: "transparent", color: "#6B6B70", border: "#CFCFD4" },
-  dark:      { bg: "#0A0B1A", color: "#fff",    border: "#0A0B1A" },
-  invert:    { bg: "#fff",    color: "#1A1A1A", border: "#fff" },
+  primary:    { bg: "#FF6B35",          color: "#fff",           border: "#FF6B35" },
+  ghost:      { bg: "transparent",      color: "var(--ink)",     border: "var(--ink)" },
+  ghostMuted: { bg: "transparent",      color: "var(--ink-muted)", border: "var(--border)" },
+  dark:       { bg: "#0A0B1A",          color: "#fff",           border: "#0A0B1A" },
+  invert:     { bg: "var(--surface)",   color: "var(--ink)",     border: "var(--surface)" },
 };
 
 const sizes: Record<BtnSize, { padding: string; fontSize: string; height: string }> = {

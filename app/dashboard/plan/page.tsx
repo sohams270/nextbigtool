@@ -19,22 +19,22 @@ export default async function PlanPage() {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4 }}>Billing</div>
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>Billing</div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
-            <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0f0f10", letterSpacing: "-0.02em", margin: 0 }}>My Plan</h1>
-            <span style={{ background: "#f1f1ee", border: "1px solid #e5e5e3", borderRadius: 20, padding: "3px 12px", fontSize: 12, fontWeight: 700, color: "#6b6b78", textTransform: "capitalize" as const }}>
+            <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.02em", margin: 0 }}>My Plan</h1>
+            <span style={{ background: "var(--surface-alt)", border: "1px solid var(--border)", borderRadius: 20, padding: "3px 12px", fontSize: 12, fontWeight: 700, color: "var(--ink-muted)", textTransform: "capitalize" as const }}>
               {currentPlan}
             </span>
           </div>
-          <p style={{ fontSize: 13, color: "#6b6b78", margin: 0 }}>
-            You&apos;re on the <b style={{ color: "#0f0f10" }}>Free</b> plan.{" "}
+          <p style={{ fontSize: 13, color: "var(--ink-muted)", margin: 0 }}>
+            You&apos;re on the <b style={{ color: "var(--ink)" }}>Free</b> plan.{" "}
             Upgrade to unlock Founder CRM, unlimited listings, and Hall of Fame placement.
           </p>
         </div>
         <Link href="/pricing" style={{
           display: "inline-flex", alignItems: "center", gap: 6,
-          padding: "8px 16px", borderRadius: 9, border: "1px solid #e5e5e3",
-          background: "#fff", fontSize: 13, fontWeight: 600, color: "#3a3a45",
+          padding: "8px 16px", borderRadius: 9, border: "1px solid var(--border)",
+          background: "var(--surface)", fontSize: 13, fontWeight: 600, color: "var(--ink-2)",
           textDecoration: "none",
         }}>
           See full pricing →
@@ -45,20 +45,20 @@ export default async function PlanPage() {
       <PlanToggle />
 
       {/* Billing section */}
-      <div style={{ marginTop: 24, background: "#fff", border: "1px solid #e5e5e3", borderRadius: 14, padding: 20 }}>
-        <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0f0f10", margin: "0 0 4px" }}>Billing &amp; invoices</h2>
-        <p style={{ fontSize: 13, color: "#9090a0", margin: "0 0 16px" }}>Manage your payment method and download past receipts.</p>
+      <div style={{ marginTop: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 20 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", margin: "0 0 4px" }}>Billing &amp; invoices</h2>
+        <p style={{ fontSize: 13, color: "var(--ink-muted)", margin: "0 0 16px" }}>Manage your payment method and download past receipts.</p>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 0", borderBottom: "1px solid #ececea" }}>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <div style={{ width: 38, height: 26, borderRadius: 4, background: "#0e0e10", color: "#fff", display: "grid", placeItems: "center", fontSize: 10, fontWeight: 700, letterSpacing: ".1em" }}>VISA</div>
             <div>
               <b style={{ fontSize: 13 }}>•••• 4242</b>
-              <div style={{ fontSize: 11.5, color: "#9090a0" }}>Expires 08/27</div>
+              <div style={{ fontSize: 11.5, color: "var(--ink-muted)" }}>Expires 08/27</div>
             </div>
           </div>
-          <button style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid #d8d8d4", background: "transparent", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "#3a3a45", fontFamily: "inherit" }}>Update</button>
+          <button style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid #d8d8d4", background: "transparent", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "var(--ink-2)", fontFamily: "inherit" }}>Update</button>
         </div>
-        <div style={{ padding: "14px 0", fontSize: 13, color: "#9090a0" }}>
+        <div style={{ padding: "14px 0", fontSize: 13, color: "var(--ink-muted)" }}>
           No invoices yet — you&apos;re on the Free plan.
         </div>
       </div>

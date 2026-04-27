@@ -114,42 +114,30 @@ export default function PostCard({
     setCommentLoading(false);
   }
 
-  const inputStyle: React.CSSProperties = {
-    flex: 1,
-    padding: "7px 10px",
-    border: "1px solid #CFCFD4",
-    borderRadius: 6,
-    fontSize: 11,
-    fontFamily: "inherit",
-    outline: "none",
-  };
-
   return (
     <>
       <div
         style={{
-          background: "#F5F5F5",
+          background: "var(--surface-alt)",
           borderRadius: 8,
-          border: "1px solid #CFCFD4",
+          border: "1px solid var(--border)",
           overflow: "hidden",
         }}
       >
         <div style={{ padding: "10px 12px" }}>
-          {/* header */}
           <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#00B87A", flexShrink: 0, marginTop: 6 }} className="pulse" />
             <Avatar size={26} letter={initials} color="#0A0B1A" />
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 10.5, fontWeight: 700 }}>{authorName}</span>
-                {post.tools && <span style={{ fontSize: 10, color: "#6B6B70" }}>· {post.tools.name}</span>}
+                <span style={{ fontSize: 10.5, fontWeight: 700, color: "var(--ink)" }}>{authorName}</span>
+                {post.tools && <span style={{ fontSize: 10, color: "var(--ink-muted)" }}>· {post.tools.name}</span>}
                 <Pill color={meta.color} size="xs">{meta.label}</Pill>
-                <span style={{ fontSize: 9, color: "#A8A8AD" }}>{timeAgo(post.created_at)}</span>
+                <span style={{ fontSize: 9, color: "var(--ink-faint)" }}>{timeAgo(post.created_at)}</span>
               </div>
             </div>
           </div>
 
-          {/* metric highlight */}
           {post.metric_label && post.metric_value && (
             <div
               style={{
@@ -163,12 +151,9 @@ export default function PostCard({
             </div>
           )}
 
-          {/* content */}
-          <p style={{ fontSize: 10.5, margin: "6px 0 0 16px", color: "#1A1A1A", lineHeight: 1.5 }}>{post.content}</p>
+          <p style={{ fontSize: 10.5, margin: "6px 0 0 16px", color: "var(--ink)", lineHeight: 1.5 }}>{post.content}</p>
 
-          {/* action bar */}
           <div style={{ display: "flex", gap: 14, marginTop: 10, paddingLeft: 16 }}>
-            {/* Like */}
             <button
               onClick={handleLike}
               disabled={likeLoading}
@@ -176,25 +161,24 @@ export default function PostCard({
                 display: "flex", alignItems: "center", gap: 4,
                 background: "none", border: "none", padding: 0,
                 cursor: "pointer", fontSize: 11, fontWeight: 600,
-                color: liked ? "#FF6B35" : "#6B6B70",
+                color: liked ? "#FF6B35" : "var(--ink-muted)",
                 fontFamily: "inherit",
                 opacity: likeLoading ? 0.6 : 1,
               }}
             >
-              <svg width={13} height={13} viewBox="0 0 24 24" fill={liked ? "#FF6B35" : "none"} stroke={liked ? "#FF6B35" : "#6B6B70"} strokeWidth={2}>
+              <svg width={13} height={13} viewBox="0 0 24 24" fill={liked ? "#FF6B35" : "none"} stroke={liked ? "#FF6B35" : "currentColor"} strokeWidth={2}>
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
               <span>{likesCount}</span>
             </button>
 
-            {/* Comment */}
             <button
               onClick={handleToggleComments}
               style={{
                 display: "flex", alignItems: "center", gap: 4,
                 background: "none", border: "none", padding: 0,
                 cursor: "pointer", fontSize: 11, fontWeight: 600,
-                color: showComments ? "#0A0B1A" : "#6B6B70",
+                color: showComments ? "var(--ink)" : "var(--ink-muted)",
                 fontFamily: "inherit",
               }}
             >
@@ -206,9 +190,8 @@ export default function PostCard({
           </div>
         </div>
 
-        {/* comments section */}
         {showComments && (
-          <div style={{ borderTop: "1px solid #E8E8E8", background: "#fff", padding: "10px 12px" }}>
+          <div style={{ borderTop: "1px solid var(--border-faint)", background: "var(--surface)", padding: "10px 12px" }}>
             {comments.length > 0 && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 10 }}>
                 {comments.map((c) => {
@@ -216,11 +199,11 @@ export default function PostCard({
                   const cInit = cName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
                   return (
                     <div key={c.id} style={{ display: "flex", gap: 7, alignItems: "flex-start" }}>
-                      <Avatar size={22} letter={cInit} color="#6B6B70" />
-                      <div style={{ flex: 1, background: "#F5F5F5", borderRadius: 6, padding: "6px 10px" }}>
-                        <span style={{ fontSize: 10.5, fontWeight: 700 }}>{cName}</span>
-                        <span style={{ fontSize: 9, color: "#A8A8AD", marginLeft: 6 }}>{timeAgo(c.created_at)}</span>
-                        <p style={{ fontSize: 10.5, margin: "3px 0 0", color: "#1A1A1A" }}>{c.content}</p>
+                      <Avatar size={22} letter={cInit} color="var(--ink-muted)" />
+                      <div style={{ flex: 1, background: "var(--surface-alt)", borderRadius: 6, padding: "6px 10px" }}>
+                        <span style={{ fontSize: 10.5, fontWeight: 700, color: "var(--ink)" }}>{cName}</span>
+                        <span style={{ fontSize: 9, color: "var(--ink-faint)", marginLeft: 6 }}>{timeAgo(c.created_at)}</span>
+                        <p style={{ fontSize: 10.5, margin: "3px 0 0", color: "var(--ink)" }}>{c.content}</p>
                       </div>
                     </div>
                   );
@@ -229,12 +212,19 @@ export default function PostCard({
             )}
 
             {comments.length === 0 && commentsLoaded && (
-              <p style={{ fontSize: 11, color: "#A8A8AD", margin: "0 0 10px" }}>No comments yet. Be the first!</p>
+              <p style={{ fontSize: 11, color: "var(--ink-faint)", margin: "0 0 10px" }}>No comments yet. Be the first!</p>
             )}
 
             <form onSubmit={handleComment} style={{ display: "flex", gap: 6 }}>
               <input
-                style={inputStyle}
+                style={{
+                  flex: 1, padding: "7px 10px",
+                  border: "1px solid var(--border)",
+                  borderRadius: 6, fontSize: 11,
+                  fontFamily: "inherit", outline: "none",
+                  background: "var(--surface)",
+                  color: "var(--ink)",
+                }}
                 placeholder={userId ? "Write a comment…" : "Sign in to comment"}
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}

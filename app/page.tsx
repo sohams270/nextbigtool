@@ -100,7 +100,7 @@ export default async function HomePage() {
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#F5F5F5" }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
       <TopNav />
 
       <HeroSection />
@@ -112,8 +112,8 @@ export default async function HomePage() {
           alignItems: "center",
           justifyContent: "space-between",
           padding: "10px 40px",
-          borderBottom: "1px solid #CFCFD4",
-          background: "#fff",
+          borderBottom: "1px solid var(--border)",
+          background: "var(--surface)",
         }}
       >
         <div style={{ display: "flex", gap: 6 }}>
@@ -153,8 +153,8 @@ export default async function HomePage() {
 
           {/* Sidebar */}
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <div style={{ border: "1px solid #CFCFD4", borderRadius: 10, padding: 14, background: "#fff" }}>
-              <span style={{ fontSize: 12, fontWeight: 800, display: "block", marginBottom: 12 }}>
+            <div style={{ border: "1px solid var(--border)", borderRadius: 10, padding: 14, background: "var(--surface)" }}>
+              <span style={{ fontSize: 12, fontWeight: 800, display: "block", marginBottom: 12, color: "var(--ink)" }}>
                 Browse Categories
               </span>
               {CATEGORIES.map(({ name, count, icon }) => (
@@ -165,14 +165,14 @@ export default async function HomePage() {
                     justifyContent: "space-between",
                     alignItems: "center",
                     padding: "6px 0",
-                    borderBottom: "1px solid #F5F5F5",
+                    borderBottom: "1px solid var(--border-faint)",
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <div style={{ width: 26, height: 26, borderRadius: 6, background: "#F5F5F5", color: "#1A1A1A", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <div style={{ width: 26, height: 26, borderRadius: 6, background: "var(--surface-alt)", color: "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       {icon}
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 500 }}>{name}</span>
+                    <span style={{ fontSize: 11, fontWeight: 500, color: "var(--ink)" }}>{name}</span>
                   </div>
                   <Pill color="gray" size="xs">{count}</Pill>
                 </div>
@@ -183,16 +183,16 @@ export default async function HomePage() {
             </div>
 
             <div className="featured-card-wrap" style={{ borderRadius: 10 }}>
-              <div style={{ borderRadius: 8, padding: 14, background: "#fff" }}>
-                <span style={{ fontSize: 12, fontWeight: 800, display: "block", marginBottom: 10 }}>
+              <div style={{ borderRadius: 8, padding: 14, background: "var(--surface)" }}>
+                <span style={{ fontSize: 12, fontWeight: 800, display: "block", marginBottom: 10, color: "var(--ink)" }}>
                   🏆 Hall of Fame
                 </span>
                 {LEADERBOARD.map(([medal, name, votes]) => (
                   <div key={name} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}>
                     <Logo size={24} letter={name[0]} />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 11, fontWeight: 700 }}>{name}</div>
-                      <div style={{ fontSize: 10, color: "#6B6B70" }}>▲ {votes}</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink)" }}>{name}</div>
+                      <div style={{ fontSize: 10, color: "var(--ink-muted)" }}>▲ {votes}</div>
                     </div>
                     <span style={{ fontSize: 14 }}>{medal}</span>
                   </div>

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ThemeProvider from "./components/ThemeProvider";
+import ThemeToggle from "./components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "Next Big Tool — Where Builders Launch. Where Buyers Discover.",
@@ -19,8 +21,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full antialiased" style={{ zoom: "1.5" }}>
-      <body className="min-h-full">{children}</body>
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+      <body className="min-h-full">
+        <ThemeProvider>
+          {children}
+          <ThemeToggle />
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

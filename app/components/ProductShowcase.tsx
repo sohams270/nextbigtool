@@ -76,7 +76,7 @@ function ProductLogo({
           flexShrink: 0,
           border: "1px solid rgba(0,0,0,0.08)",
           boxShadow: "inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.06)",
-          background: "#f6f6f4",
+          background: "var(--surface-alt)",
         }}
       >
         <ToolLogoImg src={tool.logo_url} alt={`${tool.name} logo`} size={size} />
@@ -113,8 +113,8 @@ function CatChip({ label }: { label: string }) {
       display: "inline-flex", alignItems: "center",
       fontSize: 11, fontWeight: 500,
       padding: "3px 8px", borderRadius: 6,
-      background: "#fff", color: "#3a3a3d",
-      border: "1px solid #e3e3e0", letterSpacing: ".01em",
+      background: "var(--surface)", color: "var(--ink-2)",
+      border: "1px solid var(--border)", letterSpacing: ".01em",
       whiteSpace: "nowrap" as const,
     }}>
       {label}
@@ -144,9 +144,9 @@ function PriceChip({ label }: { label: string }) {
 function RedirectBtn({ subtle = false, href }: { subtle?: boolean; href?: string }) {
   const style: React.CSSProperties = {
     width: 30, height: 30, borderRadius: 9,
-    background: subtle ? "#fff" : "#0f0f10",
-    color: subtle ? "#0f0f10" : "#fff",
-    border: subtle ? "1px solid #e3e3e0" : "none",
+    background: subtle ? "var(--surface)" : "var(--ink)",
+    color: subtle ? "var(--ink)" : "var(--bg)",
+    border: subtle ? "1px solid var(--border)" : "none",
     display: "grid", placeItems: "center",
     flexShrink: 0, cursor: "pointer",
     transition: "transform .15s, background .15s",
@@ -168,8 +168,8 @@ function CommentBtn({ count }: { count: number }) {
     <button style={{
       display: "inline-flex", alignItems: "center", gap: 6,
       padding: "7px 12px", borderRadius: 10,
-      background: "#fff", border: "1px solid #e3e3e0",
-      fontWeight: 600, fontSize: 13, color: "#5c5c63",
+      background: "var(--surface)", border: "1px solid var(--border)",
+      fontWeight: 600, fontSize: 13, color: "var(--ink-muted)",
       cursor: "pointer", fontFamily: "inherit",
       transition: "border-color .15s",
     }}>
@@ -234,9 +234,9 @@ function MosaicHero({
   const t = tags(tool);
   return (
     <article style={{
-      background: "#fff",
+      background: "var(--surface)",
       border: "1.5px solid transparent",
-      backgroundImage: "linear-gradient(#fff,#fff), linear-gradient(135deg,#ff6a3d,#ff3d88)",
+      backgroundImage: "linear-gradient(var(--surface),var(--surface)), linear-gradient(135deg,#ff6a3d,#ff3d88)",
       backgroundOrigin: "border-box",
       backgroundClip: "padding-box, border-box",
       borderRadius: 18,
@@ -259,13 +259,13 @@ function MosaicHero({
           <ProductLogo tool={tool} size={64} radius={16} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" as const, marginBottom: 4 }}>
-              <h3 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", color: "#0f0f10", margin: 0 }}>
+              <h3 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", color: "var(--ink)", margin: 0 }}>
                 {tool.name}
               </h3>
               <BadgeFeatured />
               <RedirectBtn href={`/tools/${tool.slug}`} />
             </div>
-            <div style={{ fontSize: 12.5, color: "#8a8a90", fontWeight: 500 }}>
+            <div style={{ fontSize: 12.5, color: "var(--ink-muted)", fontWeight: 500 }}>
               #{rank} · {pricing(tool)}
             </div>
           </div>
@@ -273,7 +273,7 @@ function MosaicHero({
 
         {/* Description */}
         <p style={{
-          fontSize: 15, lineHeight: 1.6, color: "#3a3a3d",
+          fontSize: 15, lineHeight: 1.6, color: "var(--ink-2)",
           margin: 0, flex: 1,
         }}>
           {tool.tagline}
@@ -313,8 +313,8 @@ function MosaicMini({
       gridTemplateColumns: "28px 44px 1fr auto",
       gap: 12,
       alignItems: "center",
-      background: "#fff",
-      border: "1px solid #ececea",
+      background: "var(--surface)",
+      border: "1px solid var(--border)",
       borderRadius: 14,
       padding: "14px 16px",
       transition: "border-color .15s, transform .15s",
@@ -324,7 +324,7 @@ function MosaicMini({
         fontFamily: "Inter, sans-serif",
         fontSize: 22, fontWeight: 800,
         letterSpacing: "-0.04em",
-        color: "#0f0f10",
+        color: "var(--ink)",
         fontVariantNumeric: "tabular-nums",
       }}>
         {String(rank).padStart(2, "0")}
@@ -335,12 +335,12 @@ function MosaicMini({
       {/* Info */}
       <div style={{ minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
-          <h4 style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-0.01em", color: "#0f0f10", margin: 0 }}>
+          <h4 style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink)", margin: 0 }}>
             {tool.name}
           </h4>
         </div>
         <p style={{
-          fontSize: 12.5, color: "#5c5c63", margin: "2px 0 6px",
+          fontSize: 12.5, color: "var(--ink-muted)", margin: "2px 0 6px",
           lineHeight: 1.4,
           overflow: "hidden", display: "-webkit-box",
           WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const,
@@ -385,7 +385,7 @@ function RankedRow({
       gap: 18,
       alignItems: "center",
       padding: "18px 22px",
-      borderBottom: "1px solid #ececea",
+      borderBottom: "1px solid var(--border)",
       transition: "background .15s",
       cursor: "pointer",
     }}>
@@ -395,7 +395,7 @@ function RankedRow({
           fontFamily: "Inter, sans-serif",
           fontSize: 26, fontWeight: 800,
           letterSpacing: "-0.04em",
-          color: "#0f0f10",
+          color: "var(--ink)",
           fontVariantNumeric: "tabular-nums",
           lineHeight: 0.9,
         }}>
@@ -409,11 +409,11 @@ function RankedRow({
       {/* Body */}
       <div style={{ minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" as const, marginBottom: 2 }}>
-          <h4 style={{ fontSize: 16, fontWeight: 700, letterSpacing: "-0.01em", color: "#0f0f10", margin: 0 }}>
+          <h4 style={{ fontSize: 16, fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink)", margin: 0 }}>
             {tool.name}
           </h4>
         </div>
-        <p style={{ fontSize: 13.5, color: "#3a3a3d", margin: "4px 0 8px", lineHeight: 1.45 }}>
+        <p style={{ fontSize: 13.5, color: "var(--ink-2)", margin: "4px 0 8px", lineHeight: 1.45 }}>
           {tool.tagline}
         </p>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" as const }}>
@@ -454,7 +454,7 @@ export default function ProductShowcase({
     return (
       <div style={{
         textAlign: "center", padding: "64px 0",
-        color: "#8a8a90", fontSize: 14,
+        color: "var(--ink-muted)", fontSize: 14,
       }}>
         No tools yet — be the first to submit yours!
       </div>
@@ -478,14 +478,14 @@ export default function ProductShowcase({
         justifyContent: "space-between",
         gap: 24,
         padding: "0 4px 12px",
-        borderBottom: "1px solid #e3e3e0",
+        borderBottom: "1px solid var(--border)",
         flexWrap: "wrap" as const,
       }}>
         <div>
           {/* Live eyebrow */}
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 7,
-            fontSize: 11, fontWeight: 600, color: "#3a3a3d",
+            fontSize: 11, fontWeight: 600, color: "var(--ink-2)",
             letterSpacing: ".06em", textTransform: "uppercase" as const,
             marginBottom: 8,
           }}>
@@ -501,11 +501,11 @@ export default function ProductShowcase({
             fontFamily: "Inter, sans-serif",
             fontSize: 30, fontWeight: 800,
             letterSpacing: "-0.03em", lineHeight: 1.05,
-            color: "#0f0f10", margin: 0,
+            color: "var(--ink)", margin: 0,
           }}>
             Today&rsquo;s Top Tools
           </h2>
-          <p style={{ margin: "6px 0 0", color: "#8a8a90", fontSize: 13 }}>
+          <p style={{ margin: "6px 0 0", color: "var(--ink-muted)", fontSize: 13 }}>
             {tools.length} launches · ranked by upvotes
           </p>
         </div>
@@ -514,14 +514,14 @@ export default function ProductShowcase({
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div style={{
             display: "inline-flex", padding: 3,
-            background: "#ececea", borderRadius: 10, gap: 2,
+            background: "var(--surface-alt)", borderRadius: 10, gap: 2,
           }}>
             {["Today", "Week", "Month"].map((label, i) => (
               <button key={label} style={{
                 fontSize: 12, padding: "6px 12px", borderRadius: 8,
-                color: i === 0 ? "#0f0f10" : "#5c5c63",
+                color: i === 0 ? "var(--ink)" : "var(--ink-muted)",
                 fontWeight: 600,
-                background: i === 0 ? "#fff" : "transparent",
+                background: i === 0 ? "var(--surface)" : "transparent",
                 border: "none",
                 cursor: "pointer",
                 fontFamily: "inherit",
@@ -577,7 +577,7 @@ export default function ProductShowcase({
         }}>
           <h3 style={{
             fontSize: 18, fontWeight: 800,
-            letterSpacing: "-0.01em", color: "#0f0f10",
+            letterSpacing: "-0.01em", color: "var(--ink)",
             margin: 0,
           }}>
             Trending This Week
@@ -595,8 +595,8 @@ export default function ProductShowcase({
       {rest.length > 0 && (
         <ol style={{
           display: "flex", flexDirection: "column", gap: 0,
-          border: "1px solid #ececea", borderRadius: 16,
-          background: "#fff", overflow: "hidden",
+          border: "1px solid var(--border)", borderRadius: 16,
+          background: "var(--surface)", overflow: "hidden",
           listStyle: "none", margin: 0, padding: 0,
         }}>
           {rest.map((t, i) => (
@@ -619,7 +619,7 @@ export default function ProductShowcase({
         <Link href="/discover" style={{
           display: "inline-flex", alignItems: "center", gap: 8,
           padding: "11px 24px", borderRadius: 999,
-          background: "#0f0f10", color: "#fff",
+          background: "var(--ink)", color: "var(--bg)",
           fontSize: 13, fontWeight: 600,
           textDecoration: "none",
           transition: "transform .15s, background .15s",

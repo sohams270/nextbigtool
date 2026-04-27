@@ -201,7 +201,7 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
                 border: "none", outline: "none",
                 padding: compact ? "11px 10px" : "14px 12px",
                 fontSize: compact ? 13 : 13.5,
-                color: "#0f0f10",
+                color: "var(--ink)",
                 background: "transparent",
                 fontFamily: "inherit",
                 minWidth: 0,
@@ -230,7 +230,7 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
 
             {/* Smart Search button — dark fill, like launch-btn-inner */}
             <button type="submit" style={{
-              background: "#0A0B1A",
+              background: "var(--sidebar-bg)",
               color: "#fff", border: "none",
               padding: compact ? "0 16px" : "0 22px",
               fontSize: compact ? 11.5 : 12.5,
@@ -242,7 +242,7 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
               whiteSpace: "nowrap",
             }}
               onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#12132a"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#0A0B1A"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--sidebar-bg)"; }}
             >
               <SparkleIcon size={12} color="#fff" />
               Smart Search
@@ -262,11 +262,11 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
       {showDropdown && (
         <div style={{
           position: "absolute", top: "calc(100% - 2px)", left: 0, right: 0, zIndex: 900,
-          background: "#fff",
+          background: "var(--surface)",
           borderRadius: "0 0 12px 12px",
           border: "2px solid transparent",
           borderTop: "none",
-          backgroundImage: "linear-gradient(#fff,#fff), linear-gradient(270deg,#FF6B35,#FF3B6B,#7B2FFF,#3B7FFF,#00C2FF,#00B87A,#FF6B35)",
+          backgroundImage: "linear-gradient(var(--surface),var(--surface)), linear-gradient(270deg,#FF6B35,#FF3B6B,#7B2FFF,#3B7FFF,#00C2FF,#00B87A,#FF6B35)",
           backgroundOrigin: "border-box",
           backgroundClip: "padding-box, border-box",
           boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
@@ -311,35 +311,35 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
                     style={{
                       display: "flex", alignItems: "center", gap: 13,
                       padding: "10px 16px", cursor: "pointer",
-                      background: isActive ? "#fff8f5" : "#fff",
-                      borderTop: "1px solid #f5f5f3",
+                      background: isActive ? "var(--orange-soft)" : "var(--surface)",
+                      borderTop: "1px solid var(--border-faint)",
                       transition: "background 0.1s",
                     }}
                   >
                     {/* Logo */}
-                    <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 9, border: "1px solid #f0f0ee", overflow: "hidden" }}>
+                    <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 9, border: "1px solid var(--border-faint)", overflow: "hidden" }}>
                       <ResultLogo result={r} />
                     </div>
 
                     {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 3 }}>
-                        <span style={{ fontSize: 13.5, fontWeight: 700, color: "#0f0f10" }}>{r.name}</span>
+                        <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink)" }}>{r.name}</span>
                         <span style={{ fontSize: 10, fontWeight: 700, color: pc.color, background: pc.bg, padding: "1px 7px", borderRadius: 20 }}>
                           {r.pricing.charAt(0).toUpperCase() + r.pricing.slice(1)}
                         </span>
                         {tags.map((t) => (
-                          <span key={t} style={{ fontSize: 10, fontWeight: 500, color: "#9090a0", background: "#f5f5f3", padding: "1px 7px", borderRadius: 20 }}>{t}</span>
+                          <span key={t} style={{ fontSize: 10, fontWeight: 500, color: "var(--ink-muted)", background: "var(--surface-alt)", padding: "1px 7px", borderRadius: 20 }}>{t}</span>
                         ))}
                       </div>
-                      <div style={{ fontSize: 12, color: "#6b6b78", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <div style={{ fontSize: 12, color: "var(--ink-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {r.tagline}
                       </div>
                     </div>
 
                     {/* Upvotes + arrow */}
                     <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-                      <span style={{ fontSize: 11, color: "#9090a0", display: "flex", alignItems: "center", gap: 3 }}>
+                      <span style={{ fontSize: 11, color: "var(--ink-muted)", display: "flex", alignItems: "center", gap: 3 }}>
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                         {r.upvote_count}
                       </span>
@@ -357,12 +357,12 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
                 style={{
                   padding: "11px 16px", display: "flex", alignItems: "center",
                   justifyContent: "space-between", cursor: "pointer",
-                  background: "linear-gradient(135deg, #fff8f5, #fff5fa)",
-                  borderTop: "1px solid #f0f0ee",
+                  background: "linear-gradient(135deg, var(--orange-soft), var(--surface-alt))",
+                  borderTop: "1px solid var(--border-faint)",
                   transition: "background 0.12s",
                 }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = "linear-gradient(135deg,#fff1e6,#ffeef5)"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = "linear-gradient(135deg,#fff8f5,#fff5fa)"; }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = "var(--orange-soft)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = "linear-gradient(135deg,var(--orange-soft),var(--surface-alt))"; }}
               >
                 <span style={{ fontSize: 12, color: "#FF6B35", fontWeight: 700 }}>
                   See all {total > 6 ? `${total}+` : ""} results for &ldquo;{query}&rdquo;
@@ -378,11 +378,11 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
           {!loading && searched && !hasResults && (
             <div style={{ padding: "28px 20px", textAlign: "center" }}>
               <div style={{ fontSize: 30, marginBottom: 10 }}>🔍</div>
-              <div style={{ fontSize: 14, fontWeight: 800, color: "#0f0f10", marginBottom: 6 }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)", marginBottom: 6 }}>
                 No tools found
               </div>
-              <div style={{ fontSize: 12, color: "#9090a0", lineHeight: 1.65, maxWidth: 280, margin: "0 auto 16px" }}>
-                No tool in our catalog matches &ldquo;<strong style={{ color: "#0f0f10" }}>{query}</strong>&rdquo;. Try different keywords or browse by category.
+              <div style={{ fontSize: 12, color: "var(--ink-muted)", lineHeight: 1.65, maxWidth: 280, margin: "0 auto 16px" }}>
+                No tool in our catalog matches &ldquo;<strong style={{ color: "var(--ink)" }}>{query}</strong>&rdquo;. Try different keywords or browse by category.
               </div>
               <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
                 <div

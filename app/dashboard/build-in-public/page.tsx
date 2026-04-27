@@ -15,7 +15,7 @@ type Post = {
   tools?: { name: string } | null;
 };
 
-const card: React.CSSProperties = { background: "#fff", border: "1px solid #ececea", borderRadius: 14, padding: 20 };
+const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 20 };
 
 function timeAgo(iso: string) {
   const d = new Date(iso);
@@ -98,16 +98,16 @@ export default function BuildInPublicPage() {
     <main style={{ flex: 1, overflow: "auto", padding: "28px 32px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4 }}>Social · Build in Public Wall</div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0f0f10", letterSpacing: "-0.02em", margin: "0 0 4px" }}>Build In Public</h1>
-          <p style={{ fontSize: 13, color: "#6b6b78", margin: 0 }}>Share milestones, funding, launches, and updates with the NextBigTool community.</p>
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>Social · Build in Public Wall</div>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.02em", margin: "0 0 4px" }}>Build In Public</h1>
+          <p style={{ fontSize: 13, color: "var(--ink-muted)", margin: 0 }}>Share milestones, funding, launches, and updates with the NextBigTool community.</p>
         </div>
-        <div style={{ display: "flex", background: "#f1f1ee", borderRadius: 9, padding: 3 }}>
+        <div style={{ display: "flex", background: "var(--surface-alt)", borderRadius: 9, padding: 3 }}>
           {(["mine", "wall"] as const).map((t) => (
             <button key={t} onClick={() => setActiveTab(t)} style={{
               padding: "5px 14px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer", border: "none",
               background: activeTab === t ? "#fff" : "transparent",
-              color: activeTab === t ? "#0f0f10" : "#6b6b78",
+              color: activeTab === t ? "var(--ink)" : "var(--ink-muted)",
               boxShadow: activeTab === t ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
             }}>
               {t === "mine" ? "My posts" : "Public wall"}
@@ -126,7 +126,7 @@ export default function BuildInPublicPage() {
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 700, fontSize: 13 }}>{displayName}</div>
-                <div style={{ fontSize: 11.5, color: "#9090a0" }}>
+                <div style={{ fontSize: 11.5, color: "var(--ink-muted)" }}>
                   Posting to <b>Build in Public Wall</b>
                   {tools.length > 0 && (
                     <select value={selectedTool} onChange={(e) => setSelectedTool(e.target.value)} style={{ marginLeft: 6, fontSize: 11, border: "none", background: "transparent", color: "#ff6a3d", fontWeight: 600, cursor: "pointer" }}>
@@ -148,7 +148,7 @@ export default function BuildInPublicPage() {
               style={{
                 width: "100%", border: "1.5px solid #ececea", borderRadius: 10, padding: "10px 12px",
                 fontSize: 13.5, lineHeight: 1.5, resize: "vertical" as const, minHeight: 80,
-                fontFamily: "inherit", outline: "none", color: "#0f0f10",
+                fontFamily: "inherit", outline: "none", color: "var(--ink)",
               }}
             />
             {/* Tags */}
@@ -158,14 +158,14 @@ export default function BuildInPublicPage() {
                   padding: "3px 10px", borderRadius: 6, fontSize: 11.5, fontWeight: 600, cursor: "pointer",
                   border: selectedTags.includes(tag) ? "1.5px solid #ff6a3d" : "1.5px solid #ececea",
                   background: selectedTags.includes(tag) ? "#fff0eb" : "#f9f9f8",
-                  color: selectedTags.includes(tag) ? "#c04400" : "#6b6b78",
+                  color: selectedTags.includes(tag) ? "#c04400" : "var(--ink-muted)",
                 }}>
                   {tag}
                 </button>
               ))}
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-              <button style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid #d8d8d4", background: "transparent", fontSize: 12, fontWeight: 600, color: "#6b6b78", cursor: "pointer" }}>
+              <button style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid #d8d8d4", background: "transparent", fontSize: 12, fontWeight: 600, color: "var(--ink-muted)", cursor: "pointer" }}>
                 Save draft
               </button>
               <button onClick={handlePost} disabled={submitting || !text.trim()} style={{
@@ -185,16 +185,16 @@ export default function BuildInPublicPage() {
                 padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer",
                 border: i === 0 ? "1.5px solid #ff6a3d" : "1.5px solid #ececea",
                 background: i === 0 ? "#fff0eb" : "#fff",
-                color: i === 0 ? "#c04400" : "#6b6b78",
+                color: i === 0 ? "#c04400" : "var(--ink-muted)",
               }}>{f}</button>
             ))}
           </div>
 
           {/* Posts */}
           {displayPosts.length === 0 ? (
-            <div style={{ ...card, textAlign: "center", padding: "36px 20px", color: "#9090a0" }}>
+            <div style={{ ...card, textAlign: "center", padding: "36px 20px", color: "var(--ink-muted)" }}>
               <div style={{ fontSize: 28, marginBottom: 8 }}>✍️</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#0f0f10", marginBottom: 4 }}>No posts yet</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", marginBottom: 4 }}>No posts yet</div>
               <div style={{ fontSize: 12 }}>Share your first build-in-public update above!</div>
             </div>
           ) : (
@@ -209,23 +209,23 @@ export default function BuildInPublicPage() {
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         <b style={{ fontSize: 13.5 }}>{displayName}</b>
                         {(p.tools as { name: string } | null)?.name && (
-                          <span style={{ padding: "2px 8px", borderRadius: 20, background: "#f1f1ee", fontSize: 11, fontWeight: 600, color: "#6b6b78" }}>
+                          <span style={{ padding: "2px 8px", borderRadius: 20, background: "var(--surface-alt)", fontSize: 11, fontWeight: 600, color: "var(--ink-muted)" }}>
                             {(p.tools as { name: string }).name}
                           </span>
                         )}
                       </div>
-                      <div style={{ fontSize: 11.5, color: "#9090a0" }}>{timeAgo(p.created_at)}</div>
+                      <div style={{ fontSize: 11.5, color: "var(--ink-muted)" }}>{timeAgo(p.created_at)}</div>
                     </div>
                   </div>
-                  <div style={{ fontSize: 13.5, lineHeight: 1.6, color: "#0f0f10", marginBottom: 8 }}>{p.content}</div>
+                  <div style={{ fontSize: 13.5, lineHeight: 1.6, color: "var(--ink)", marginBottom: 8 }}>{p.content}</div>
                   {p.tags && p.tags.length > 0 && (
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" as const, marginBottom: 10 }}>
                       {p.tags.map(tag => (
-                        <span key={tag} style={{ padding: "2px 8px", borderRadius: 6, background: "#f1f1ee", fontSize: 11, color: "#6b6b78" }}>{tag}</span>
+                        <span key={tag} style={{ padding: "2px 8px", borderRadius: 6, background: "var(--surface-alt)", fontSize: 11, color: "var(--ink-muted)" }}>{tag}</span>
                       ))}
                     </div>
                   )}
-                  <div style={{ display: "flex", gap: 16, fontSize: 12.5, color: "#6b6b78", borderTop: "1px solid #f5f5f3", paddingTop: 10 }}>
+                  <div style={{ display: "flex", gap: 16, fontSize: 12.5, color: "var(--ink-muted)", borderTop: "1px solid #f5f5f3", paddingTop: 10 }}>
                     <span style={{ cursor: "pointer" }}>▲ {p.likes_count ?? 0} upvotes</span>
                     <span style={{ cursor: "pointer" }}>💬 {p.comments_count ?? 0} comments</span>
                     <span style={{ marginLeft: "auto", color: "#ff6a3d", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
@@ -258,12 +258,12 @@ export default function BuildInPublicPage() {
           </div>
 
           <div style={card}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#0f0f10", margin: "0 0 14px" }}>Post performance</h3>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", margin: "0 0 14px" }}>Post performance</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {[["Total posts", posts.length.toString()], ["Total views", "—"], ["Avg. engagement", "—"], ["Top tag", posts.flatMap(p => p.tags ?? [])[0] ?? "—"]].map(([l, v]) => (
                 <div key={l} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
-                  <span style={{ color: "#6b6b78" }}>{l}</span>
-                  <b style={{ color: "#0f0f10" }}>{v}</b>
+                  <span style={{ color: "var(--ink-muted)" }}>{l}</span>
+                  <b style={{ color: "var(--ink)" }}>{v}</b>
                 </div>
               ))}
             </div>

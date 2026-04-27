@@ -114,10 +114,10 @@ function SplitDropdown({ items, hero }: { items: DDItem[]; hero: HeroPanel }) {
       left: "50%",
       transform: "translateX(-50%)",
       width: 560,
-      background: "#fff",
+      background: "var(--surface)",
       borderRadius: 18,
-      boxShadow: "0 1px 0 rgba(15,15,16,.04), 0 20px 50px rgba(15,15,16,.14)",
-      border: "1px solid #ececea",
+      boxShadow: "0 1px 0 rgba(15,15,16,.04), 0 20px 50px rgba(15,15,16,.18)",
+      border: "1px solid var(--border)",
       overflow: "hidden",
       display: "grid",
       gridTemplateColumns: "1.1fr 1fr",
@@ -125,22 +125,21 @@ function SplitDropdown({ items, hero }: { items: DDItem[]; hero: HeroPanel }) {
     }}>
       {/* Left – item list */}
       <div style={{ padding: "18px 18px 14px" }}>
-        <div style={{ fontSize: 10.5, letterSpacing: ".14em", textTransform: "uppercase" as const, color: "#b0b0b5", fontWeight: 700, padding: "0 6px 10px" }}>
+        <div style={{ fontSize: 10.5, letterSpacing: ".14em", textTransform: "uppercase" as const, color: "var(--ink-faint)", fontWeight: 700, padding: "0 6px 10px" }}>
           {items === DISCOVER_ITEMS ? "Discover" : "Resources"}
         </div>
         {items.map((item) => (
           <Link key={item.label} href={item.href} style={{ textDecoration: "none" }}>
             <div
+              className="nav-dd-item"
               style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 8px", borderRadius: 10, cursor: "pointer", transition: "background .12s" }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#f6f6f4")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
             >
               <div style={{ width: 36, height: 36, borderRadius: 10, background: item.iconBg, color: item.iconColor, display: "grid", placeItems: "center", flexShrink: 0 }}>
                 {item.icon}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#0f0f10", lineHeight: 1.2 }}>{item.label}</div>
-                <div style={{ fontSize: 12.5, color: "#8a8a90", marginTop: 2 }}>{item.sub}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", lineHeight: 1.2 }}>{item.label}</div>
+                <div style={{ fontSize: 12.5, color: "var(--ink-muted)", marginTop: 2 }}>{item.sub}</div>
               </div>
             </div>
           </Link>
@@ -208,9 +207,9 @@ function RailDropBtn({
   const btnStyle: React.CSSProperties = {
     display: "inline-flex", alignItems: "center", gap: 5,
     padding: "7px 13px", borderRadius: 999, border: "none",
-    background: featured ? "#fff" : "transparent",
+    background: featured ? "var(--surface)" : "transparent",
     boxShadow: featured ? "0 1px 2px rgba(15,15,16,.08)" : "none",
-    color: "#0f0f10",
+    color: "var(--ink)",
     fontWeight: featured ? 600 : 500, fontSize: 13,
     whiteSpace: "nowrap" as const,
     cursor: "pointer", fontFamily: "inherit",
@@ -231,7 +230,7 @@ function RailDropBtn({
   return (
     <div style={{ position: "relative" }} onMouseEnter={enter} onMouseLeave={leave}>
       <button style={btnStyle}
-        onMouseEnter={(e) => { if (!featured) (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,0,0,0.06)"; }}
+        onMouseEnter={(e) => { if (!featured) (e.currentTarget as HTMLButtonElement).style.background = "var(--border-faint)"; }}
         onMouseLeave={(e) => { if (!featured) (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
       >
         {label}
@@ -277,11 +276,10 @@ export default function TopNav({ dark }: { dark?: boolean }) {
 
   const isSignedIn = userId != null && userId !== undefined;
 
-  /* Nav background depending on dark mode */
-  const navBg    = dark ? "#0A0B1A" : "#fff";
-  const navBorder = dark ? "rgba(255,255,255,0.08)" : "#ececea";
-  const railBg   = dark ? "rgba(255,255,255,0.08)" : "#f1efeb";
-  const railTxt  = dark ? "rgba(255,255,255,0.85)" : "#0f0f10";
+  const navBg    = "var(--surface)";
+  const navBorder = "var(--border)";
+  const railBg   = "var(--surface-alt)";
+  const railTxt  = "var(--ink)";
 
   return (
     <>
@@ -334,8 +332,8 @@ export default function TopNav({ dark }: { dark?: boolean }) {
                     display: "inline-flex", alignItems: "center", gap: 7,
                     transition: "background .15s, border-color .15s",
                   }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = dark ? "rgba(255,255,255,0.13)" : "#f6f6f4"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = dark ? "rgba(255,255,255,0.08)" : "#fff"; }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-alt)"; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--surface)"; }}
                   >
                     <div style={{ width: 22, height: 22, borderRadius: "50%", background: "linear-gradient(135deg,#ff6a3d,#ff3d88)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#fff" }}>
                       {userInitial}
@@ -350,10 +348,10 @@ export default function TopNav({ dark }: { dark?: boolean }) {
                 onClick={() => openAuthModal("Welcome back", "Sign in to your NextBigTool account.")}
                 style={{
                   padding: "8px 16px", borderRadius: 999,
-                  border: `1px solid ${dark ? "rgba(255,255,255,0.2)" : "#e3e3e0"}`,
-                  background: dark ? "rgba(255,255,255,0.08)" : "#fff",
+                  border: "1px solid var(--border)",
+                  background: "var(--surface)",
                   fontWeight: 500, fontSize: 13,
-                  color: dark ? "rgba(255,255,255,0.9)" : "#0f0f10",
+                  color: "var(--ink)",
                   whiteSpace: "nowrap" as const, cursor: "pointer", fontFamily: "inherit",
                   transition: "background .15s, border-color .15s",
                 }}

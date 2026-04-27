@@ -14,7 +14,7 @@ type Tool = {
 
 /* ─── shared dash styles ─── */
 const card: React.CSSProperties = {
-  background: "#fff", border: "1px solid #ececea",
+  background: "var(--surface)", border: "1px solid var(--border)",
   borderRadius: 14, padding: 20,
 };
 const pageHead: React.CSSProperties = {
@@ -23,13 +23,13 @@ const pageHead: React.CSSProperties = {
 };
 const eyebrow: React.CSSProperties = {
   fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const,
-  letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4,
+  letterSpacing: "0.08em", color: "var(--ink-muted)" as string, marginBottom: 4,
 };
 const h1: React.CSSProperties = {
-  fontSize: 22, fontWeight: 800, color: "#0f0f10",
+  fontSize: 22, fontWeight: 800, color: "var(--ink)" as string,
   letterSpacing: "-0.02em", margin: "0 0 4px",
 };
-const sub: React.CSSProperties = { fontSize: 13, color: "#6b6b78", margin: 0 };
+const sub: React.CSSProperties = { fontSize: 13, color: "var(--ink-muted)" as string, margin: 0 };
 const btnPrimary: React.CSSProperties = {
   background: "linear-gradient(90deg,#ff6a3d,#ff3d88)",
   border: "none", borderRadius: 9, padding: "0 18px", height: 36,
@@ -38,9 +38,9 @@ const btnPrimary: React.CSSProperties = {
   textDecoration: "none",
 };
 const btnOutline: React.CSSProperties = {
-  background: "transparent", border: "1px solid #d8d8d4",
+  background: "transparent", border: "1px solid var(--border)",
   borderRadius: 9, padding: "0 14px", height: 34,
-  fontSize: 12, fontWeight: 600, color: "#3a3a45", cursor: "pointer",
+  fontSize: 12, fontWeight: 600, color: "var(--ink-2)" as string, cursor: "pointer",
   display: "inline-flex", alignItems: "center", gap: 6,
   textDecoration: "none",
 };
@@ -71,7 +71,7 @@ export default async function DashboardPage() {
     { label: "Total Upvotes",  value: totalUpvotes.toLocaleString(), delta: "across all products",  color: "#ff6a3d" },
     { label: "Profile Views",  value: totalViews.toLocaleString(),   delta: "all-time",             color: "#3b7fff" },
     { label: "Live Products",  value: liveTools.toString(),          delta: `of ${myTools.length} submitted`, color: "#00b87a" },
-    { label: "Followers",      value: "—",                           delta: "coming soon",           color: "#9090a0" },
+    { label: "Followers",      value: "—",                           delta: "coming soon",           color: "var(--ink-muted)" },
   ];
 
   return (
@@ -93,13 +93,13 @@ export default async function DashboardPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         {kpis.map((k) => (
           <div key={k.label} style={{ ...card, padding: 16 }}>
-            <div style={{ fontSize: 11, color: "#9090a0", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>
+            <div style={{ fontSize: 11, color: "var(--ink-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>
               {k.label}
             </div>
             <div style={{ fontSize: 28, fontWeight: 800, color: k.color, letterSpacing: "-0.03em", lineHeight: 1 }}>
               {k.value}
             </div>
-            <div style={{ fontSize: 11.5, color: "#9090a0", marginTop: 6 }}>{k.delta}</div>
+            <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 6 }}>{k.delta}</div>
           </div>
         ))}
       </div>
@@ -109,10 +109,10 @@ export default async function DashboardPage() {
         <div style={card}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#0f0f10" }}>Engagement over time</div>
-              <div style={{ fontSize: 12, color: "#9090a0", marginTop: 2 }}>Upvotes, views, and comments across all products</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>Engagement over time</div>
+              <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2 }}>Upvotes, views, and comments across all products</div>
             </div>
-            <div style={{ display: "flex", gap: 12, fontSize: 11, color: "#9090a0" }}>
+            <div style={{ display: "flex", gap: 12, fontSize: 11, color: "var(--ink-muted)" }}>
               <span style={{ display: "flex", gap: 5, alignItems: "center" }}>
                 <span style={{ width: 8, height: 8, borderRadius: 2, background: "#ff6a3d", display: "inline-block" }}/>Upvotes
               </span>
@@ -140,11 +140,11 @@ export default async function DashboardPage() {
 
         <div style={card}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: "#0f0f10" }}>Activity</div>
-            <span style={{ fontSize: 12, color: "#9090a0" }}>Recent</span>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>Activity</div>
+            <span style={{ fontSize: 12, color: "var(--ink-muted)" }}>Recent</span>
           </div>
           {myTools.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "20px 0", color: "#9090a0", fontSize: 12 }}>
+            <div style={{ textAlign: "center", padding: "20px 0", color: "var(--ink-muted)", fontSize: 12 }}>
               No activity yet — submit your first product!
             </div>
           ) : (
@@ -160,7 +160,7 @@ export default async function DashboardPage() {
                   </div>
                   <div style={{ fontSize: 13 }}>
                     {a.label}
-                    <div style={{ fontSize: 11, color: "#9090a0", marginTop: 2 }}>{a.time}</div>
+                    <div style={{ fontSize: 11, color: "var(--ink-muted)", marginTop: 2 }}>{a.time}</div>
                   </div>
                 </div>
               ))}
@@ -172,15 +172,15 @@ export default async function DashboardPage() {
       {/* My Products preview */}
       <div style={card}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "#0f0f10" }}>My Products</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>My Products</div>
           <Link href="/dashboard/products" style={{ fontSize: 12, color: "#ff6a3d", fontWeight: 600, textDecoration: "none" }}>
             View all →
           </Link>
         </div>
         {myTools.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "24px 0", color: "#9090a0" }}>
+          <div style={{ textAlign: "center", padding: "24px 0", color: "var(--ink-muted)" }}>
             <div style={{ fontSize: 28, marginBottom: 8 }}>🚀</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#0f0f10", marginBottom: 4 }}>No products yet</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", marginBottom: 4 }}>No products yet</div>
             <div style={{ fontSize: 12, marginBottom: 16 }}>Submit your first product to start tracking engagement.</div>
             <Link href="/dashboard/submit" style={btnPrimary}>Submit Your First Product →</Link>
           </div>
@@ -201,17 +201,17 @@ export default async function DashboardPage() {
                   {t.name[0]}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#0f0f10" }}>{t.name}</div>
-                  <div style={{ fontSize: 12, color: "#9090a0", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.tagline}</div>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink)" }}>{t.name}</div>
+                  <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.tagline}</div>
                 </div>
                 <div style={{ display: "flex", gap: 20, flexShrink: 0 }}>
                   <div style={{ textAlign: "center" }}>
                     <div style={{ fontSize: 15, fontWeight: 800, color: "#ff6a3d" }}>{t.upvote_count ?? 0}</div>
-                    <div style={{ fontSize: 10, color: "#9090a0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Upvotes</div>
+                    <div style={{ fontSize: 10, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Upvotes</div>
                   </div>
                   <div style={{ textAlign: "center" }}>
                     <div style={{ fontSize: 15, fontWeight: 800, color: "#3b7fff" }}>{t.view_count ?? 0}</div>
-                    <div style={{ fontSize: 10, color: "#9090a0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Views</div>
+                    <div style={{ fontSize: 10, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Views</div>
                   </div>
                 </div>
                 <div style={{

@@ -50,7 +50,7 @@ export default function AuthModal({
           position: "fixed", top: "50%", left: "50%",
           transform: "translate(-50%, -50%)",
           zIndex: 2001,
-          background: "#fff",
+          background: "var(--surface)",
           borderRadius: 20,
           padding: "36px 32px 28px",
           width: 360,
@@ -64,7 +64,7 @@ export default function AuthModal({
           style={{
             position: "absolute", top: 14, right: 16,
             background: "none", border: "none",
-            fontSize: 18, color: "#A8A8AD",
+            fontSize: 18, color: "var(--ink-muted)",
             cursor: "pointer", lineHeight: 1, padding: 4,
             fontFamily: "inherit",
           }}
@@ -77,10 +77,10 @@ export default function AuthModal({
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
             <NBTWordmark height={28} />
           </div>
-          <div style={{ fontSize: 18, fontWeight: 800, color: "#1A1A1A", letterSpacing: "-0.02em" }}>
+          <div style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.02em" }}>
             {title ?? "Welcome to NextBigTool"}
           </div>
-          <div style={{ fontSize: 12, color: "#6B6B70", marginTop: 5, lineHeight: 1.5 }}>
+          <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 5, lineHeight: 1.5 }}>
             {subtitle ?? "Sign in or sign up to continue"}
           </div>
         </div>
@@ -91,18 +91,18 @@ export default function AuthModal({
           style={{
             width: "100%", display: "flex", alignItems: "center", justifyContent: "center",
             gap: 10, padding: "13px 0",
-            border: "1px solid #CFCFD4", borderRadius: 10,
-            background: "#fff", fontSize: 13.5, fontWeight: 600,
-            cursor: "pointer", fontFamily: "inherit", color: "#1A1A1A",
+            border: "1px solid var(--border)", borderRadius: 10,
+            background: "var(--surface)", fontSize: 13.5, fontWeight: 600,
+            cursor: "pointer", fontFamily: "inherit", color: "var(--ink)",
             transition: "background 0.15s, box-shadow 0.15s",
             boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = "#F9F9F9";
+            e.currentTarget.style.background = "var(--surface-alt)";
             e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = "#fff";
+            e.currentTarget.style.background = "var(--surface)";
             e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.08)";
           }}
         >
@@ -125,11 +125,11 @@ export default function AuthModal({
           </div>
         )}
 
-        <div style={{ fontSize: 10.5, color: "#A8A8AD", marginTop: 18, lineHeight: 1.6 }}>
+        <div style={{ fontSize: 10.5, color: "var(--ink-muted)", marginTop: 18, lineHeight: 1.6 }}>
           By continuing you agree to our{" "}
-          <a href="/rules" style={{ color: "#6B6B70", textDecoration: "underline" }}>Terms</a>
+          <a href="/rules" style={{ color: "var(--ink-muted)", textDecoration: "underline" }}>Terms</a>
           {" "}and{" "}
-          <a href="/rules" style={{ color: "#6B6B70", textDecoration: "underline" }}>Privacy Policy</a>.
+          <a href="/rules" style={{ color: "var(--ink-muted)", textDecoration: "underline" }}>Privacy Policy</a>.
         </div>
       </div>
     </>

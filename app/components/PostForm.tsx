@@ -65,11 +65,11 @@ export default function PostForm({
 
   const select: React.CSSProperties = {
     padding: "8px 10px",
-    border: "1px solid #CFCFD4",
+    border: "1px solid var(--border)",
     borderRadius: 6,
     fontSize: 12,
     fontFamily: "inherit",
-    background: "#fff",
+    background: "var(--surface)",
     outline: "none",
     cursor: "pointer",
   };
@@ -77,7 +77,7 @@ export default function PostForm({
   const input: React.CSSProperties = {
     width: "100%",
     padding: "8px 10px",
-    border: "1px solid #CFCFD4",
+    border: "1px solid var(--border)",
     borderRadius: 6,
     fontSize: 12,
     fontFamily: "inherit",
@@ -94,14 +94,14 @@ export default function PostForm({
           alignItems: "center",
           gap: 10,
           padding: "10px 14px",
-          border: "1px dashed #CFCFD4",
+          border: "1px dashed var(--border)",
           borderRadius: 8,
           cursor: "pointer",
-          background: "#FAFAFA",
+          background: "var(--surface-alt)",
         }}
       >
         {selectedTool && <Logo size={32} letter={selectedTool.name[0]} />}
-        <span style={{ fontSize: 12, color: "#A8A8AD", flex: 1 }}>
+        <span style={{ fontSize: 12, color: "var(--ink-muted)", flex: 1 }}>
           Share a milestone, update, or launch moment…
         </span>
         <Btn variant="primary" size="sm" onClick={() => setOpen(true)}>
@@ -115,9 +115,9 @@ export default function PostForm({
     <form
       onSubmit={handleSubmit}
       style={{
-        border: "1px solid #CFCFD4",
+        border: "1px solid var(--border)",
         borderRadius: 8,
-        background: "#fff",
+        background: "var(--surface)",
         overflow: "hidden",
       }}
     >
@@ -127,7 +127,7 @@ export default function PostForm({
           display: "flex",
           gap: 8,
           padding: "12px 14px",
-          borderBottom: "1px solid #F5F5F5",
+          borderBottom: "1px solid var(--border-faint)",
           flexWrap: "wrap",
         }}
       >
@@ -182,7 +182,7 @@ export default function PostForm({
           ...input,
           borderRadius: 0,
           border: "none",
-          borderBottom: "1px solid #F5F5F5",
+          borderBottom: "1px solid var(--border-faint)",
           resize: "none",
           padding: "12px 14px",
           lineHeight: 1.5,

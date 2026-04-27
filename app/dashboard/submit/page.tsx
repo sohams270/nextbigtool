@@ -43,20 +43,20 @@ const PLAN_OPTIONS = [
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "9px 12px",
-  border: "1px solid #CFCFD4",
+  border: "1px solid var(--border)",
   borderRadius: 7,
   fontSize: 12,
   outline: "none",
   boxSizing: "border-box",
   fontFamily: "inherit",
-  color: "#1A1A1A",
-  background: "#fff",
+  color: "var(--ink)",
+  background: "var(--surface)",
 };
 
 const labelStyle: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 700,
-  color: "#1A1A1A",
+  color: "var(--ink)",
   display: "block",
   marginBottom: 5,
 };
@@ -80,19 +80,19 @@ function StepIndicator({ active }: { active: number }) {
               <div style={{
                 width: 26, height: 26, borderRadius: "50%",
                 background: done ? "#00B87A" : cur ? "#FF6B35" : "#fff",
-                color: done || cur ? "#fff" : "#6B6B70",
-                border: `1.5px solid ${done ? "#00B87A" : cur ? "#FF6B35" : "#CFCFD4"}`,
+                color: done || cur ? "#fff" : "var(--ink-muted)",
+                border: `1.5px solid ${done ? "#00B87A" : cur ? "#FF6B35" : "var(--border)"}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 10, fontWeight: 800, flexShrink: 0,
               }}>
                 {done ? "✓" : i + 1}
               </div>
-              <span style={{ fontSize: 11, fontWeight: cur || done ? 700 : 500, color: cur ? "#1A1A1A" : done ? "#00B87A" : "#6B6B70", whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: 11, fontWeight: cur || done ? 700 : 500, color: cur ? "var(--ink)" : done ? "#00B87A" : "var(--ink-muted)", whiteSpace: "nowrap" }}>
                 {s}
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div style={{ flex: 1, height: 1, background: done ? "#00B87A" : "#CFCFD4", margin: "0 12px" }} />
+              <div style={{ flex: 1, height: 1, background: done ? "#00B87A" : "var(--border)", margin: "0 12px" }} />
             )}
           </div>
         );
@@ -103,7 +103,7 @@ function StepIndicator({ active }: { active: number }) {
 
 function Panel({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ background: "#fff", border: "1px solid #CFCFD4", borderRadius: 12, padding: "24px 28px", marginBottom: 16 }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, padding: "24px 28px", marginBottom: 16 }}>
       {children}
     </div>
   );
@@ -268,13 +268,13 @@ export default function SubmitPage() {
     return (
       <>
         <DashTopbar title="Submit Your Tool" subtitle="Submission received" />
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", background: "#F5F5F5" }}>
-          <div style={{ background: "#fff", border: "1px solid #CFCFD4", borderRadius: 16, padding: "48px 40px", maxWidth: 440, width: "100%", textAlign: "center" }}>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface-alt)" }}>
+          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "48px 40px", maxWidth: 440, width: "100%", textAlign: "center" }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>🚀</div>
             <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>You're in the queue!</div>
-            <div style={{ fontSize: 12, color: "#6B6B70", lineHeight: 1.7, marginBottom: 24 }}>
-              Your tool <strong style={{ color: "#1A1A1A" }}>{form.name}</strong> has been submitted and is pending review.<br />
-              We'll notify you at <strong style={{ color: "#1A1A1A" }}>{form.contact_email}</strong> once it's live.
+            <div style={{ fontSize: 12, color: "var(--ink-muted)", lineHeight: 1.7, marginBottom: 24 }}>
+              Your tool <strong style={{ color: "var(--ink)" }}>{form.name}</strong> has been submitted and is pending review.<br />
+              We'll notify you at <strong style={{ color: "var(--ink)" }}>{form.contact_email}</strong> once it's live.
             </div>
             <Btn variant="primary" size="md" onClick={() => router.push("/dashboard")}>
               Go to Dashboard
@@ -292,7 +292,7 @@ export default function SubmitPage() {
         title="Submit Your Tool"
         subtitle={`Step ${step + 1} of ${STEPS.length} — ${STEPS[step]}`}
       />
-      <div style={{ flex: 1, overflow: "auto", padding: "28px 40px", background: "#F5F5F5" }}>
+      <div style={{ flex: 1, overflow: "auto", padding: "28px 40px", background: "var(--surface-alt)" }}>
         <div style={{ maxWidth: 620, margin: "0 auto" }}>
           <StepIndicator active={step} />
 
@@ -300,7 +300,7 @@ export default function SubmitPage() {
           {step === 0 && (
             <Panel>
               <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 4 }}>Start with your website</div>
-              <p style={{ fontSize: 12, color: "#6B6B70", marginBottom: 20, marginTop: 0 }}>
+              <p style={{ fontSize: 12, color: "var(--ink-muted)", marginBottom: 20, marginTop: 0 }}>
                 Paste your product URL — we'll use it to identify your listing.
               </p>
               <FieldGroup label="Website URL">
@@ -327,7 +327,7 @@ export default function SubmitPage() {
           {step === 1 && (
             <Panel>
               <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 4 }}>Product details</div>
-              <p style={{ fontSize: 12, color: "#6B6B70", marginBottom: 20, marginTop: 0 }}>
+              <p style={{ fontSize: 12, color: "var(--ink-muted)", marginBottom: 20, marginTop: 0 }}>
                 This is what people see in the directory.
               </p>
 
@@ -339,14 +339,14 @@ export default function SubmitPage() {
                     style={{
                       width: 64, height: 64, borderRadius: 10,
                       border: "1.5px dashed #CFCFD4",
-                      background: logoPreview ? "transparent" : "#F5F5F5",
+                      background: logoPreview ? "transparent" : "var(--surface-alt)",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       cursor: "pointer", overflow: "hidden", flexShrink: 0,
                     }}
                   >
                     {logoPreview
                       ? <img src={logoPreview} alt="logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      : <span style={{ fontSize: 22, color: "#CFCFD4" }}>+</span>}
+                      : <span style={{ fontSize: 22, color: "var(--border)" }}>+</span>}
                   </div>
                   <div>
                     <Btn variant="ghostMuted" size="sm" onClick={() => logoRef.current?.click()}>
@@ -407,7 +407,7 @@ export default function SubmitPage() {
               </div>
 
               <FieldGroup label="Tags" hint="Up to 5 tags — press Enter or comma to add">
-                <div style={{ border: "1px solid #CFCFD4", borderRadius: 7, padding: "6px 8px", background: "#fff", display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+                <div style={{ border: "1px solid var(--border)", borderRadius: 7, padding: "6px 8px", background: "var(--surface)", display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
                   {form.tags.map((t) => (
                     <span key={t} style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#FFE3D6", color: "#FF6B35", borderRadius: 5, padding: "2px 8px", fontSize: 11, fontWeight: 600 }}>
                       {t}
@@ -416,7 +416,7 @@ export default function SubmitPage() {
                   ))}
                   {form.tags.length < 5 && (
                     <input
-                      style={{ border: "none", outline: "none", fontSize: 12, fontFamily: "inherit", flex: 1, minWidth: 100, color: "#1A1A1A" }}
+                      style={{ border: "none", outline: "none", fontSize: 12, fontFamily: "inherit", flex: 1, minWidth: 100, color: "var(--ink)" }}
                       placeholder="+ add tag…"
                       value={tagInput}
                       onChange={(e) => setTagInput(e.target.value)}
@@ -471,7 +471,7 @@ export default function SubmitPage() {
           {step === 2 && (
             <Panel>
               <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 4 }}>Choose a plan</div>
-              <p style={{ fontSize: 12, color: "#6B6B70", marginBottom: 22, marginTop: 0 }}>
+              <p style={{ fontSize: 12, color: "var(--ink-muted)", marginBottom: 22, marginTop: 0 }}>
                 You can upgrade anytime after launch.
               </p>
 
@@ -483,7 +483,7 @@ export default function SubmitPage() {
                       key={plan.id}
                       onClick={() => set("plan", plan.id)}
                       style={{
-                        border: `2px solid ${selected ? "#FF6B35" : "#CFCFD4"}`,
+                        border: `2px solid ${selected ? "#FF6B35" : "var(--border)"}`,
                         borderRadius: 10, padding: "16px 18px",
                         cursor: "pointer", background: selected ? "#FFF8F5" : "#fff",
                         transition: "all 0.15s",
@@ -499,19 +499,19 @@ export default function SubmitPage() {
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                           <div style={{
                             width: 18, height: 18, borderRadius: "50%",
-                            border: `2px solid ${selected ? "#FF6B35" : "#CFCFD4"}`,
+                            border: `2px solid ${selected ? "#FF6B35" : "var(--border)"}`,
                             background: selected ? "#FF6B35" : "#fff",
                             display: "flex", alignItems: "center", justifyContent: "center",
                           }}>
-                            {selected && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />}
+                            {selected && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--surface)" }} />}
                           </div>
                           <span style={{ fontSize: 13, fontWeight: 700 }}>{plan.label}</span>
                         </div>
-                        <span style={{ fontSize: 15, fontWeight: 800, color: selected ? "#FF6B35" : "#1A1A1A" }}>{plan.price}</span>
+                        <span style={{ fontSize: 15, fontWeight: 800, color: selected ? "#FF6B35" : "var(--ink)" }}>{plan.price}</span>
                       </div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 4, paddingLeft: 28 }}>
                         {plan.perks.map((p) => (
-                          <div key={p} style={{ fontSize: 11, color: "#6B6B70", display: "flex", alignItems: "center", gap: 6 }}>
+                          <div key={p} style={{ fontSize: 11, color: "var(--ink-muted)", display: "flex", alignItems: "center", gap: 6 }}>
                             <span style={{ color: "#00B87A", fontWeight: 700 }}>✓</span> {p}
                           </div>
                         ))}
@@ -532,7 +532,7 @@ export default function SubmitPage() {
           {step === 3 && (
             <Panel>
               <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 4 }}>Review & Launch</div>
-              <p style={{ fontSize: 12, color: "#6B6B70", marginBottom: 20, marginTop: 0 }}>
+              <p style={{ fontSize: 12, color: "var(--ink-muted)", marginBottom: 20, marginTop: 0 }}>
                 Double-check your details before submitting.
               </p>
 
@@ -547,8 +547,8 @@ export default function SubmitPage() {
                   ["Contact email", form.contact_email || "—"],
                 ].map(([k, v]) => (
                   <div key={k} style={{ display: "flex", gap: 12, fontSize: 12 }}>
-                    <span style={{ width: 110, flexShrink: 0, color: "#6B6B70", fontWeight: 600 }}>{k}</span>
-                    <span style={{ color: "#1A1A1A", fontWeight: 500, wordBreak: "break-all" }}>{v}</span>
+                    <span style={{ width: 110, flexShrink: 0, color: "var(--ink-muted)", fontWeight: 600 }}>{k}</span>
+                    <span style={{ color: "var(--ink)", fontWeight: 500, wordBreak: "break-all" }}>{v}</span>
                   </div>
                 ))}
               </div>
@@ -559,7 +559,7 @@ export default function SubmitPage() {
                 </div>
               )}
 
-              <div style={{ background: "#F9F9F9", borderRadius: 8, padding: "12px 14px", marginBottom: 18, fontSize: 11, color: "#6B6B70", lineHeight: 1.6 }}>
+              <div style={{ background: "#F9F9F9", borderRadius: 8, padding: "12px 14px", marginBottom: 18, fontSize: 11, color: "var(--ink-muted)", lineHeight: 1.6 }}>
                 Your tool will be reviewed by the team before going live. Usually within 24 hours.
               </div>
 

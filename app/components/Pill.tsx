@@ -4,13 +4,13 @@ type PillColor = "gray" | "orange" | "orangeSolid" | "green" | "blue" | "outline
 type PillSize = "xs" | "sm" | "md";
 
 const colors: Record<PillColor, { bg: string; fg: string; border: string }> = {
-  gray:        { bg: "#F5F5F5",  fg: "#1A1A1A", border: "#CFCFD4" },
-  orange:      { bg: "#FFE3D6",  fg: "#FF6B35", border: "#FF6B35" },
-  orangeSolid: { bg: "#FF6B35",  fg: "#fff",    border: "#FF6B35" },
-  green:       { bg: "#D8F5E8",  fg: "#007A52", border: "#00B87A" },
-  blue:        { bg: "#DDE9FF",  fg: "#2558C9", border: "#3B7FFF" },
-  outline:     { bg: "transparent", fg: "#1A1A1A", border: "#1A1A1A" },
-  dark:        { bg: "#0A0B1A", fg: "#fff",    border: "#0A0B1A" },
+  gray:        { bg: "var(--surface-alt)", fg: "var(--ink)",    border: "var(--border)" },
+  orange:      { bg: "var(--orange-soft)", fg: "#FF6B35",       border: "#FF6B35" },
+  orangeSolid: { bg: "#FF6B35",            fg: "#fff",          border: "#FF6B35" },
+  green:       { bg: "var(--green-soft)",  fg: "#007A52",       border: "#00B87A" },
+  blue:        { bg: "#DDE9FF",            fg: "#2558C9",       border: "#3B7FFF" },
+  outline:     { bg: "transparent",        fg: "var(--ink)",    border: "var(--ink)" },
+  dark:        { bg: "#0A0B1A",            fg: "#fff",          border: "#0A0B1A" },
 };
 
 const sizes: Record<PillSize, { padding: string; fontSize: string }> = {

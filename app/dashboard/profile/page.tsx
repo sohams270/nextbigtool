@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 
-const card: React.CSSProperties = { background: "#fff", border: "1px solid #ececea", borderRadius: 14, padding: 20 };
+const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 20 };
 const field: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 5 };
-const label: React.CSSProperties = { fontSize: 11.5, fontWeight: 600, color: "#3a3a45" };
-const input: React.CSSProperties = { padding: "8px 10px", borderRadius: 8, border: "1.5px solid #ececea", fontSize: 13, color: "#0f0f10", fontFamily: "inherit", outline: "none", width: "100%" };
+const label: React.CSSProperties = { fontSize: 11.5, fontWeight: 600, color: "var(--ink-2)" };
+const input: React.CSSProperties = { padding: "8px 10px", borderRadius: 8, border: "1.5px solid #ececea", fontSize: 13, color: "var(--ink)", fontFamily: "inherit", outline: "none", width: "100%" };
 
 type Profile = {
   full_name: string;
@@ -63,12 +63,12 @@ export default function ProfilePage() {
     <main style={{ flex: 1, overflow: "auto", padding: "28px 32px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4 }}>Account</div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0f0f10", letterSpacing: "-0.02em", margin: "0 0 4px" }}>My Profile</h1>
-          <p style={{ fontSize: 13, color: "#6b6b78", margin: 0 }}>This info appears on your product listings and public profile.</p>
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>Account</div>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.02em", margin: "0 0 4px" }}>My Profile</h1>
+          <p style={{ fontSize: 13, color: "var(--ink-muted)", margin: 0 }}>This info appears on your product listings and public profile.</p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button style={{ padding: "0 14px", height: 36, borderRadius: 9, border: "1px solid #d8d8d4", background: "transparent", fontSize: 12.5, fontWeight: 600, cursor: "pointer", color: "#3a3a45" }}>
+          <button style={{ padding: "0 14px", height: 36, borderRadius: 9, border: "1px solid #d8d8d4", background: "transparent", fontSize: 12.5, fontWeight: 600, cursor: "pointer", color: "var(--ink-2)" }}>
             Cancel
           </button>
           <button onClick={handleSave} disabled={saving} style={{
@@ -83,7 +83,7 @@ export default function ProfilePage() {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20 }}>
         {/* Form */}
         <div style={card}>
-          <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0f0f10", margin: "0 0 16px" }}>Personal details</h2>
+          <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", margin: "0 0 16px" }}>Personal details</h2>
 
           {/* Avatar */}
           <div style={{ display: "flex", gap: 16, marginBottom: 20 }}>
@@ -92,10 +92,10 @@ export default function ProfilePage() {
             </div>
             <div>
               <div style={{ fontWeight: 600, fontSize: 13.5, marginBottom: 2 }}>Profile photo</div>
-              <div style={{ fontSize: 12, color: "#9090a0", marginBottom: 10 }}>PNG or JPG, 400×400 recommended</div>
+              <div style={{ fontSize: 12, color: "var(--ink-muted)", marginBottom: 10 }}>PNG or JPG, 400×400 recommended</div>
               <div style={{ display: "flex", gap: 6 }}>
-                <button style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid #d8d8d4", background: "transparent", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "#3a3a45" }}>Upload</button>
-                <button style={{ padding: "5px 12px", borderRadius: 7, border: "none", background: "transparent", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "#9090a0" }}>Remove</button>
+                <button style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid #d8d8d4", background: "transparent", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "var(--ink-2)" }}>Upload</button>
+                <button style={{ padding: "5px 12px", borderRadius: 7, border: "none", background: "transparent", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "var(--ink-muted)" }}>Remove</button>
               </div>
             </div>
           </div>
@@ -113,12 +113,12 @@ export default function ProfilePage() {
             </div>
             <div style={field}>
               <label style={label}>Email</label>
-              <input value={userEmail} disabled style={{ ...input, background: "#fafaf9", color: "#9090a0" }} />
+              <input value={userEmail} disabled style={{ ...input, background: "#fafaf9", color: "var(--ink-muted)" }} />
             </div>
             <div style={field}>
               <label style={label}>Username</label>
               <input value={username} onChange={set("username")} placeholder="yourhandle" style={input} />
-              {username && <div style={{ fontSize: 11, color: "#9090a0" }}>nextbigtool.com/@{username}</div>}
+              {username && <div style={{ fontSize: 11, color: "var(--ink-muted)" }}>nextbigtool.com/@{username}</div>}
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div style={field}>
@@ -136,7 +136,7 @@ export default function ProfilePage() {
             </div>
 
             <div style={{ borderTop: "1px solid #ececea", paddingTop: 16 }}>
-              <h3 style={{ fontSize: 13.5, fontWeight: 700, color: "#0f0f10", margin: "0 0 14px" }}>Social links</h3>
+              <h3 style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink)", margin: "0 0 14px" }}>Social links</h3>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div style={field}>
                   <label style={label}>Website</label>
@@ -163,40 +163,40 @@ export default function ProfilePage() {
         <aside style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {/* Profile preview */}
           <div style={card}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#0f0f10", margin: "0 0 14px" }}>Profile preview</h3>
-            <div style={{ border: "1px solid #ececea", borderRadius: 12, padding: 16, textAlign: "center" }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", margin: "0 0 14px" }}>Profile preview</h3>
+            <div style={{ border: "1px solid var(--border)", borderRadius: 12, padding: 16, textAlign: "center" }}>
               <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg,#ff6a3d,#ff3d88)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 800, color: "#fff", margin: "0 auto 10px" }}>
                 {initials.toUpperCase() || "?"}
               </div>
               <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 2 }}>{profile.full_name || "Your Name"}</div>
-              <div style={{ fontSize: 12, color: "#9090a0" }}>
+              <div style={{ fontSize: 12, color: "var(--ink-muted)" }}>
                 {username ? `@${username} · ` : ""}{profile.role || "Maker"}{profile.company ? ` at ${profile.company}` : ""}
               </div>
               {profile.bio && (
-                <div style={{ fontSize: 12.5, color: "#3a3a45", margin: "8px 0", lineHeight: 1.5 }}>{profile.bio.slice(0, 80)}{profile.bio.length > 80 ? "…" : ""}</div>
+                <div style={{ fontSize: 12.5, color: "var(--ink-2)", margin: "8px 0", lineHeight: 1.5 }}>{profile.bio.slice(0, 80)}{profile.bio.length > 80 ? "…" : ""}</div>
               )}
             </div>
           </div>
 
           {/* Verification */}
           <div style={card}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#0f0f10", margin: "0 0 12px" }}>Verification</h3>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", margin: "0 0 12px" }}>Verification</h3>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid #f5f5f3" }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "#0f0f10" }}>Email verified</div>
-                <div style={{ fontSize: 12, color: "#9090a0" }}>{userEmail}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>Email verified</div>
+                <div style={{ fontSize: 12, color: "var(--ink-muted)" }}>{userEmail}</div>
               </div>
               <span style={{ padding: "3px 10px", borderRadius: 20, background: "#e6f9f1", color: "#0a7a4f", fontSize: 11, fontWeight: 700 }}>Verified</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0" }}>
               <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: "#0f0f10" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>
                   Domain verified
-                  <span style={{ padding: "2px 7px", borderRadius: 20, background: "#fff0eb", color: "#c04400", fontSize: 10, fontWeight: 700 }}>Core</span>
+                  <span style={{ padding: "2px 7px", borderRadius: 20, background: "var(--orange-soft)", color: "#c04400", fontSize: 10, fontWeight: 700 }}>Core</span>
                 </div>
-                <div style={{ fontSize: 12, color: "#9090a0" }}>Connect a DNS record to show a ✓ on your listings.</div>
+                <div style={{ fontSize: 12, color: "var(--ink-muted)" }}>Connect a DNS record to show a ✓ on your listings.</div>
               </div>
-              <button style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid #d8d8d4", background: "transparent", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "#3a3a45" }}>Connect</button>
+              <button style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid #d8d8d4", background: "transparent", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "var(--ink-2)" }}>Connect</button>
             </div>
           </div>
         </aside>

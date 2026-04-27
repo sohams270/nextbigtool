@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 
-const card: React.CSSProperties = { background: "#fff", border: "1px solid #ececea", borderRadius: 14, padding: 20 };
+const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 20 };
 
 const MOCK_ROWS = [
   { initials: "MJ", bg: "linear-gradient(135deg,#4f46e5,#a855f7)", user: "maria.johnson", email: "maria@stripe.com", company: "Stripe", product: "PromptCraft", action: "▲ Upvoted", actionColor: "#ff6a3d", actionBg: "#fff0eb", when: "2m ago" },
@@ -26,9 +26,9 @@ export default async function InterestedPage() {
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4 }}>Leads · Core feature</div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0f0f10", letterSpacing: "-0.02em", margin: "0 0 4px" }}>Interested Users</h1>
-          <p style={{ fontSize: 13, color: "#6b6b78", margin: 0 }}>People who upvoted or commented on your products — with enriched contact info.</p>
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>Leads · Core feature</div>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.02em", margin: "0 0 4px" }}>Interested Users</h1>
+          <p style={{ fontSize: 13, color: "var(--ink-muted)", margin: 0 }}>People who upvoted or commented on your products — with enriched contact info.</p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <button disabled style={{ opacity: 0.45, padding: "0 14px", height: 32, borderRadius: 8, border: "1px solid #d8d8d4", background: "transparent", fontSize: 12, fontWeight: 600, cursor: "not-allowed" }}>
@@ -44,10 +44,10 @@ export default async function InterestedPage() {
 
       {/* Filter row */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-        <div style={{ display: "flex", background: "#f1f1ee", borderRadius: 9, padding: 3 }}>
-          <div style={{ padding: "5px 14px", borderRadius: 7, fontSize: 12, fontWeight: 600, background: "#fff", color: "#0f0f10", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>All products</div>
+        <div style={{ display: "flex", background: "var(--surface-alt)", borderRadius: 9, padding: 3 }}>
+          <div style={{ padding: "5px 14px", borderRadius: 7, fontSize: 12, fontWeight: 600, background: "var(--surface)", color: "var(--ink)", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>All products</div>
         </div>
-        <span style={{ padding: "3px 10px", borderRadius: 20, background: "#f1f1ee", fontSize: 11, fontWeight: 600, color: "#6b6b78" }}>43 total</span>
+        <span style={{ padding: "3px 10px", borderRadius: 20, background: "var(--surface-alt)", fontSize: 11, fontWeight: 600, color: "var(--ink-muted)" }}>43 total</span>
         <span style={{ padding: "3px 10px", borderRadius: 20, background: "#e6f9f1", fontSize: 11, fontWeight: 600, color: "#0a7a4f" }}>12 new this week</span>
       </div>
 
@@ -59,7 +59,7 @@ export default async function InterestedPage() {
             <thead>
               <tr style={{ borderBottom: "1px solid #ececea" }}>
                 {["", "User", "Email", "Company", "Product", "Action", "When", ""].map((h, i) => (
-                  <th key={i} style={{ padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "#9090a0", textTransform: "uppercase" as const, letterSpacing: "0.06em", background: "#fafaf9", whiteSpace: "nowrap" as const }}>
+                  <th key={i} style={{ padding: "12px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase" as const, letterSpacing: "0.06em", background: "var(--surface-alt)", whiteSpace: "nowrap" as const }}>
                     {h}
                   </th>
                 ))}
@@ -79,15 +79,15 @@ export default async function InterestedPage() {
                       <b>{row.user}</b>
                     </div>
                   </td>
-                  <td style={{ padding: "12px 16px", color: "#6b6b78" }}>{row.email}</td>
+                  <td style={{ padding: "12px 16px", color: "var(--ink-muted)" }}>{row.email}</td>
                   <td style={{ padding: "12px 16px", fontWeight: 600 }}>{row.company}</td>
-                  <td style={{ padding: "12px 16px", color: "#6b6b78" }}>{row.product}</td>
+                  <td style={{ padding: "12px 16px", color: "var(--ink-muted)" }}>{row.product}</td>
                   <td style={{ padding: "12px 16px" }}>
                     <span style={{ padding: "3px 8px", borderRadius: 20, background: row.actionBg, color: row.actionColor, fontSize: 11, fontWeight: 700 }}>
                       {row.action}
                     </span>
                   </td>
-                  <td style={{ padding: "12px 16px", color: "#9090a0" }}>{row.when}</td>
+                  <td style={{ padding: "12px 16px", color: "var(--ink-muted)" }}>{row.when}</td>
                   <td style={{ padding: "12px 16px" }}>⋯</td>
                 </tr>
               ))}
@@ -113,8 +113,8 @@ export default async function InterestedPage() {
           }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
           </div>
-          <div style={{ fontSize: 17, fontWeight: 800, color: "#0f0f10", marginBottom: 8 }}>Unlock Interested Users</div>
-          <div style={{ fontSize: 13, color: "#6b6b78", maxWidth: 380, lineHeight: 1.6, marginBottom: 16 }}>
+          <div style={{ fontSize: 17, fontWeight: 800, color: "var(--ink)", marginBottom: 8 }}>Unlock Interested Users</div>
+          <div style={{ fontSize: 13, color: "var(--ink-muted)", maxWidth: 380, lineHeight: 1.6, marginBottom: 16 }}>
             See the name, email, and company of everyone who upvotes or comments on your products. Available on Core and Premium plans.
           </div>
           <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
@@ -125,11 +125,11 @@ export default async function InterestedPage() {
             }}>Upgrade to Core — $79/mo</Link>
             <Link href="/dashboard/plan" style={{
               background: "transparent", border: "1px solid #d8d8d4", borderRadius: 9,
-              padding: "0 16px", height: 38, fontSize: 13, fontWeight: 600, color: "#3a3a45",
+              padding: "0 16px", height: 38, fontSize: 13, fontWeight: 600, color: "var(--ink-2)",
               display: "inline-flex", alignItems: "center", textDecoration: "none",
             }}>Compare plans</Link>
           </div>
-          <div style={{ fontSize: 11, color: "#9090a0", fontFamily: "monospace" }}>
+          <div style={{ fontSize: 11, color: "var(--ink-muted)", fontFamily: "monospace" }}>
             Your data is waiting · 43 contacts pending reveal
           </div>
         </div>

@@ -17,7 +17,7 @@ type Tool = {
   tags: string[] | null;
 };
 
-const card: React.CSSProperties = { background: "#fff", border: "1px solid #ececea", borderRadius: 14, padding: 20 };
+const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 20 };
 
 export default async function ProductsPage() {
   const cookieStore = await cookies();
@@ -40,16 +40,16 @@ export default async function ProductsPage() {
   const statusColor = (s: string) =>
     s === "approved" ? { bg: "#e6f9f1", fg: "#0a7a4f" } :
     s === "pending"  ? { bg: "#fff5ec", fg: "#b05a00" } :
-                       { bg: "#f1f1ee", fg: "#6b6b78" };
+                       { bg: "var(--surface-alt)", fg: "var(--ink-muted)" };
 
   return (
     <main style={{ flex: 1, overflow: "auto", padding: "28px 32px" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4 }}>Products</div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#0f0f10", letterSpacing: "-0.02em", margin: "0 0 4px" }}>My Products</h1>
-          <p style={{ fontSize: 13, color: "#6b6b78", margin: 0 }}>Manage, edit, and track the products you&apos;ve submitted to NextBigTool.</p>
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>Products</div>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.02em", margin: "0 0 4px" }}>My Products</h1>
+          <p style={{ fontSize: 13, color: "var(--ink-muted)", margin: 0 }}>Manage, edit, and track the products you&apos;ve submitted to NextBigTool.</p>
         </div>
         <Link href="/dashboard/submit" style={{
           background: "linear-gradient(90deg,#ff6a3d,#ff3d88)", border: "none", borderRadius: 9,
@@ -63,12 +63,12 @@ export default async function ProductsPage() {
 
       {/* Tabs */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <div style={{ display: "flex", background: "#f1f1ee", borderRadius: 9, padding: 3, gap: 2 }}>
+        <div style={{ display: "flex", background: "var(--surface-alt)", borderRadius: 9, padding: 3, gap: 2 }}>
           {[`All (${tools.length})`, `Live (${live.length})`, `Draft (${draft.length})`].map((t, i) => (
             <div key={t} style={{
               padding: "5px 14px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer",
-              background: i === 0 ? "#fff" : "transparent",
-              color: i === 0 ? "#0f0f10" : "#6b6b78",
+              background: i === 0 ? "var(--surface)" : "transparent",
+              color: i === 0 ? "var(--ink)" : "var(--ink-muted)",
               boxShadow: i === 0 ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
             }}>{t}</div>
           ))}
@@ -81,8 +81,8 @@ export default async function ProductsPage() {
           {tools.length === 0 ? (
             <div style={{ ...card, textAlign: "center", padding: "48px 20px" }}>
               <div style={{ fontSize: 36, marginBottom: 12 }}>🚀</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#0f0f10", marginBottom: 6 }}>No products yet</div>
-              <div style={{ fontSize: 13, color: "#9090a0", marginBottom: 20 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", marginBottom: 6 }}>No products yet</div>
+              <div style={{ fontSize: 13, color: "var(--ink-muted)", marginBottom: 20 }}>
                 Submit your first product to reach thousands of early adopters.
               </div>
               <Link href="/dashboard/submit" style={{
@@ -105,28 +105,28 @@ export default async function ProductsPage() {
                 }}>
                   <div style={{
                     width: 48, height: 48, borderRadius: 12, flexShrink: 0,
-                    background: t.status === "draft" ? "#f1f1ee" : `hsl(${t.name.charCodeAt(0) * 5 % 360},65%,55%)`,
+                    background: t.status === "draft" ? "var(--surface-alt)" : `hsl(${t.name.charCodeAt(0) * 5 % 360},65%,55%)`,
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 18, fontWeight: 800, color: t.status === "draft" ? "#9090a0" : "#fff",
+                    fontSize: 18, fontWeight: 800, color: t.status === "draft" ? "var(--ink-muted)" : "#fff",
                   }}>
                     {t.status === "draft" ? "?" : t.name[0]}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                      <span style={{ fontSize: 15, fontWeight: 700, color: "#0f0f10" }}>{t.name}</span>
+                      <span style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>{t.name}</span>
                       <span style={{ padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: sc.bg, color: sc.fg }}>
                         {statusLabel(t.status)}
                       </span>
                       {t.plan === "featured" && (
-                        <span style={{ padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "#fff0eb", color: "#c04400" }}>Featured</span>
+                        <span style={{ padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700, background: "var(--orange-soft)", color: "#c04400" }}>Featured</span>
                       )}
                     </div>
-                    <div style={{ fontSize: 13, color: "#6b6b78", marginBottom: 4 }}>{t.tagline}</div>
+                    <div style={{ fontSize: 13, color: "var(--ink-muted)", marginBottom: 4 }}>{t.tagline}</div>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" as const }}>
                       {(t.tags ?? []).slice(0, 2).map((tag) => (
-                        <span key={tag} style={{ padding: "2px 8px", borderRadius: 6, background: "#f1f1ee", fontSize: 11, color: "#6b6b78" }}>{tag}</span>
+                        <span key={tag} style={{ padding: "2px 8px", borderRadius: 6, background: "var(--surface-alt)", fontSize: 11, color: "var(--ink-muted)" }}>{tag}</span>
                       ))}
-                      {launchDate && <span style={{ fontSize: 11, color: "#9090a0" }}>· Submitted {launchDate}</span>}
+                      {launchDate && <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>· Submitted {launchDate}</span>}
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 20, flexShrink: 0 }}>
@@ -134,17 +134,17 @@ export default async function ProductsPage() {
                       <>
                         <div style={{ textAlign: "center" }}>
                           <div style={{ fontSize: 16, fontWeight: 800, color: "#ff6a3d" }}>{t.upvote_count ?? 0}</div>
-                          <div style={{ fontSize: 10, color: "#9090a0", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Upvotes</div>
+                          <div style={{ fontSize: 10, color: "var(--ink-muted)", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Upvotes</div>
                         </div>
                         <div style={{ textAlign: "center" }}>
                           <div style={{ fontSize: 16, fontWeight: 800, color: "#3b7fff" }}>{t.view_count ?? 0}</div>
-                          <div style={{ fontSize: 10, color: "#9090a0", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Views</div>
+                          <div style={{ fontSize: 10, color: "var(--ink-muted)", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Views</div>
                         </div>
                       </>
                     ) : (
                       <Link href="/dashboard/submit" style={{
                         padding: "6px 14px", borderRadius: 8, border: "1px solid #d8d8d4",
-                        fontSize: 12, fontWeight: 600, color: "#3a3a45", textDecoration: "none",
+                        fontSize: 12, fontWeight: 600, color: "var(--ink-2)", textDecoration: "none",
                       }}>Resume →</Link>
                     )}
                   </div>
@@ -182,13 +182,13 @@ export default async function ProductsPage() {
               display: "block", textAlign: "center", background: "linear-gradient(90deg,#ff6a3d,#ff3d88)",
               borderRadius: 9, padding: "9px 0", fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none",
             }}>See plans →</Link>
-            <div style={{ fontSize: 11, color: "#6b6b78", textAlign: "center", marginTop: 8 }}>From $12 / month</div>
+            <div style={{ fontSize: 11, color: "var(--ink-muted)", textAlign: "center", marginTop: 8 }}>From $12 / month</div>
           </div>
 
           {/* Quick tips */}
           <div style={card}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#0f0f10", margin: "0 0 12px" }}>Quick tips</h3>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10, fontSize: 12.5, color: "#6b6b78", lineHeight: 1.5 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", margin: "0 0 12px" }}>Quick tips</h3>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10, fontSize: 12.5, color: "var(--ink-muted)", lineHeight: 1.5 }}>
               <li>• Clear, benefit-led first line out-performs feature lists by ~40%.</li>
               <li>• Launch on Tuesday/Wednesday for best visibility.</li>
               <li>• Add 3 categories — products with tags get 2.3× more views.</li>

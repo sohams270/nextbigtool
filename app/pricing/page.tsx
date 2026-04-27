@@ -9,7 +9,7 @@ import Link from "next/link";
 function Toggle({ yearly, onChange }: { yearly: boolean; onChange: (v: boolean) => void }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 48 }}>
-      <span style={{ fontSize: 14, fontWeight: 600, color: yearly ? "#9090a0" : "#0f0f10" }}>Monthly</span>
+      <span style={{ fontSize: 14, fontWeight: 600, color: yearly ? "var(--ink-muted)" : "var(--ink)" }}>Monthly</span>
       <button
         onClick={() => onChange(!yearly)}
         style={{
@@ -24,7 +24,7 @@ function Toggle({ yearly, onChange }: { yearly: boolean; onChange: (v: boolean) 
           transition: "left 0.2s",
         }} />
       </button>
-      <span style={{ fontSize: 14, fontWeight: 600, color: yearly ? "#0f0f10" : "#9090a0" }}>Yearly</span>
+      <span style={{ fontSize: 14, fontWeight: 600, color: yearly ? "var(--ink)" : "var(--ink-muted)" }}>Yearly</span>
       <span style={{
         background: "#d1fae5", color: "#065f46", fontSize: 12, fontWeight: 700,
         padding: "3px 10px", borderRadius: 999, letterSpacing: "0.01em",
@@ -90,7 +90,7 @@ function FaqAccordion() {
   const [open, setOpen] = useState<number | null>(null);
   return (
     <div style={{ maxWidth: 720, margin: "0 auto" }}>
-      <h2 style={{ fontSize: 32, fontWeight: 800, letterSpacing: "-0.02em", textAlign: "center", margin: "0 0 32px", color: "#0f0f10" }}>Common questions</h2>
+      <h2 style={{ fontSize: 32, fontWeight: 800, letterSpacing: "-0.02em", textAlign: "center", margin: "0 0 32px", color: "var(--ink)" }}>Common questions</h2>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {FAQ_ITEMS.map((item, i) => (
           <div
@@ -100,16 +100,16 @@ function FaqAccordion() {
             <button
               onClick={() => setOpen(open === i ? null : i)}
               style={{
-                width: "100%", background: open === i ? "#fafaf9" : "#fff", border: "none",
+                width: "100%", background: open === i ? "var(--surface-alt)" : "var(--surface)", border: "none",
                 padding: "20px 20px", display: "flex", justifyContent: "space-between",
                 alignItems: "center", cursor: "pointer", fontFamily: "inherit", textAlign: "left",
               }}
             >
-              <span style={{ fontSize: 14, fontWeight: 700, color: "#0f0f10", paddingRight: 16 }}>{item.q}</span>
-              <span style={{ fontSize: 16, color: "#9090a0", flexShrink: 0, transform: open === i ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", paddingRight: 16 }}>{item.q}</span>
+              <span style={{ fontSize: 16, color: "var(--ink-muted)", flexShrink: 0, transform: open === i ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
             </button>
             {open === i && (
-              <div style={{ padding: "0 20px 20px", background: "#fafaf9" }}>
+              <div style={{ padding: "0 20px 20px", background: "var(--surface-alt)" }}>
                 <p style={{ fontSize: 13, color: "#6b6b78", lineHeight: 1.65, margin: 0 }}>{item.a}</p>
               </div>
             )}
@@ -126,7 +126,7 @@ export default function PricingPage() {
   const corePrice = yearly ? "$49" : "$79";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#F5F5F5", fontFamily: "Inter, sans-serif" }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)", fontFamily: "Inter, sans-serif" }}>
       <TopNav />
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 32px 80px", width: "100%" }}>
@@ -136,8 +136,8 @@ export default function PricingPage() {
 
         {/* ── Section header ── */}
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "#9090a0", marginBottom: 12 }}>PLANS &amp; PRICING</div>
-          <h1 style={{ fontSize: 38, fontWeight: 800, letterSpacing: "-0.025em", color: "#0f0f10", margin: "0 0 14px" }}>The right plan for every stage</h1>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--ink-muted)", marginBottom: 12 }}>PLANS &amp; PRICING</div>
+          <h1 style={{ fontSize: 38, fontWeight: 800, letterSpacing: "-0.025em", color: "var(--ink)", margin: "0 0 14px" }}>The right plan for every stage</h1>
           <p style={{ fontSize: 16, color: "#6b6b78", margin: 0 }}>From your first launch to building serious traction.</p>
         </div>
 
@@ -145,46 +145,46 @@ export default function PricingPage() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 24, alignItems: "start" }}>
 
           {/* FREE */}
-          <div style={{ background: "#f5f5f3", border: "1px solid #e5e5e3", borderRadius: 16, padding: 28, display: "flex", flexDirection: "column", gap: 0 }}>
-            <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9090a0", marginBottom: 10 }}>FREE</div>
+          <div style={{ background: "var(--surface-alt)", border: "1px solid var(--border)", borderRadius: 16, padding: 28, display: "flex", flexDirection: "column", gap: 0 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ink-muted)", marginBottom: 10 }}>FREE</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: "-0.04em", color: "#0f0f10" }}>$0</span>
+              <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: "-0.04em", color: "var(--ink)" }}>$0</span>
             </div>
             <div style={{ fontSize: 13, color: "#6b6b78", marginBottom: 16 }}>Forever free. No credit card needed.</div>
-            <p style={{ fontSize: 13, color: "#3a3a45", lineHeight: 1.6, marginBottom: 24, margin: "0 0 24px" }}>
+            <p style={{ fontSize: 13, color: "var(--ink-2)", lineHeight: 1.6, marginBottom: 24, margin: "0 0 24px" }}>
               Perfect for exploring the platform and sharing your first product with the world.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
               {["List 1 product", "Lifetime free listing", "High authority backlink", "1 post on Build in Public wall", "Basic analytics (upvotes + comments)"].map((f) => (
                 <div key={f} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                   <Check />
-                  <span style={{ fontSize: 13, color: "#3a3a45", lineHeight: 1.45 }}>{f}</span>
+                  <span style={{ fontSize: 13, color: "var(--ink-2)", lineHeight: 1.45 }}>{f}</span>
                 </div>
               ))}
             </div>
             <Link href="/auth/login" style={{ textDecoration: "none" }}>
-              <button style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "1.5px solid #d8d8d4", background: "transparent", fontSize: 14, fontWeight: 700, color: "#3a3a45", cursor: "pointer", fontFamily: "inherit" }}>
+              <button style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "1.5px solid var(--border)", background: "transparent", fontSize: 14, fontWeight: 700, color: "var(--ink-2)", cursor: "pointer", fontFamily: "inherit" }}>
                 Get Started Free
               </button>
             </Link>
           </div>
 
           {/* BASIC */}
-          <div style={{ background: "#fff", border: "1px solid #e5e5e3", borderRadius: 16, padding: 28, display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9090a0", marginBottom: 10 }}>BASIC</div>
+          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: 28, display: "flex", flexDirection: "column" }}>
+            <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ink-muted)", marginBottom: 10 }}>BASIC</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: "-0.04em", color: "#0f0f10" }}>$19</span>
+              <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: "-0.04em", color: "var(--ink)" }}>$19</span>
             </div>
             <div style={{ fontSize: 13, color: "#6b6b78", marginBottom: 16 }}>One-time per product. Pay once, keep forever.</div>
-            <p style={{ fontSize: 13, color: "#3a3a45", lineHeight: 1.6, margin: "0 0 20px" }}>
+            <p style={{ fontSize: 13, color: "var(--ink-2)", lineHeight: 1.6, margin: "0 0 20px" }}>
               For founders who want more visibility and a boost on launch day.
             </p>
-            <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9090a0", marginBottom: 12 }}>EVERYTHING IN FREE, PLUS</div>
+            <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ink-muted)", marginBottom: 12 }}>EVERYTHING IN FREE, PLUS</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28, flex: 1 }}>
               {["Featured for 48 hours on launch", "Featured in weekly newsletter (once)", "Re-launch option", "5 posts on Build in Public wall", "CSV export of your data"].map((f) => (
                 <div key={f} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                   <Check />
-                  <span style={{ fontSize: 13, color: "#3a3a45", lineHeight: 1.45 }}>{f}</span>
+                  <span style={{ fontSize: 13, color: "var(--ink-2)", lineHeight: 1.45 }}>{f}</span>
                 </div>
               ))}
             </div>
@@ -254,7 +254,7 @@ export default function PricingPage() {
         </div>
 
         {/* ── Guarantee ── */}
-        <div style={{ textAlign: "center", fontSize: 13, color: "#9090a0", marginBottom: 72 }}>
+        <div style={{ textAlign: "center", fontSize: 13, color: "var(--ink-muted)", marginBottom: 72 }}>
           All plans include a 7-day money-back guarantee.{" "}
           <span style={{ margin: "0 8px" }}>·</span>
           <Link href="/contact" style={{ color: "#FF6B35", fontWeight: 600, textDecoration: "none" }}>Questions? Chat with us →</Link>
@@ -262,32 +262,32 @@ export default function PricingPage() {
 
         {/* ── Comparison table ── */}
         <div style={{ marginBottom: 80 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", color: "#0f0f10", margin: "0 0 6px" }}>Compare plans in detail</h2>
+          <h2 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", color: "var(--ink)", margin: "0 0 6px" }}>Compare plans in detail</h2>
           <p style={{ fontSize: 14, color: "#6b6b78", margin: "0 0 28px" }}>See exactly what you get with each plan, side by side.</p>
 
-          <div style={{ background: "#fff", border: "1px solid #e5e5e3", borderRadius: 16, overflow: "hidden" }}>
+          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, overflow: "hidden" }}>
             {/* Header row */}
             <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderBottom: "2px solid #e5e5e3" }}>
               <div style={{ padding: "20px 24px" }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#0f0f10" }}>All plans compared</div>
-                <div style={{ fontSize: 12, color: "#9090a0", marginTop: 2 }}>Full feature breakdown</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>All plans compared</div>
+                <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2 }}>Full feature breakdown</div>
               </div>
               {/* FREE col header */}
               <div style={{ padding: "20px 16px", borderLeft: "1px solid #e5e5e3", textAlign: "center" }}>
-                <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4 }}>FREE</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: "#0f0f10", letterSpacing: "-0.03em", marginBottom: 2 }}>$0</div>
-                <div style={{ fontSize: 11, color: "#9090a0", marginBottom: 12 }}>forever</div>
+                <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>FREE</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: "var(--ink)", letterSpacing: "-0.03em", marginBottom: 2 }}>$0</div>
+                <div style={{ fontSize: 11, color: "var(--ink-muted)", marginBottom: 12 }}>forever</div>
                 <Link href="/auth/login" style={{ textDecoration: "none" }}>
-                  <button style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "1.5px solid #d8d8d4", background: "transparent", fontSize: 12, fontWeight: 700, color: "#3a3a45", cursor: "pointer", fontFamily: "inherit" }}>
+                  <button style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "1.5px solid var(--border)", background: "transparent", fontSize: 12, fontWeight: 700, color: "var(--ink-2)", cursor: "pointer", fontFamily: "inherit" }}>
                     Get Started
                   </button>
                 </Link>
               </div>
               {/* BASIC col header */}
               <div style={{ padding: "20px 16px", borderLeft: "1px solid #e5e5e3", textAlign: "center" }}>
-                <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "#9090a0", marginBottom: 4 }}>BASIC</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: "#0f0f10", letterSpacing: "-0.03em", marginBottom: 2 }}>$19</div>
-                <div style={{ fontSize: 11, color: "#9090a0", marginBottom: 12 }}>one-time / product</div>
+                <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>BASIC</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: "var(--ink)", letterSpacing: "-0.03em", marginBottom: 2 }}>$19</div>
+                <div style={{ fontSize: 11, color: "var(--ink-muted)", marginBottom: 12 }}>one-time / product</div>
                 <Link href="/auth/login" style={{ textDecoration: "none" }}>
                   <button style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "1.5px solid #FF6B35", background: "transparent", fontSize: 12, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
                     Upgrade
@@ -297,8 +297,8 @@ export default function PricingPage() {
               {/* CORE col header */}
               <div style={{ padding: "20px 16px", borderLeft: "1px solid #e5e5e3", textAlign: "center", background: "rgba(255,107,53,0.05)" }}>
                 <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "#FF6B35", marginBottom: 4 }}>CORE</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: "#0f0f10", letterSpacing: "-0.03em", marginBottom: 2 }}>{corePrice}</div>
-                <div style={{ fontSize: 11, color: "#9090a0", marginBottom: 12 }}>/month · unlimited</div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: "var(--ink)", letterSpacing: "-0.03em", marginBottom: 2 }}>{corePrice}</div>
+                <div style={{ fontSize: 11, color: "var(--ink-muted)", marginBottom: 12 }}>/month · unlimited</div>
                 <Link href="/auth/login" style={{ textDecoration: "none" }}>
                   <button style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "none", background: "#FF6B35", fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
                     Start Core
@@ -366,19 +366,19 @@ export default function PricingPage() {
                 </div>
                 {/* Feature rows */}
                 {group.rows.map((row, ri) => (
-                  <div key={ri} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid #f0f0ee" }}>
+                  <div key={ri} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid var(--border-faint)" }}>
                     <div style={{ padding: "14px 24px" }}>
-                      <div style={{ fontSize: 13, color: "#0f0f10", fontWeight: 500 }}>{row.feature}</div>
-                      {row.sub && <div style={{ fontSize: 11.5, color: "#9090a0", marginTop: 2 }}>{row.sub}</div>}
+                      <div style={{ fontSize: 13, color: "var(--ink)", fontWeight: 500 }}>{row.feature}</div>
+                      {row.sub && <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 2 }}>{row.sub}</div>}
                     </div>
-                    <div style={{ padding: "14px 16px", borderLeft: "1px solid #f0f0ee", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {typeof row.free === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "#3a3a45" }}>{row.free}</span> : row.free}
+                    <div style={{ padding: "14px 16px", borderLeft: "1px solid var(--border-faint)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {typeof row.free === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-2)" }}>{row.free}</span> : row.free}
                     </div>
-                    <div style={{ padding: "14px 16px", borderLeft: "1px solid #f0f0ee", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {typeof row.basic === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "#3a3a45" }}>{row.basic}</span> : row.basic}
+                    <div style={{ padding: "14px 16px", borderLeft: "1px solid var(--border-faint)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {typeof row.basic === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-2)" }}>{row.basic}</span> : row.basic}
                     </div>
-                    <div style={{ padding: "14px 16px", borderLeft: "1px solid #f0f0ee", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,107,53,0.03)" }}>
-                      {typeof row.core === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "#3a3a45" }}>{row.core}</span> : row.core}
+                    <div style={{ padding: "14px 16px", borderLeft: "1px solid var(--border-faint)", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,107,53,0.03)" }}>
+                      {typeof row.core === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-2)" }}>{row.core}</span> : row.core}
                     </div>
                   </div>
                 ))}
