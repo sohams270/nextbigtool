@@ -182,7 +182,7 @@ export default async function HomePage({
     .from("posts")
     .select(`
       id, type, content, metric_label, metric_value, likes_count, comments_count, created_at,
-      profiles ( full_name, username ),
+      profiles ( full_name, username, avatar_url, company, role ),
       tools ( name )
     `)
     .order("created_at", { ascending: false })

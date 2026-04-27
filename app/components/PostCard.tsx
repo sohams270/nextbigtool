@@ -32,7 +32,13 @@ export type PostRow = {
   likes_count: number;
   comments_count: number;
   created_at: string;
-  profiles: { full_name: string | null; username: string | null } | null;
+  profiles: {
+    full_name: string | null;
+    username: string | null;
+    avatar_url?: string | null;
+    company?: string | null;
+    role?: string | null;
+  } | null;
   tools: { name: string } | null;
 };
 
@@ -67,6 +73,10 @@ export default function PostCard({
   const meta = TYPE_META[post.type] ?? TYPE_META.update;
   const authorName = post.profiles?.full_name ?? post.profiles?.username ?? "Founder";
   const initials = authorName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+  const avatarUrl = post.profiles?.avatar_url ?? null;
+  const company = post.profiles?.company ?? null;
+  const role = post.profiles?.role ?? null;
+  const byline = [company, role].filter(Boolean).join(" · ");
 
   async function handleLike() {
     if (!userId) { setShowAuth(true); return; }
@@ -127,7 +137,15 @@ export default function PostCard({
         <div style={{ padding: "10px 12px" }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#00B87A", flexShrink: 0, marginTop: 6 }} className="pulse" />
-            <Avatar size={26} letter={initials} color="#0A0B1A" />
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={authorName}
+                style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(255,255,255,0.1)" }}
+              />
+            ) : (
+              <Avatar size={28} letter={initials} color="#0A0B1A" />
+            )}
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                 <span style={{ fontSize: 10.5, fontWeight: 700, color: "var(--ink)" }}>{authorName}</span>
@@ -135,6 +153,9 @@ export default function PostCard({
                 <Pill color={meta.color} size="xs">{meta.label}</Pill>
                 <span style={{ fontSize: 9, color: "var(--ink-faint)" }}>{timeAgo(post.created_at)}</span>
               </div>
+              {byline && (
+                <div style={{ fontSize: 9.5, color: "var(--ink-faint)", marginTop: 1 }}>{byline}</div>
+              )}
             </div>
           </div>
 
