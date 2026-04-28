@@ -13,9 +13,10 @@ export default function OnboardingGate() {
     const client = createClient();
 
     async function check(userId: string, email: string) {
-      // Only query columns that are guaranteed to exist.
-      // We infer "onboarding done" from mandatory fields being filled rather
-      // than relying on an onboarding_completed column that may not exist yet.
+      // ── Fast-path: once the user completes onboarding we store a flag in
+      //    localStorage so auth-state re-fires never re-show the modal.
+      if (localStorage.getItem(`nbt_ob_done_${userId}`) === "1") return;
+
       const { data, error } = await client
         .from("profiles")
         .select("full_name, username, company, role")
@@ -34,7 +35,11 @@ export default function OnboardingGate() {
       const fullName = (data.full_name ?? "").trim();
       const [first, ...rest] = fullName.split(" ");
       const lastName = rest.join(" ").trim();
-      if (first && lastName && data.username && data.company && data.role) return;
+      if (first && lastName && data.username && data.company && data.role) {
+        // Mark done so we never query again for this user on this device
+        localStorage.setItem(`nbt_ob_done_${userId}`, "1");
+        return;
+      }
 
       // Incomplete profile → show onboarding
       setUserId(userId);
@@ -60,7 +65,11 @@ export default function OnboardingGate() {
     <OnboardingModal
       userId={userId}
       userEmail={userEmail}
-      onComplete={() => setShow(false)}
+      onComplete={() => {
+        // Lock out re-shows for this user on this device
+        localStorage.setItem(`nbt_ob_done_${userId}`, "1");
+        setShow(false);
+      }}
     />
   );
 }

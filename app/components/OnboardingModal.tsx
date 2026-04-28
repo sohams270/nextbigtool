@@ -121,25 +121,42 @@ export default function OnboardingModal({ userId, userEmail, onComplete }: {
     const client = createClient();
     const fullName = `${fields.first_name.trim()} ${fields.last_name.trim()}`.trim();
 
-    // upsert so the save works whether or not a stub row exists.
-    // onboarding_completed is intentionally excluded — the column may not
-    // exist in the DB; we infer completion from mandatory fields being set.
-    const { error: e } = await client.from("profiles").upsert({
-      id: userId,
-      full_name: fullName,
-      username: fields.username.trim().toLowerCase(),
-      company: fields.company.trim(),
-      role: fields.role.trim(),
-      bio: fields.bio.trim() || null,
-      website_url: fields.website_url.trim() || null,
-      twitter_url: fields.twitter_url.trim() || null,
+    const payload = {
+      full_name:    fullName,
+      username:     fields.username.trim().toLowerCase(),
+      company:      fields.company.trim(),
+      role:         fields.role.trim(),
+      bio:          fields.bio.trim() || null,
+      website_url:  fields.website_url.trim() || null,
+      twitter_url:  fields.twitter_url.trim() || null,
       linkedin_url: fields.linkedin_url.trim() || null,
-    }, { onConflict: "id" });
+    };
 
-    if (e) {
+    // 1️⃣ Try UPDATE first — the profile page already proves UPDATE RLS works.
+    //    .select() lets us confirm how many rows were actually written.
+    const { data: updated, error: updateErr } = await client
+      .from("profiles")
+      .update(payload)
+      .eq("id", userId)
+      .select("id");
+
+    if (updateErr) {
       setSaving(false);
-      setError("Something went wrong. Please try again.");
+      setError(`Save failed: ${updateErr.message}`);
       return;
+    }
+
+    // 2️⃣ If UPDATE matched 0 rows the profile row doesn't exist yet — INSERT it.
+    if (!updated || updated.length === 0) {
+      const { error: insertErr } = await client
+        .from("profiles")
+        .insert({ id: userId, ...payload });
+
+      if (insertErr) {
+        setSaving(false);
+        setError(`Save failed: ${insertErr.message}`);
+        return;
+      }
     }
 
     setSaving(false);
