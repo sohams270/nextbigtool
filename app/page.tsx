@@ -11,26 +11,10 @@ import PostStoryWallButton from "./components/PostStoryWallButton";
 import HeroSection from "./components/HeroSection";
 import Pill from "./components/Pill";
 import Btn from "./components/Btn";
-import Logo from "./components/Logo";
 import Footer from "./components/Footer";
 import FilterBar from "./components/FilterBar";
 import SubmissionNudge, { type NudgeSubmission } from "./components/SubmissionNudge";
 
-const CATEGORIES = [
-  { name: "AI Tools",     count: 142, icon: <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg> },
-  { name: "Developer",   count: 98,  icon: <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> },
-  { name: "Marketing",   count: 76,  icon: <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> },
-  { name: "Design",      count: 64,  icon: <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg> },
-  { name: "Productivity",count: 58,  icon: <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="none"/></svg> },
-  { name: "Finance",     count: 42,  icon: <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
-  { name: "No-code",     count: 36,  icon: <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="6" height="6" rx="1"/><rect x="16" y="3" width="6" height="6" rx="1"/><rect x="9" y="15" width="6" height="6" rx="1"/><path d="M5 9v3a7 7 0 0 0 7 7M19 9v3a7 7 0 0 1-4 6.3"/></svg> },
-] as const;
-
-const LEADERBOARD = [
-  ["🥇", "PromptBase", 312],
-  ["🥈", "Raycast",    287],
-  ["🥉", "Linear",     251],
-] as const;
 
 type ToolRow = {
   id: string;
@@ -193,6 +177,28 @@ export default async function HomePage({
     .filter((r: any) => r.tools)
     .map((r: any) => ({ inducted_at: r.inducted_at, tool: r.tools as any }));
 
+  // ── Categories with live tool counts ─────────────────────────────────
+  const { data: catRows } = await supabase
+    .from("categories")
+    .select("id, name")
+    .order("name");
+
+  // Count approved tools per category
+  const { data: toolCatCounts } = await supabase
+    .from("tools")
+    .select("category_id")
+    .eq("status", "approved")
+    .not("category_id", "is", null);
+
+  const countByCategory = (toolCatCounts ?? []).reduce<Record<string, number>>((acc, r: { category_id: string }) => {
+    acc[r.category_id] = (acc[r.category_id] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  const liveCategories = (catRows ?? [])
+    .map((c: { id: string; name: string }) => ({ id: c.id, name: c.name, count: countByCategory[c.id] ?? 0 }))
+    .sort((a, b) => b.count - a.count);
+
   // Posts are now fetched client-side by <BuildInPublicWall />
 
   return (
@@ -282,52 +288,67 @@ export default async function HomePage({
 
           {/* Sidebar */}
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {/* Browse Categories — live counts */}
             <div style={{ border: "1px solid var(--border)", borderRadius: 10, padding: 14, background: "var(--surface)" }}>
               <span style={{ fontSize: 12, fontWeight: 800, display: "block", marginBottom: 12, color: "var(--ink)" }}>
                 Browse Categories
               </span>
-              {CATEGORIES.map(({ name, count, icon }) => (
-                <div
-                  key={name}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "6px 0",
-                    borderBottom: "1px solid var(--border-faint)",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <div style={{ width: 26, height: 26, borderRadius: 6, background: "var(--surface-alt)", color: "var(--ink)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      {icon}
-                    </div>
+              {liveCategories.length === 0 ? (
+                <p style={{ fontSize: 11, color: "var(--ink-muted)", margin: 0 }}>No categories yet.</p>
+              ) : (
+                liveCategories.slice(0, 7).map(({ id, name, count }) => (
+                  <a
+                    key={id}
+                    href={`/?category=${encodeURIComponent(name)}`}
+                    style={{ textDecoration: "none", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderBottom: "1px solid var(--border-faint)" }}
+                  >
                     <span style={{ fontSize: 11, fontWeight: 500, color: "var(--ink)" }}>{name}</span>
-                  </div>
-                  <Pill color="gray" size="xs">{count}</Pill>
-                </div>
-              ))}
-              <span style={{ fontSize: 10, color: "#FF6B35", fontWeight: 600, display: "block", marginTop: 10, cursor: "pointer" }}>
-                View all 24 categories →
-              </span>
+                    <Pill color="gray" size="xs">{count}</Pill>
+                  </a>
+                ))
+              )}
+              {liveCategories.length > 7 && (
+                <a href="/discover" style={{ fontSize: 10, color: "#FF6B35", fontWeight: 600, display: "block", marginTop: 10, textDecoration: "none" }}>
+                  View all {liveCategories.length} categories →
+                </a>
+              )}
             </div>
 
-            <div className="featured-card-wrap" style={{ borderRadius: 10 }}>
-              <div style={{ borderRadius: 8, padding: 14, background: "var(--surface)" }}>
-                <span style={{ fontSize: 12, fontWeight: 800, display: "block", marginBottom: 10, color: "var(--ink)" }}>
-                  🏆 Hall of Fame
-                </span>
-                {LEADERBOARD.map(([medal, name, votes]) => (
-                  <div key={name} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0" }}>
-                    <Logo size={24} letter={name[0]} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink)" }}>{name}</div>
-                      <div style={{ fontSize: 10, color: "var(--ink-muted)" }}>▲ {votes}</div>
-                    </div>
-                    <span style={{ fontSize: 14 }}>{medal}</span>
-                  </div>
-                ))}
+            {/* Hall of Fame sidebar — live from DB */}
+            {hofEntries.length > 0 && (
+              <div style={{ borderRadius: 10, border: "1px solid rgba(255,215,0,0.3)", background: "linear-gradient(145deg,#0D0E22,#1A0D2E)" }}>
+                <div style={{ padding: 14 }}>
+                  <span style={{ fontSize: 12, fontWeight: 800, display: "block", marginBottom: 10, color: "#FFD700" }}>
+                    🏆 Hall of Fame
+                  </span>
+                  {hofEntries.map((entry, i) => {
+                    const medals = ["🥇", "🥈", "🥉"];
+                    const t = entry.tool;
+                    let logoSrc: string | null = t.logo_url;
+                    if (!logoSrc && t.website_url) {
+                      try { const d = new URL(t.website_url).hostname.replace(/^www\./, ""); logoSrc = `https://logo.clearbit.com/${d}`; } catch { /* no-op */ }
+                    }
+                    return (
+                      <a key={t.id} href={`/tools/${t.slug}`} style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: i < hofEntries.length - 1 ? "1px solid rgba(255,255,255,0.07)" : "none" }}>
+                        <div style={{ width: 28, height: 28, borderRadius: 7, overflow: "hidden", flexShrink: 0, background: "rgba(255,215,0,0.1)", border: "1px solid rgba(255,215,0,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: "#FFD700" }}>
+                          {logoSrc
+                            ? <img src={logoSrc} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                            : t.name[0]}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.name}</div>
+                          <div style={{ fontSize: 10, color: "rgba(255,215,0,0.6)" }}>▲ {t.upvote_count}</div>
+                        </div>
+                        <span style={{ fontSize: 14, flexShrink: 0 }}>{medals[i] ?? "🏅"}</span>
+                      </a>
+                    );
+                  })}
+                  <a href="/discover?tab=hall-of-fame" style={{ fontSize: 10, color: "rgba(255,215,0,0.7)", fontWeight: 600, display: "block", marginTop: 10, textDecoration: "none" }}>
+                    View all →
+                  </a>
+                </div>
               </div>
-            </div>
+            )}
 
             <div style={{ background: "#0A0B1A", borderRadius: 10, padding: 16 }}>
               <span style={{ fontSize: 12, fontWeight: 800, color: "#fff", display: "block", marginBottom: 4 }}>
