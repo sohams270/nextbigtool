@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import { createClient } from "@/utils/supabase/server";
 import TopNav from "./components/TopNav";
 import ProductShowcase from "./components/ProductShowcase";
-import PostCard, { type PostRow } from "./components/PostCard";
+import BuildInPublicWall from "./components/BuildInPublicWall";
 import PostStoryWallButton from "./components/PostStoryWallButton";
 import HeroSection from "./components/HeroSection";
 import Pill from "./components/Pill";
@@ -179,55 +179,7 @@ export default async function HomePage({
     }
   }
 
-  // ── Recent posts — two separate queries to avoid any join-related RLS failures ──
-  // Step 1: fetch raw posts (no joins)
-  const { data: rawPosts } = await supabase
-    .from("posts")
-    .select("id, type, content, metric_label, metric_value, likes_count, comments_count, created_at, author_id, tool_id")
-    .order("created_at", { ascending: false })
-    .limit(3);
-
-  // Step 2: enrich with profile + tool data
-  let posts: PostRow[] = [];
-  if (rawPosts && rawPosts.length > 0) {
-    // Fetch profiles for all authors
-    const authorIds = [...new Set(rawPosts.map((p: Record<string, unknown>) => p.author_id as string))];
-    const toolIds   = [...new Set(rawPosts.map((p: Record<string, unknown>) => p.tool_id as string).filter(Boolean))];
-
-    const [{ data: profileRows }, { data: toolRows }] = await Promise.all([
-      supabase.from("profiles").select("id, full_name, username, avatar_url, company, role").in("id", authorIds),
-      toolIds.length > 0
-        ? supabase.from("tools").select("id, name").in("id", toolIds)
-        : Promise.resolve({ data: [] }),
-    ]);
-
-    const profileMap = Object.fromEntries((profileRows ?? []).map((p: Record<string, unknown>) => [p.id, p]));
-    const toolMap    = Object.fromEntries((toolRows ?? []).map((t: Record<string, unknown>) => [t.id, t]));
-
-    posts = rawPosts.map((p: Record<string, unknown>) => ({
-      id:            p.id as string,
-      type:          p.type as string,
-      content:       p.content as string,
-      metric_label:  p.metric_label as string | null,
-      metric_value:  p.metric_value as string | null,
-      likes_count:   p.likes_count as number,
-      comments_count: p.comments_count as number,
-      created_at:    p.created_at as string,
-      profiles:      profileMap[p.author_id as string] as PostRow["profiles"] ?? null,
-      tools:         p.tool_id ? toolMap[p.tool_id as string] as PostRow["tools"] ?? null : null,
-    }));
-  }
-
-  let userLikedPostIds: string[] = [];
-  if (user && posts.length > 0) {
-    const postIds = posts.map((p) => p.id);
-    const { data: likes } = await supabase
-      .from("post_likes")
-      .select("post_id")
-      .eq("user_id", user.id)
-      .in("post_id", postIds);
-    userLikedPostIds = (likes ?? []).map((l: { post_id: string }) => l.post_id);
-  }
+  // Posts are now fetched client-side by <BuildInPublicWall />
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
@@ -482,7 +434,8 @@ export default async function HomePage({
             pointerEvents: "none",
           }} />
 
-          <div style={{ position: "relative", zIndex: 1, padding: "22px 24px 0" }}>
+          <div style={{ position: "relative", zIndex: 1, padding: "22px 24px 20px" }}>
+            {/* Header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -508,33 +461,8 @@ export default async function HomePage({
               </span>
             </div>
 
-            {posts.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "48px 0 40px" }}>
-                <div style={{
-                  width: 52, height: 52, borderRadius: 14,
-                  background: "rgba(255,107,53,0.12)", border: "1px solid rgba(255,107,53,0.25)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  margin: "0 auto 14px", fontSize: 22,
-                }}>🔥</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.85)", marginBottom: 6 }}>
-                  No posts yet — be the first founder to share
-                </div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", maxWidth: 340, margin: "0 auto" }}>
-                  Submit your tool and post milestones, funding news, and updates directly to this wall.
-                </div>
-              </div>
-            ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-                {posts.map((p) => (
-                  <PostCard
-                    key={p.id}
-                    post={p}
-                    userId={user?.id ?? null}
-                    isLiked={userLikedPostIds.includes(p.id)}
-                  />
-                ))}
-              </div>
-            )}
+            {/* Client component — handles fetching, pagination, and rendering */}
+            <BuildInPublicWall userId={user?.id ?? null} />
           </div>
 
           {!user && (
