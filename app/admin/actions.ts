@@ -38,3 +38,21 @@ export async function rejectSubmission(submissionId: string) {
   await supabase.from("newsletter_submissions").update({ status: "rejected" }).eq("id", submissionId);
   revalidatePath("/admin");
 }
+
+export async function approveBlogRequest(requestId: string) {
+  const { supabase } = await getAdminUser();
+  await supabase.from("blog_post_requests").update({ status: "approved" }).eq("id", requestId);
+  revalidatePath("/admin");
+}
+
+export async function rejectBlogRequest(requestId: string) {
+  const { supabase } = await getAdminUser();
+  await supabase.from("blog_post_requests").update({ status: "rejected" }).eq("id", requestId);
+  revalidatePath("/admin");
+}
+
+export async function publishBlogRequest(requestId: string, blogUrl: string) {
+  const { supabase } = await getAdminUser();
+  await supabase.from("blog_post_requests").update({ status: "published", blog_url: blogUrl }).eq("id", requestId);
+  revalidatePath("/admin");
+}

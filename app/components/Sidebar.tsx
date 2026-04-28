@@ -13,6 +13,7 @@ const NAV = [
   { id: "interested",      label: "Founder's CRM",      href: "/dashboard/interested",        icon: UsersIcon,   prime: true },
   { id: "bip",             label: "Build In Public",    href: "/dashboard/build-in-public",   icon: EditIcon },
   { id: "newsletter",      label: "Newsletter",          href: "/dashboard/newsletter",        icon: MailIcon },
+  { id: "blog",            label: "Featured Blog Post",  href: "/dashboard/blog",              icon: FileTextIcon, prime: true },
   { id: "hof",             label: "Hall of Fame",        href: "/dashboard/hall-of-fame",      icon: TrophyIcon,  locked: true },
   { id: "plan",            label: "My Plan",             href: "/dashboard/plan",              icon: StarIcon },
   { id: "profile",         label: "My Profile",          href: "/dashboard/profile",           icon: PersonIcon },
@@ -244,6 +245,17 @@ function GearIcon({ size = 16, color = "currentColor" }: { size?: number; color?
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="3"/>
       <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+    </svg>
+  );
+}
+function FileTextIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/>
+      <line x1="16" y1="17" x2="8" y2="17"/>
+      <polyline points="10 9 9 9 8 9"/>
     </svg>
   );
 }

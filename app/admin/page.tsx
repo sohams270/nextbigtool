@@ -3,8 +3,23 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import ReviewButtons from "./ReviewButtons";
 import SubmissionButtons from "./SubmissionButtons";
+import BlogRequestButtons from "./BlogRequestButtons";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "";
+
+type BlogRequest = {
+  id: string;
+  company_name: string;
+  headline: string;
+  story: string;
+  link: string | null;
+  status: string;
+  blog_url: string | null;
+  created_at: string;
+  user_id: string;
+  profiles: { full_name: string | null; email: string | null } | null;
+  tools: { name: string } | null;
+};
 
 type NewsletterSubmission = {
   id: string;
@@ -97,6 +112,24 @@ export default async function AdminPage() {
   const pendingNewsletter: NewsletterSubmission[] = (pendingNewsletterRaw ?? []).map((s: any) => ({
     ...s,
     profiles: profileMap[s.user_id] ?? null,
+  }));
+
+  // Blog post requests
+  const { data: pendingBlogRaw } = await supabase
+    .from("blog_post_requests")
+    .select("id, company_name, headline, story, link, status, blog_url, created_at, user_id, tools(name)")
+    .in("status", ["pending", "approved"])
+    .order("created_at", { ascending: false });
+
+  const blogSubmitterIds = [...new Set((pendingBlogRaw ?? []).map((r: any) => r.user_id))];
+  const { data: blogProfiles } = blogSubmitterIds.length > 0
+    ? await supabase.from("profiles").select("id, full_name, email").in("id", blogSubmitterIds)
+    : { data: [] };
+  const blogProfileMap = Object.fromEntries((blogProfiles ?? []).map((p: any) => [p.id, p]));
+
+  const pendingBlogRequests: BlogRequest[] = (pendingBlogRaw ?? []).map((r: any) => ({
+    ...r,
+    profiles: blogProfileMap[r.user_id] ?? null,
   }));
 
   const tools = (pending ?? []) as Tool[];
@@ -308,6 +341,86 @@ export default async function AdminPage() {
 
                 {/* Action buttons */}
                 <SubmissionButtons submissionId={s.id} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Featured Blog Post Requests ── */}
+      <div style={{ margin: "44px 0 10px", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+        <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink-muted)", whiteSpace: "nowrap" }}>
+          Featured Blog Post Requests
+        </span>
+        <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+      </div>
+
+      <div style={{ marginBottom: 8, fontSize: 14, fontWeight: 700, color: "var(--ink)", display: "flex", alignItems: "center", gap: 8, marginTop: 20 }}>
+        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#3b7fff", display: "inline-block" }} />
+        Pending / Approved ({pendingBlogRequests.length})
+      </div>
+
+      {pendingBlogRequests.length === 0 ? (
+        <div style={{ ...card, textAlign: "center", padding: "40px 20px", color: "var(--ink-muted)", marginBottom: 36 }}>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>✍️</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", marginBottom: 4 }}>No blog post requests</div>
+          <div style={{ fontSize: 13 }}>When Core plan users request a featured blog post, they&apos;ll appear here.</div>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 36 }}>
+          {pendingBlogRequests.map(r => (
+            <div key={r.id} style={{ ...card, display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {/* Submitter + company */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>
+                      {r.profiles?.full_name ?? r.profiles?.email ?? "Unknown user"}
+                    </span>
+                    <span style={{ padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "rgba(59,127,255,0.1)", color: "#3b7fff" }}>
+                      {r.company_name}
+                    </span>
+                    {r.tools?.name && (
+                      <span style={{ padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "var(--orange-soft)", color: "#ff6a3d" }}>
+                        {r.tools.name}
+                      </span>
+                    )}
+                    <span style={{
+                      marginLeft: "auto", padding: "2px 9px", borderRadius: 20, fontSize: 11, fontWeight: 700,
+                      background: r.status === "approved" ? "rgba(59,127,255,0.1)" : "rgba(245,158,11,0.1)",
+                      color: r.status === "approved" ? "#3b7fff" : "#b45309",
+                    }}>
+                      {r.status === "approved" ? "Approved" : "Pending"}
+                    </span>
+                    <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>{timeAgo(r.created_at)}</span>
+                  </div>
+
+                  {/* Headline */}
+                  <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)", marginBottom: 4, letterSpacing: "-0.01em" }}>
+                    {r.headline}
+                  </div>
+
+                  {/* Story */}
+                  <div style={{
+                    fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.6,
+                    padding: "8px 12px", borderRadius: 8,
+                    background: "var(--surface-alt)", borderLeft: "3px solid var(--border)",
+                  }}>
+                    {r.story}
+                  </div>
+
+                  {/* Link */}
+                  {r.link && (
+                    <a href={r.link} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize: 12, color: "#3b7fff", textDecoration: "none", fontWeight: 500, marginTop: 6, display: "inline-block" }}>
+                      {r.link.replace(/^https?:\/\//, "")} ↗
+                    </a>
+                  )}
+                </div>
+
+                {/* Action buttons */}
+                <BlogRequestButtons requestId={r.id} status={r.status} />
               </div>
             </div>
           ))}
