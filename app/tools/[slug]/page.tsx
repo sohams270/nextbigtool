@@ -34,13 +34,20 @@ export default async function ToolPage({ params }: Props) {
       id, slug, name, tagline, description, website_url, logo_url, pricing,
       status, upvote_count, maker_comment, demo_url, twitter_url,
       github_url, contact_email, created_at, submitter_id,
-      tool_tags ( tags ( name ) )
+      tool_tags ( tags ( name ) ),
+      categories ( name )
     `)
     .eq("slug", slug)
     .eq("status", "approved")
     .maybeSingle();
 
   if (toolErr || !tool) notFound();
+
+  const { data: screenshots } = await supabase
+    .from("screenshots")
+    .select("id, url, position")
+    .eq("tool_id", tool.id)
+    .order("position");
 
   let isUpvoted = false;
   if (user) {
@@ -56,6 +63,9 @@ export default async function ToolPage({ params }: Props) {
   const tags = ((tool.tool_tags ?? []) as any[])
     .map((tt: any) => tt.tags?.name)
     .filter(Boolean) as string[];
+
+  const categoryName = (tool.categories as any)?.name ?? null;
+  const shots = (screenshots ?? []) as { id: string; url: string; position: number }[];
 
   // Clearbit logo fallback
   let logoSrc: string | null = tool.logo_url;
@@ -233,6 +243,21 @@ export default async function ToolPage({ params }: Props) {
               </div>
             )}
 
+            {/* Screenshots */}
+            {shots.length > 0 && (
+              <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "24px 28px" }}>
+                <h2 style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.01em", color: "var(--ink)", margin: "0 0 16px" }}>Screenshots</h2>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {shots.map((s) => (
+                    <div key={s.id} style={{ borderRadius: 10, overflow: "hidden", border: "1px solid var(--border)", background: "var(--surface-alt)" }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={s.url} alt="Screenshot" style={{ width: "100%", display: "block", objectFit: "cover" }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Comments */}
             <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "24px 28px" }}>
               <CommentSection toolId={tool.id} userId={user?.id ?? null} />
@@ -249,7 +274,8 @@ export default async function ToolPage({ params }: Props) {
               </h3>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 <Row label="Pricing" value={pricingLabel(tool.pricing)} />
-                {tags.length > 0 && <Row label="Category" value={tags[0]} />}
+                {categoryName && <Row label="Category" value={categoryName} />}
+                {tags.length > 0 && <Row label="Tags" value={tags.join(", ")} />}
                 {tool.created_at && (
                   <Row label="Listed" value={new Date(tool.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" })} />
                 )}

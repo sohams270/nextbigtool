@@ -132,7 +132,10 @@ export default function SubmitPage() {
   const [done, setDone]       = useState(false);
   const [tagInput, setTagInput] = useState("");
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [screenshotPreviews, setScreenshotPreviews] = useState<string[]>([]);
+  const [screenshotFiles, setScreenshotFiles] = useState<File[]>([]);
   const logoRef = useRef<HTMLInputElement>(null);
+  const screenshotRef = useRef<HTMLInputElement>(null);
 
   // form data
   const [form, setForm] = useState({
@@ -177,6 +180,21 @@ export default function SubmitPage() {
     if (!file) return;
     set("logo_file", file);
     setLogoPreview(URL.createObjectURL(file));
+  }
+
+  /* screenshot file pick */
+  function handleScreenshotChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    const remaining = 5 - screenshotFiles.length;
+    const toAdd = files.slice(0, remaining);
+    setScreenshotFiles((prev) => [...prev, ...toAdd]);
+    setScreenshotPreviews((prev) => [...prev, ...toAdd.map((f) => URL.createObjectURL(f))]);
+    e.target.value = "";
+  }
+
+  function removeScreenshot(i: number) {
+    setScreenshotFiles((prev) => prev.filter((_, idx) => idx !== i));
+    setScreenshotPreviews((prev) => prev.filter((_, idx) => idx !== i));
   }
 
   /* tag helpers */
@@ -252,6 +270,20 @@ export default function SubmitPage() {
 
         if (tagRow) {
           await supabase.from("tool_tags").insert({ tool_id: tool.id, tag_id: tagRow.id });
+        }
+      }
+
+      // 4. upload screenshots
+      for (let i = 0; i < screenshotFiles.length; i++) {
+        const file = screenshotFiles[i];
+        const ext  = file.name.split(".").pop();
+        const path = `${userId}/screenshots/${tool.id}/${i}.${ext}`;
+        const { error: scErr } = await supabase.storage
+          .from("tool-logos")
+          .upload(path, file, { upsert: true });
+        if (!scErr) {
+          const { data: scUrl } = supabase.storage.from("tool-logos").getPublicUrl(path);
+          await supabase.from("screenshots").insert({ tool_id: tool.id, url: scUrl.publicUrl, position: i });
         }
       }
 
@@ -452,6 +484,43 @@ export default function SubmitPage() {
                     value={form.maker_comment}
                     onChange={(e) => set("maker_comment", e.target.value)}
                   />
+                </FieldGroup>
+
+                {/* Screenshots */}
+                <FieldGroup label="Product screenshots" hint={`Up to 5 screenshots (PNG or JPG) — ${screenshotFiles.length}/5 added`}>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "flex-start" }}>
+                    {screenshotPreviews.map((src, i) => (
+                      <div key={i} style={{ position: "relative", width: 100, height: 70, borderRadius: 8, overflow: "hidden", border: "1px solid var(--border)", flexShrink: 0 }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                        <button
+                          onClick={() => removeScreenshot(i)}
+                          style={{
+                            position: "absolute", top: 3, right: 3,
+                            width: 18, height: 18, borderRadius: "50%",
+                            background: "rgba(0,0,0,0.6)", color: "#fff",
+                            border: "none", cursor: "pointer", fontSize: 10, fontWeight: 800,
+                            display: "flex", alignItems: "center", justifyContent: "center", padding: 0,
+                          }}
+                        >×</button>
+                      </div>
+                    ))}
+                    {screenshotFiles.length < 5 && (
+                      <div
+                        onClick={() => screenshotRef.current?.click()}
+                        style={{
+                          width: 100, height: 70, borderRadius: 8,
+                          border: "1.5px dashed #CFCFD4", background: "var(--surface-alt)",
+                          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                          cursor: "pointer", gap: 4,
+                        }}
+                      >
+                        <span style={{ fontSize: 20, color: "var(--border)" }}>+</span>
+                        <span style={{ fontSize: 10, color: "var(--ink-muted)" }}>Add</span>
+                      </div>
+                    )}
+                    <input ref={screenshotRef} type="file" accept="image/*" multiple style={{ display: "none" }} onChange={handleScreenshotChange} />
+                  </div>
                 </FieldGroup>
               </div>
 
