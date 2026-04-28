@@ -122,7 +122,7 @@ export default async function HomePage({
       break;
   }
 
-  const { data: allTools } = await toolQuery.limit(12);
+  const { data: allTools } = await toolQuery.limit(15);
   const tools = (allTools ?? []) as unknown as ToolRow[];
 
   // For non-hof sorts, put featured tools first

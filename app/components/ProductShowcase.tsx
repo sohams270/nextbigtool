@@ -485,11 +485,67 @@ function MosaicMini({
 /* RANKED ROW                                                              */
 /* ─────────────────────────────────────────────────────────────────────── */
 function RankedRow({
-  tool, rank, delta = 0, userId, isUpvoted,
+  tool, rank, delta = 0, userId, isUpvoted, compact = false,
 }: {
-  tool: ShowcaseTool; rank: number; delta?: number; userId: string | null; isUpvoted: boolean;
+  tool: ShowcaseTool; rank: number; delta?: number; userId: string | null; isUpvoted: boolean; compact?: boolean;
 }) {
   const t = tags(tool);
+
+  if (compact) {
+    return (
+      <li style={{
+        display: "grid",
+        gridTemplateColumns: "40px 36px 1fr auto",
+        gap: 12,
+        alignItems: "center",
+        padding: "9px 16px",
+        borderBottom: "1px solid var(--border)",
+        transition: "background .15s",
+        cursor: "pointer",
+      }}>
+        {/* Rank + trend */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          <span style={{
+            fontFamily: "Inter, sans-serif",
+            fontSize: 17, fontWeight: 800,
+            letterSpacing: "-0.04em",
+            color: "var(--ink)",
+            fontVariantNumeric: "tabular-nums",
+            lineHeight: 1,
+          }}>
+            {String(rank).padStart(2, "0")}
+          </span>
+          <TrendChip delta={delta} />
+        </div>
+
+        <ProductLogo tool={tool} size={36} radius={9} />
+
+        {/* Body — name + single tag row, no description */}
+        <div style={{ minWidth: 0 }}>
+          <h4 style={{ fontSize: 13.5, fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink)", margin: "0 0 4px" }}>
+            {tool.name}
+          </h4>
+          <div style={{ display: "flex", gap: 4, flexWrap: "wrap" as const }}>
+            {t.slice(0, 2).map((c) => <CatChip key={c} label={c} />)}
+            <PriceChip label={pricing(tool)} />
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <UpvoteButton
+            toolId={tool.id}
+            userId={userId}
+            initialCount={tool.upvote_count}
+            initialActive={isUpvoted}
+            size="sm"
+          />
+          <RedirectBtn subtle href={`/tools/${tool.slug}`} />
+        </div>
+      </li>
+    );
+  }
+
   return (
     <li style={{
       display: "grid",
@@ -706,18 +762,19 @@ export default function ProductShowcase({
             </Link>
           </div>
 
-          {/* Ranked rows */}
+          {/* Compact ranked rows — up to 10 */}
           <ol style={{
             display: "flex", flexDirection: "column", gap: 0,
             border: "1px solid var(--border)", borderRadius: 16,
             background: "var(--surface)", overflow: "hidden",
             listStyle: "none", margin: 0, padding: 0,
           }}>
-            {rest.map((t, i) => (
+            {rest.slice(0, 10).map((t, i) => (
               <RankedRow
                 key={t.id} tool={t} rank={i + 4}
                 delta={DELTAS[i + 3] ?? 1}
                 userId={userId} isUpvoted={userUpvotedIds.includes(t.id)}
+                compact
               />
             ))}
             <style>{`ol li:last-child { border-bottom: none !important; }`}</style>
