@@ -85,8 +85,7 @@ export default function PostStoryModal({ onClose }: { onClose: () => void }) {
             fontSize: 13.5, color: "var(--ink-muted)", lineHeight: 1.65,
             margin: "0 0 22px",
           }}>
-            Sign up and be a part of our community of founders building in public — share milestones, launches, and updates with{" "}
-            <strong style={{ color: "var(--ink)" }}>8,400+ builders and buyers</strong>.
+            Sign up and be a part of our community of founders building in public — share milestones, launches, and updates.
           </p>
 
           {/* Google CTA */}
@@ -131,36 +130,7 @@ export default function PostStoryModal({ onClose }: { onClose: () => void }) {
             </div>
           )}
 
-          {/* Divider */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-            <span style={{ fontSize: 11, color: "var(--ink-faint)", flexShrink: 0 }}>already a member?</span>
-            <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-          </div>
-
-          <a
-            href="/auth/login"
-            style={{
-              display: "block", width: "100%", padding: "11px 0",
-              borderRadius: 12, border: "1px solid var(--border)",
-              fontSize: 13.5, fontWeight: 600,
-              color: "var(--ink-muted)", textDecoration: "none",
-              background: "transparent", textAlign: "center",
-              transition: "background 0.15s, color 0.15s",
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLAnchorElement).style.background = "var(--surface-alt)";
-              (e.currentTarget as HTMLAnchorElement).style.color = "var(--ink)";
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
-              (e.currentTarget as HTMLAnchorElement).style.color = "var(--ink-muted)";
-            }}
-          >
-            Sign in to existing account
-          </a>
-
-          <p style={{ fontSize: 10.5, color: "var(--ink-faint)", margin: "16px 0 0", lineHeight: 1.6 }}>
+          <p style={{ fontSize: 10.5, color: "var(--ink-faint)", margin: "0 0 0", lineHeight: 1.6 }}>
             By continuing you agree to our{" "}
             <a href="/rules" style={{ color: "var(--ink-faint)", textDecoration: "underline" }}>Terms</a>
             {" "}and{" "}
