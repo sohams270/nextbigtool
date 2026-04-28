@@ -381,7 +381,13 @@ export default function PostCard({
         )}
       </div>
 
-      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+      {showAuth && (
+        <AuthModal
+          onClose={() => setShowAuth(false)}
+          title="You're one step away 🚀"
+          subtitle="Join to like, comment, and interact with founders building in public."
+        />
+      )}
 
       <style>{`
         .post-card:hover {
