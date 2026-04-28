@@ -24,13 +24,6 @@ type Profile = { plan: string; full_name: string | null };
 const PLAN_ORDER = ["free", "basic", "core"];
 const canFeature = (plan: string) => plan === "basic" || plan === "core";
 
-const MOCK_ISSUES: Issue[] = [
-  { id: "1", number: 43, title: "Upcoming — Submit your story", status: "scheduled", sent_at: "2026-04-25T00:00:00Z", subscribers_count: null, open_rate: null, click_rate: null, live_url: null },
-  { id: "2", number: 42, title: "AI tools you missed this week", status: "sent", sent_at: "2026-04-18T00:00:00Z", subscribers_count: 14208, open_rate: 42, click_rate: 8.3, live_url: "#" },
-  { id: "3", number: 41, title: "Developer launches of the week", status: "sent", sent_at: "2026-04-11T00:00:00Z", subscribers_count: 13980, open_rate: 39, click_rate: 7.1, live_url: "#" },
-  { id: "4", number: 40, title: "Design tools roundup", status: "sent", sent_at: "2026-04-04T00:00:00Z", subscribers_count: 13820, open_rate: 44, click_rate: 9.2, live_url: "#" },
-  { id: "5", number: 39, title: "No-code builders to watch", status: "sent", sent_at: "2026-03-28T00:00:00Z", subscribers_count: 13550, open_rate: 40, click_rate: 6.8, live_url: "#" },
-];
 
 const card: React.CSSProperties = {
   background: "var(--surface)",
@@ -430,10 +423,7 @@ export default function NewsletterPage() {
       // Newsletter issues
       supabase.from("newsletter_issues").select("*")
         .order("number", { ascending: false }).limit(10)
-        .then(({ data }) => {
-          if (data && data.length > 0) setIssues(data as Issue[]);
-          else setIssues(MOCK_ISSUES);
-        });
+        .then(({ data }) => setIssues((data ?? []) as Issue[]));
 
       // Issues where user has a submission
       supabase.from("newsletter_submissions").select("issue_id")
