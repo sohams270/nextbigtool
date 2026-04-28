@@ -26,6 +26,11 @@ export type ShowcaseTool = {
   tool_tags: { tags: { name: string } | null }[];
 };
 
+export type HofEntry = {
+  inducted_at: string | null;
+  tool: ShowcaseTool;
+};
+
 /* ─── logo colour palette (fallback when no logo_url) ──────────────── */
 const LOGO_GRADIENTS = [
   "linear-gradient(135deg,#7c3aed 0%,#ec4899 100%)",
@@ -219,6 +224,101 @@ function BadgeFeatured() {
       </svg>
       Featured
     </span>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────── */
+/* HALL OF FAME CARD                                                       */
+/* ─────────────────────────────────────────────────────────────────────── */
+function HofCard({ entry, rank, userId, isUpvoted }: {
+  entry: HofEntry; rank: number; userId: string | null; isUpvoted: boolean;
+}) {
+  const t = tags(entry.tool);
+  const year = entry.inducted_at
+    ? new Date(entry.inducted_at).getFullYear()
+    : new Date().getFullYear();
+  const meta = [
+    `EST. ${year}`,
+    ...t.slice(0, 2).map(s => s.toUpperCase()),
+  ].join(" · ");
+
+  return (
+    <article style={{
+      background: "var(--surface)",
+      border: "1.5px solid rgba(255,215,0,0.45)",
+      borderRadius: 16,
+      padding: "18px 18px 16px",
+      position: "relative",
+      overflow: "hidden",
+      display: "flex",
+      flexDirection: "column",
+      gap: 0,
+      transition: "box-shadow .15s, transform .15s",
+    }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 28px rgba(255,215,0,0.18)";
+        (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLElement).style.boxShadow = "none";
+        (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+      }}
+    >
+      {/* Gold top bar */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,#ffd700,#ff8c00,#ffd700)" }} />
+
+      {/* Rank watermark */}
+      <div style={{ position: "absolute", top: 10, right: 14, fontSize: 11, fontWeight: 800, color: "rgba(255,215,0,0.9)", letterSpacing: "0.04em" }}>
+        # {String(rank).padStart(2, "0")}
+      </div>
+
+      {/* Logo + name + PREMIUM badge */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 12, paddingTop: 6 }}>
+        <ProductLogo tool={entry.tool} size={48} radius={12} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" as const, marginBottom: 4 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 800, letterSpacing: "-0.02em", color: "var(--ink)", margin: 0 }}>
+              {entry.tool.name}
+            </h3>
+            <span style={{
+              fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 20,
+              background: "rgba(255,215,0,0.15)", color: "#9a6a00",
+              border: "1px solid rgba(255,215,0,0.4)", letterSpacing: "0.06em", textTransform: "uppercase" as const,
+            }}>PREMIUM</span>
+          </div>
+          <p style={{ fontSize: 12.5, color: "var(--ink-2)", margin: 0, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
+            {entry.tool.tagline}
+          </p>
+        </div>
+      </div>
+
+      {/* Meta */}
+      <div style={{ fontSize: 10, fontWeight: 600, color: "var(--ink-faint)", letterSpacing: "0.05em", marginBottom: 14 }}>
+        {meta}
+      </div>
+
+      {/* Actions */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: "auto" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, color: "var(--ink-muted)", fontWeight: 600 }}>
+          <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 15l6-6 6 6"/></svg>
+          {entry.tool.upvote_count}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, color: "var(--ink-muted)", fontWeight: 600 }}>
+          <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a4 4 0 0 1-4 4H8l-5 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
+          0
+        </div>
+        <Link href={`/tools/${entry.tool.slug}`} target="_blank" rel="noopener noreferrer" style={{
+          marginLeft: "auto", display: "inline-flex", alignItems: "center", gap: 5,
+          padding: "6px 14px", borderRadius: 9,
+          background: "linear-gradient(90deg,rgba(255,215,0,0.15),rgba(255,140,0,0.1))",
+          border: "1px solid rgba(255,215,0,0.4)",
+          fontSize: 12, fontWeight: 700, color: "#9a6a00", textDecoration: "none",
+        }}>
+          Visit
+          <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
+        </Link>
+      </div>
+    </article>
   );
 }
 
@@ -445,173 +545,173 @@ export default function ProductShowcase({
   tools,
   userId,
   userUpvotedIds,
+  hofEntries = [],
 }: {
   tools: ShowcaseTool[];
   userId: string | null;
   userUpvotedIds: string[];
+  hofEntries?: HofEntry[];
 }) {
-  if (tools.length === 0) {
+  if (tools.length === 0 && hofEntries.length === 0) {
     return (
-      <div style={{
-        textAlign: "center", padding: "64px 0",
-        color: "var(--ink-muted)", fontSize: 14,
-      }}>
+      <div style={{ textAlign: "center", padding: "64px 0", color: "var(--ink-muted)", fontSize: 14 }}>
         No tools yet — be the first to submit yours!
       </div>
     );
   }
 
-  // Split: hero + 2 mini cards in mosaic, rest in ranked rows
   const [hero, mini1, mini2, ...rest] = tools;
   const miniCards = [mini1, mini2].filter(Boolean);
-
-  // Synthetic deltas for ranking trend (real data could come from DB later)
   const DELTAS = [24, 18, 12, 9, 7, 5, 4, 3, 2, 1];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
 
-      {/* ── Section header ───────────────────────────────────────── */}
-      <div style={{
-        display: "flex",
-        alignItems: "flex-end",
-        justifyContent: "space-between",
-        gap: 24,
-        padding: "0 4px 12px",
-        borderBottom: "1px solid var(--border)",
-        flexWrap: "wrap" as const,
-      }}>
+      {/* ── Hall of Fame section ─────────────────────────────────── */}
+      {hofEntries.length > 0 && (
         <div>
-          {/* Live eyebrow */}
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 7,
-            fontSize: 11, fontWeight: 600, color: "var(--ink-2)",
-            letterSpacing: ".06em", textTransform: "uppercase" as const,
-            marginBottom: 8,
-          }}>
-            <span style={{
-              width: 7, height: 7, borderRadius: "50%", background: "#16a34a",
-              boxShadow: "0 0 0 0 rgba(22,163,74,.5)",
-              animation: "pulse 2s infinite",
-              display: "inline-block",
-            }} />
-            Live ranking · updated just now
+          {/* Section header */}
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 16 }}>
+            <div>
+              <div style={{ marginBottom: 6 }}>
+                <span style={{
+                  display: "inline-flex", alignItems: "center", gap: 5,
+                  fontSize: 10, fontWeight: 800, letterSpacing: "0.07em",
+                  textTransform: "uppercase" as const,
+                  padding: "3px 10px", borderRadius: 20,
+                  background: "rgba(255,215,0,0.15)", color: "#9a6a00",
+                  border: "1px solid rgba(255,215,0,0.35)",
+                }}>
+                  🏆 All-Time Greats
+                </span>
+              </div>
+              <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", color: "var(--ink)", margin: 0 }}>
+                Hall of Fame
+              </h2>
+            </div>
+            <Link href="/discover?tab=hall-of-fame" style={{ fontSize: 12.5, fontWeight: 600, color: "#ff6a3d", textDecoration: "none" }}>
+              View all →
+            </Link>
           </div>
-          <h2 style={{
-            fontFamily: "Inter, sans-serif",
-            fontSize: 30, fontWeight: 800,
-            letterSpacing: "-0.03em", lineHeight: 1.05,
-            color: "var(--ink)", margin: 0,
-          }}>
-            Today&rsquo;s Top Tools
-          </h2>
-          <p style={{ margin: "6px 0 0", color: "var(--ink-muted)", fontSize: 13 }}>
-            {tools.length} launches · ranked by upvotes
-          </p>
-        </div>
 
-        {/* Filter tabs */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{
-            display: "inline-flex", padding: 3,
-            background: "var(--surface-alt)", borderRadius: 10, gap: 2,
-          }}>
-            {["Today", "Week", "Month"].map((label, i) => (
-              <button key={label} style={{
-                fontSize: 12, padding: "6px 12px", borderRadius: 8,
-                color: i === 0 ? "var(--ink)" : "var(--ink-muted)",
-                fontWeight: 600,
-                background: i === 0 ? "var(--surface)" : "transparent",
-                border: "none",
-                cursor: "pointer",
-                fontFamily: "inherit",
-                boxShadow: i === 0 ? "0 1px 2px rgba(0,0,0,.06)" : "none",
-              }}>
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Mosaic featured ──────────────────────────────────────── */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: miniCards.length > 0 ? "1.5fr 1fr" : "1fr",
-        gap: 16,
-        alignItems: "stretch",
-      }}>
-        {/* Hero */}
-        {hero && (
-          <MosaicHero
-            tool={hero}
-            rank={1}
-            userId={userId}
-            isUpvoted={userUpvotedIds.includes(hero.id)}
-          />
-        )}
-
-        {/* Mini cards stacked right */}
-        {miniCards.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {miniCards.map((t, i) => (
-              <MosaicMini
-                key={t.id}
-                tool={t}
-                rank={i + 2}
+          {/* 3-col gold grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+            {hofEntries.slice(0, 3).map((entry, i) => (
+              <HofCard
+                key={entry.tool.id}
+                entry={entry}
+                rank={i + 1}
                 userId={userId}
-                isUpvoted={userUpvotedIds.includes(t.id)}
+                isUpvoted={userUpvotedIds.includes(entry.tool.id)}
               />
             ))}
           </div>
-        )}
-      </div>
-
-      {/* ── Trending sub-header ──────────────────────────────────── */}
-      {rest.length > 0 && (
-        <div style={{
-          display: "flex", alignItems: "center",
-          justifyContent: "space-between",
-          padding: "10px 4px 2px",
-          marginTop: 4,
-        }}>
-          <h3 style={{
-            fontSize: 18, fontWeight: 800,
-            letterSpacing: "-0.01em", color: "var(--ink)",
-            margin: 0,
-          }}>
-            Trending This Week
-          </h3>
-          <Link href="/discover" style={{
-            fontSize: 12.5, fontWeight: 600,
-            color: "#ff6a3d", textDecoration: "none",
-          }}>
-            See all →
-          </Link>
         </div>
       )}
 
-      {/* ── Ranked rows ──────────────────────────────────────────── */}
+      {/* ── Featured Tools section ───────────────────────────────── */}
+      {tools.length > 0 && (
+        <div>
+          {/* Section header */}
+          <div style={{
+            display: "flex", alignItems: "flex-end", justifyContent: "space-between",
+            gap: 24, padding: "0 4px 14px",
+            borderBottom: "1px solid var(--border)", flexWrap: "wrap" as const, marginBottom: 16,
+          }}>
+            <div>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 7,
+                fontSize: 11, fontWeight: 600, color: "var(--ink-2)",
+                letterSpacing: ".06em", textTransform: "uppercase" as const, marginBottom: 8,
+              }}>
+                <span style={{
+                  width: 7, height: 7, borderRadius: "50%", background: "#16a34a",
+                  display: "inline-block", animation: "nbt-pulse 2s infinite",
+                }} />
+                Live ranking · updated just now
+              </div>
+              <h2 style={{
+                fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em",
+                lineHeight: 1.05, color: "var(--ink)", margin: 0,
+              }}>
+                Featured Tools
+              </h2>
+              <p style={{ margin: "6px 0 0", color: "var(--ink-muted)", fontSize: 13 }}>
+                Hand-picked tools, ranked by builders
+              </p>
+            </div>
+            <div style={{ display: "inline-flex", padding: 3, background: "var(--surface-alt)", borderRadius: 10, gap: 2 }}>
+              {["Today", "Week", "Month"].map((label, i) => (
+                <button key={label} style={{
+                  fontSize: 12, padding: "6px 12px", borderRadius: 8,
+                  color: i === 0 ? "var(--ink)" : "var(--ink-muted)",
+                  fontWeight: 600,
+                  background: i === 0 ? "var(--surface)" : "transparent",
+                  border: "none", cursor: "pointer", fontFamily: "inherit",
+                  boxShadow: i === 0 ? "0 1px 2px rgba(0,0,0,.06)" : "none",
+                }}>{label}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Mosaic: hero + 2 mini */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: miniCards.length > 0 ? "1.5fr 1fr" : "1fr",
+            gap: 16, alignItems: "stretch",
+          }}>
+            {hero && <MosaicHero tool={hero} rank={1} userId={userId} isUpvoted={userUpvotedIds.includes(hero.id)} />}
+            {miniCards.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {miniCards.map((t, i) => (
+                  <MosaicMini key={t.id} tool={t} rank={i + 2} userId={userId} isUpvoted={userUpvotedIds.includes(t.id)} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Trending This Week ───────────────────────────────────── */}
       {rest.length > 0 && (
-        <ol style={{
-          display: "flex", flexDirection: "column", gap: 0,
-          border: "1px solid var(--border)", borderRadius: 16,
-          background: "var(--surface)", overflow: "hidden",
-          listStyle: "none", margin: 0, padding: 0,
-        }}>
-          {rest.map((t, i) => (
-            <RankedRow
-              key={t.id}
-              tool={t}
-              rank={i + 4}
-              delta={DELTAS[i + 3] ?? 1}
-              userId={userId}
-              isUpvoted={userUpvotedIds.includes(t.id)}
-            />
-          ))}
-          {/* Remove bottom border on last row */}
-          <style>{`ol li:last-child { border-bottom: none !important; }`}</style>
-        </ol>
+        <div>
+          {/* Section header */}
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 16 }}>
+            <div>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                fontSize: 11, fontWeight: 700, color: "#16a34a",
+                letterSpacing: "0.07em", textTransform: "uppercase" as const, marginBottom: 6,
+              }}>
+                <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#16a34a", display: "inline-block" }} />
+                Trending This Week
+              </div>
+              <h3 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.02em", color: "var(--ink)", margin: 0 }}>
+                Climbing the charts
+              </h3>
+            </div>
+            <Link href="/discover" style={{ fontSize: 12.5, fontWeight: 600, color: "#ff6a3d", textDecoration: "none" }}>
+              See all →
+            </Link>
+          </div>
+
+          {/* Ranked rows */}
+          <ol style={{
+            display: "flex", flexDirection: "column", gap: 0,
+            border: "1px solid var(--border)", borderRadius: 16,
+            background: "var(--surface)", overflow: "hidden",
+            listStyle: "none", margin: 0, padding: 0,
+          }}>
+            {rest.map((t, i) => (
+              <RankedRow
+                key={t.id} tool={t} rank={i + 4}
+                delta={DELTAS[i + 3] ?? 1}
+                userId={userId} isUpvoted={userUpvotedIds.includes(t.id)}
+              />
+            ))}
+            <style>{`ol li:last-child { border-bottom: none !important; }`}</style>
+          </ol>
+        </div>
       )}
 
       {/* ── Footer ───────────────────────────────────────────────── */}
@@ -620,9 +720,7 @@ export default function ProductShowcase({
           display: "inline-flex", alignItems: "center", gap: 8,
           padding: "11px 24px", borderRadius: 999,
           background: "var(--ink)", color: "var(--bg)",
-          fontSize: 13, fontWeight: 600,
-          textDecoration: "none",
-          transition: "transform .15s, background .15s",
+          fontSize: 13, fontWeight: 600, textDecoration: "none",
         }}>
           See all tools
           <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -631,7 +729,6 @@ export default function ProductShowcase({
         </Link>
       </div>
 
-      {/* Pulse keyframe (injected once per page) */}
       <style>{`
         @keyframes nbt-pulse {
           0%{box-shadow:0 0 0 0 rgba(22,163,74,.45)}

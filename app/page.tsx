@@ -6,7 +6,7 @@ import { createClient } from "@/utils/supabase/server";
 import TopNav from "./components/TopNav";
 import ProductShowcase from "./components/ProductShowcase";
 import BuildInPublicWall from "./components/BuildInPublicWall";
-import HallOfFameStrip from "./components/HallOfFameStrip";
+import { type HofEntry } from "./components/ProductShowcase";
 import PostStoryWallButton from "./components/PostStoryWallButton";
 import HeroSection from "./components/HeroSection";
 import Pill from "./components/Pill";
@@ -180,6 +180,18 @@ export default async function HomePage({
     }
   }
 
+  // ── Hall of Fame inducted tools ───────────────────────────────────────
+  const { data: hofRows } = await supabase
+    .from("hall_of_fame")
+    .select("inducted_at, tools(id, slug, name, tagline, logo_url, pricing, upvote_count, featured, tool_tags(tags(name)))")
+    .eq("status", "approved")
+    .order("inducted_at", { ascending: false })
+    .limit(3);
+
+  const hofEntries: HofEntry[] = (hofRows ?? [])
+    .filter((r: any) => r.tools)
+    .map((r: any) => ({ inducted_at: r.inducted_at, tool: r.tools as any }));
+
   // Posts are now fetched client-side by <BuildInPublicWall />
 
   return (
@@ -263,6 +275,7 @@ export default async function HomePage({
               tools={sortedTools}
               userId={user?.id ?? null}
               userUpvotedIds={userUpvotedIds}
+              hofEntries={hofEntries}
             />
           </div>
 
@@ -401,11 +414,6 @@ export default async function HomePage({
             </div>
           </div>
         </div>
-
-        {/* Hall of Fame Strip */}
-        <Suspense fallback={null}>
-          <HallOfFameStrip />
-        </Suspense>
 
         {/* Build in Public Wall */}
         <div
