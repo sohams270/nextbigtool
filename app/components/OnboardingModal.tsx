@@ -121,34 +121,26 @@ export default function OnboardingModal({ userId, userEmail, onComplete }: {
     const client = createClient();
     const fullName = `${fields.first_name.trim()} ${fields.last_name.trim()}`.trim();
 
-    // Use update (not upsert) — the profile row always exists at this point
-    // (created by the auth/callback stub upsert or a DB trigger).
-    // update only requires the UPDATE RLS policy, not INSERT.
-    const { error: e } = await client
-      .from("profiles")
-      .update({
-        full_name: fullName,
-        username: fields.username.trim().toLowerCase(),
-        company: fields.company.trim(),
-        role: fields.role.trim(),
-        bio: fields.bio.trim() || null,
-        website_url: fields.website_url.trim() || null,
-        twitter_url: fields.twitter_url.trim() || null,
-        linkedin_url: fields.linkedin_url.trim() || null,
-      })
-      .eq("id", userId);
+    // upsert so the save works whether or not a stub row exists.
+    // onboarding_completed is intentionally excluded — the column may not
+    // exist in the DB; we infer completion from mandatory fields being set.
+    const { error: e } = await client.from("profiles").upsert({
+      id: userId,
+      full_name: fullName,
+      username: fields.username.trim().toLowerCase(),
+      company: fields.company.trim(),
+      role: fields.role.trim(),
+      bio: fields.bio.trim() || null,
+      website_url: fields.website_url.trim() || null,
+      twitter_url: fields.twitter_url.trim() || null,
+      linkedin_url: fields.linkedin_url.trim() || null,
+    }, { onConflict: "id" });
 
     if (e) {
       setSaving(false);
       setError("Something went wrong. Please try again.");
       return;
     }
-
-    // Best-effort: mark onboarding_completed = true (silently ignored if column missing)
-    await client
-      .from("profiles")
-      .update({ onboarding_completed: true })
-      .eq("id", userId);
 
     setSaving(false);
     onComplete();
