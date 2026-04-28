@@ -314,8 +314,8 @@ function HofCard({ entry, rank }: {
         <ProductLogo tool={entry.tool} size={46} radius={11} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" as const, marginBottom: 3 }}>
-            <h3 style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: "#ffffff", margin: 0 }}>
-              {entry.tool.name}
+            <h3 style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", margin: 0 }}>
+              <Link href={`/tools/${entry.tool.slug}`} style={{ color: "#ffffff", textDecoration: "none" }}>{entry.tool.name}</Link>
             </h3>
             <span style={{
               fontSize: 8.5, fontWeight: 800, padding: "2px 6px", borderRadius: 20,
@@ -549,8 +549,8 @@ function RankedRow({
 
         {/* Body — name + single tag row, no description */}
         <div style={{ minWidth: 0 }}>
-          <h4 style={{ fontSize: 13.5, fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink)", margin: "0 0 4px" }}>
-            {tool.name}
+          <h4 style={{ fontSize: 13.5, fontWeight: 700, letterSpacing: "-0.01em", margin: "0 0 4px" }}>
+            <Link href={`/tools/${tool.slug}`} style={{ color: "var(--ink)", textDecoration: "none" }}>{tool.name}</Link>
           </h4>
           <div style={{ display: "flex", gap: 4, flexWrap: "wrap" as const }}>
             {t.slice(0, 2).map((c) => <CatChip key={c} label={c} />)}
@@ -604,8 +604,8 @@ function RankedRow({
       {/* Body */}
       <div style={{ minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" as const, marginBottom: 2 }}>
-          <h4 style={{ fontSize: 16, fontWeight: 700, letterSpacing: "-0.01em", color: "var(--ink)", margin: 0 }}>
-            {tool.name}
+          <h4 style={{ fontSize: 16, fontWeight: 700, letterSpacing: "-0.01em", margin: 0 }}>
+            <Link href={`/tools/${tool.slug}`} style={{ color: "var(--ink)", textDecoration: "none" }}>{tool.name}</Link>
           </h4>
         </div>
         <p style={{ fontSize: 13.5, color: "var(--ink-2)", margin: "4px 0 8px", lineHeight: 1.45 }}>
