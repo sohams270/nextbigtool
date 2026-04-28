@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * ProductShowcase — editorial leaderboard section for the homepage.
  *
