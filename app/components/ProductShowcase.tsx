@@ -12,8 +12,8 @@
  */
 
 import Link from "next/link";
+import { useState } from "react";
 import UpvoteButton from "./UpvoteButton";
-import ToolLogoImg from "./ToolLogoImg";
 
 /* ─── types ──────────────────────────────────────────────────────────── */
 export type ShowcaseTool = {
@@ -22,6 +22,7 @@ export type ShowcaseTool = {
   name: string;
   tagline: string;
   logo_url: string | null;
+  website_url: string | null;
   pricing: string;
   upvote_count: number;
   featured: boolean;
@@ -70,9 +71,25 @@ function ProductLogo({
   size: number;
   radius: number;
 }) {
+  const [failed, setFailed] = useState(false);
   const fs = Math.round(size * 0.42);
 
-  if (tool.logo_url) {
+  // Priority: explicit logo_url → Clearbit from website_url → gradient badge
+  let src: string | null = null;
+  if (!failed) {
+    if (tool.logo_url) {
+      src = tool.logo_url;
+    } else if (tool.website_url) {
+      try {
+        const domain = new URL(tool.website_url).hostname.replace(/^www\./, "");
+        src = `https://logo.clearbit.com/${domain}`;
+      } catch {
+        src = null;
+      }
+    }
+  }
+
+  if (src) {
     return (
       <div
         style={{
@@ -84,9 +101,19 @@ function ProductLogo({
           border: "1px solid rgba(0,0,0,0.08)",
           boxShadow: "inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.06)",
           background: "var(--surface-alt)",
+          display: "grid",
+          placeItems: "center",
         }}
       >
-        <ToolLogoImg src={tool.logo_url} alt={`${tool.name} logo`} size={size} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt={`${tool.name} logo`}
+          width={size}
+          height={size}
+          style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+          onError={() => setFailed(true)}
+        />
       </div>
     );
   }

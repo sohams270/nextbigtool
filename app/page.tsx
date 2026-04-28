@@ -38,6 +38,7 @@ type ToolRow = {
   name: string;
   tagline: string;
   logo_url: string | null;
+  website_url: string | null;
   pricing: string;
   upvote_count: number;
   featured: boolean;
@@ -69,7 +70,7 @@ export default async function HomePage({
   let toolQuery = supabase
     .from("tools")
     .select(`
-      id, slug, name, tagline, logo_url, pricing, upvote_count, featured,
+      id, slug, name, tagline, logo_url, website_url, pricing, upvote_count, featured,
       tool_tags ( tags ( name ) )
     `)
     .eq("status", "approved");
@@ -183,7 +184,7 @@ export default async function HomePage({
   // ── Hall of Fame inducted tools ───────────────────────────────────────
   const { data: hofRows } = await supabase
     .from("hall_of_fame")
-    .select("inducted_at, tools(id, slug, name, tagline, logo_url, pricing, upvote_count, featured, tool_tags(tags(name)))")
+    .select("inducted_at, tools(id, slug, name, tagline, logo_url, website_url, pricing, upvote_count, featured, tool_tags(tags(name)))")
     .eq("status", "approved")
     .order("inducted_at", { ascending: false })
     .limit(3);

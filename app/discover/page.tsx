@@ -20,7 +20,7 @@ const CATEGORIES = [
 
 type ToolRow = {
   id: string; slug: string; name: string; tagline: string;
-  logo_url: string | null; pricing: string; upvote_count: number;
+  logo_url: string | null; website_url: string | null; pricing: string; upvote_count: number;
   featured: boolean; description?: string;
   tool_tags: { tags: { name: string } | null }[];
 };
@@ -69,7 +69,7 @@ export default async function DiscoverPage({
 
     const { data: toolRows } = await supabase
       .from("tools")
-      .select("id, slug, name, tagline, logo_url, pricing, upvote_count, featured, tool_tags(tags(name))")
+      .select("id, slug, name, tagline, logo_url, website_url, pricing, upvote_count, featured, tool_tags(tags(name))")
       .eq("status", "approved")
       .or(toolFilter)
       .order("upvote_count", { ascending: false })
@@ -92,7 +92,7 @@ export default async function DiscoverPage({
       if (newIds.length > 0) {
         const { data: tagToolRows } = await supabase
           .from("tools")
-          .select("id, slug, name, tagline, logo_url, pricing, upvote_count, featured, tool_tags(tags(name))")
+          .select("id, slug, name, tagline, logo_url, website_url, pricing, upvote_count, featured, tool_tags(tags(name))")
           .eq("status", "approved").in("id", newIds)
           .order("upvote_count", { ascending: false }).limit(10);
         extraTools = (tagToolRows ?? []) as unknown as ToolRow[];
@@ -104,7 +104,7 @@ export default async function DiscoverPage({
     /* ── Normal browse mode ── */
     let query = supabase
       .from("tools")
-      .select("id, slug, name, tagline, logo_url, pricing, upvote_count, featured, tool_tags(tags(name))")
+      .select("id, slug, name, tagline, logo_url, website_url, pricing, upvote_count, featured, tool_tags(tags(name))")
       .eq("status", "approved")
       .order("upvote_count", { ascending: false });
 
@@ -123,7 +123,7 @@ export default async function DiscoverPage({
   if (tab === "hall-of-fame") {
     const { data: hofRows } = await supabase
       .from("hall_of_fame")
-      .select("inducted_at, tools(id, slug, name, tagline, logo_url, pricing, upvote_count, featured, tool_tags(tags(name)))")
+      .select("inducted_at, tools(id, slug, name, tagline, logo_url, website_url, pricing, upvote_count, featured, tool_tags(tags(name)))")
       .eq("status", "approved")
       .order("inducted_at", { ascending: false })
       .limit(50);
@@ -251,12 +251,20 @@ export default async function DiscoverPage({
                             <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12 }}>
                               <div style={{
                                 width:44,height:44,borderRadius:12,flexShrink:0,
-                                background: t.logo_url ? "transparent" : `hsl(${t.name.charCodeAt(0)*7%360},60%,50%)`,
+                                background: (t.logo_url || t.website_url) ? "var(--surface-alt,#f4f4f5)" : `hsl(${t.name.charCodeAt(0)*7%360},60%,50%)`,
                                 display:"flex",alignItems:"center",justifyContent:"center",
                                 fontSize:18,fontWeight:800,color:"#fff",overflow:"hidden",
                                 border:"1.5px solid rgba(255,215,0,0.3)",
                               }}>
-                                {t.logo_url ? <img src={t.logo_url} alt={t.name} style={{ width:"100%",height:"100%",objectFit:"cover" }} /> : t.name[0]}
+                                {(t.logo_url || t.website_url) ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img
+                                    src={t.logo_url ?? `https://logo.clearbit.com/${(() => { try { return new URL(t.website_url!).hostname.replace(/^www\./,""); } catch { return ""; } })()}`}
+                                    alt={t.name}
+                                    style={{ width:"100%",height:"100%",objectFit:"contain" }}
+                                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display="none"; }}
+                                  />
+                                ) : t.name[0]}
                               </div>
                               <span style={{ fontSize:11,fontWeight:700,padding:"2px 8px",borderRadius:20,background:"rgba(255,215,0,0.12)",color:"#9a6a00",border:"1px solid rgba(255,215,0,0.3)" }}>
                                 🏆 Inducted
