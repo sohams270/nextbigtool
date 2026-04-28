@@ -6,6 +6,7 @@ import { createClient } from "@/utils/supabase/server";
 import TopNav from "./components/TopNav";
 import ProductShowcase from "./components/ProductShowcase";
 import BuildInPublicWall from "./components/BuildInPublicWall";
+import HallOfFameStrip from "./components/HallOfFameStrip";
 import PostStoryWallButton from "./components/PostStoryWallButton";
 import HeroSection from "./components/HeroSection";
 import Pill from "./components/Pill";
@@ -400,6 +401,11 @@ export default async function HomePage({
             </div>
           </div>
         </div>
+
+        {/* Hall of Fame Strip */}
+        <Suspense fallback={null}>
+          <HallOfFameStrip />
+        </Suspense>
 
         {/* Build in Public Wall */}
         <div

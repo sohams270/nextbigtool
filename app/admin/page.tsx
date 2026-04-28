@@ -4,8 +4,19 @@ import { createClient } from "@/utils/supabase/server";
 import ReviewButtons from "./ReviewButtons";
 import SubmissionButtons from "./SubmissionButtons";
 import BlogRequestButtons from "./BlogRequestButtons";
+import HofNominationButtons from "./HofNominationButtons";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "";
+
+type HofNomination = {
+  id: string;
+  pitch: string | null;
+  status: string;
+  created_at: string;
+  user_id: string;
+  profiles: { full_name: string | null; email: string | null } | null;
+  tools: { name: string; logo_url: string | null; tagline: string } | null;
+};
 
 type BlogRequest = {
   id: string;
@@ -112,6 +123,24 @@ export default async function AdminPage() {
   const pendingNewsletter: NewsletterSubmission[] = (pendingNewsletterRaw ?? []).map((s: any) => ({
     ...s,
     profiles: profileMap[s.user_id] ?? null,
+  }));
+
+  // Hall of Fame nominations
+  const { data: pendingHofRaw } = await supabase
+    .from("hall_of_fame")
+    .select("id, pitch, status, created_at, user_id, tools(name, logo_url, tagline)")
+    .eq("status", "pending")
+    .order("created_at", { ascending: false });
+
+  const hofSubmitterIds = [...new Set((pendingHofRaw ?? []).map((r: any) => r.user_id))];
+  const { data: hofProfiles } = hofSubmitterIds.length > 0
+    ? await supabase.from("profiles").select("id, full_name, email").in("id", hofSubmitterIds)
+    : { data: [] };
+  const hofProfileMap = Object.fromEntries((hofProfiles ?? []).map((p: any) => [p.id, p]));
+
+  const pendingHofNominations: HofNomination[] = (pendingHofRaw ?? []).map((r: any) => ({
+    ...r,
+    profiles: hofProfileMap[r.user_id] ?? null,
   }));
 
   // Blog post requests
@@ -266,6 +295,69 @@ export default async function AdminPage() {
                   ))}
                 </div>
               )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Hall of Fame Nominations ── */}
+      <div style={{ margin: "44px 0 10px", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+        <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink-muted)", whiteSpace: "nowrap" }}>
+          Hall of Fame Nominations
+        </span>
+        <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+      </div>
+
+      <div style={{ marginBottom: 8, fontSize: 14, fontWeight: 700, color: "var(--ink)", display: "flex", alignItems: "center", gap: 8, marginTop: 20 }}>
+        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#ffd700", display: "inline-block" }} />
+        Pending Nominations ({pendingHofNominations.length})
+      </div>
+
+      {pendingHofNominations.length === 0 ? (
+        <div style={{ ...card, textAlign: "center", padding: "40px 20px", color: "var(--ink-muted)", marginBottom: 36 }}>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>🏆</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", marginBottom: 4 }}>No pending nominations</div>
+          <div style={{ fontSize: 13 }}>When Core plan users nominate products, they&apos;ll appear here.</div>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 36 }}>
+          {pendingHofNominations.map(n => (
+            <div key={n.id} style={{ ...card, display: "flex", gap: 14, alignItems: "flex-start" }}>
+              {/* Logo */}
+              <div style={{
+                width: 50, height: 50, borderRadius: 12, flexShrink: 0,
+                background: n.tools?.logo_url ? "transparent" : `hsl(${(n.tools?.name.charCodeAt(0) ?? 0) * 7 % 360},60%,50%)`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 20, fontWeight: 800, color: "#fff", overflow: "hidden",
+                border: "1.5px solid rgba(255,215,0,0.4)",
+              }}>
+                {n.tools?.logo_url
+                  ? <img src={n.tools.logo_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  : (n.tools?.name[0] ?? "?")}
+              </div>
+
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)" }}>{n.tools?.name}</span>
+                  <span style={{ fontSize: 12, color: "var(--ink-muted)" }}>{n.tools?.tagline}</span>
+                  <span style={{ fontSize: 11, color: "var(--ink-muted)", marginLeft: "auto" }}>{timeAgo(n.created_at)}</span>
+                </div>
+                <div style={{ fontSize: 12, color: "var(--ink-muted)", marginBottom: 6 }}>
+                  Submitted by: <b>{n.profiles?.full_name ?? n.profiles?.email ?? "Unknown"}</b>
+                </div>
+                {n.pitch && (
+                  <div style={{
+                    fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.6,
+                    padding: "8px 12px", borderRadius: 8,
+                    background: "var(--surface-alt)", borderLeft: "3px solid rgba(255,215,0,0.5)",
+                  }}>
+                    {n.pitch}
+                  </div>
+                )}
+              </div>
+
+              <HofNominationButtons nominationId={n.id} />
             </div>
           ))}
         </div>

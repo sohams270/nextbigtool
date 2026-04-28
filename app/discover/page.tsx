@@ -108,12 +108,27 @@ export default async function DiscoverPage({
       .eq("status", "approved")
       .order("upvote_count", { ascending: false });
 
-    if (tab === "featured")      query = query.eq("featured", true);
-    if (tab === "free")          query = query.eq("pricing", "free");
-    if (tab === "hall-of-fame")  query = query.gte("upvote_count", 100);
+    if (tab === "featured")     query = query.eq("featured", true);
+    if (tab === "free")         query = query.eq("pricing", "free");
+    // hall-of-fame is handled separately below
+    if (tab !== "hall-of-fame") {
+      const { data } = await query.limit(30);
+      tools = (data ?? []) as unknown as ToolRow[];
+    }
+  }
 
-    const { data } = await query.limit(30);
-    tools = (data ?? []) as unknown as ToolRow[];
+  // Fetch Hall of Fame inducted tools
+  type HofEntry = { inducted_at: string | null; tools: ToolRow | null };
+  let hofEntries: HofEntry[] = [];
+  if (tab === "hall-of-fame") {
+    const { data: hofRows } = await supabase
+      .from("hall_of_fame")
+      .select("inducted_at, tools(id, slug, name, tagline, logo_url, pricing, upvote_count, featured, tool_tags(tags(name)))")
+      .eq("status", "approved")
+      .order("inducted_at", { ascending: false })
+      .limit(50);
+    hofEntries = (hofRows ?? []) as unknown as HofEntry[];
+    tools = hofEntries.map(e => e.tools).filter(Boolean) as ToolRow[];
   }
 
   let userUpvotedIds: string[] = [];
@@ -180,7 +195,99 @@ export default async function DiscoverPage({
         <div style={{ display: "grid", gridTemplateColumns: "1fr 240px", gap: 24 }}>
           {/* Tool grid */}
           <div>
-            {!isSearchMode && tab === "categories" ? (
+            {!isSearchMode && tab === "hall-of-fame" ? (
+              /* ── Hall of Fame gold grid ── */
+              <div>
+                {/* Gold hero banner */}
+                <div style={{
+                  marginBottom: 20, padding: "20px 22px",
+                  background: "linear-gradient(135deg,#0D0E22,#1A0D2E)",
+                  borderRadius: 14, border: "1px solid rgba(255,215,0,0.25)",
+                  display: "flex", alignItems: "center", gap: 16,
+                  position: "relative", overflow: "hidden",
+                }}>
+                  {[{t:"10%",l:"5%",s:2},{t:"20%",l:"90%",s:1.5},{t:"65%",l:"93%",s:2},{t:"80%",l:"3%",s:1.5},{t:"45%",l:"50%",s:1}].map((d,i) => (
+                    <div key={i} style={{ position:"absolute",top:d.t,left:d.l,width:d.s,height:d.s,borderRadius:"50%",background:"rgba(255,215,80,0.5)" }} />
+                  ))}
+                  <div style={{ width:52,height:52,borderRadius:14,background:"linear-gradient(135deg,rgba(255,215,80,0.2),rgba(255,140,0,0.15))",border:"1px solid rgba(255,215,80,0.4)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,flexShrink:0 }}>🏆</div>
+                  <div>
+                    <div style={{ fontSize:18, fontWeight:800, letterSpacing:"-0.02em", background:"linear-gradient(90deg,#FFD700,#FFA500)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+                      Hall of Fame
+                    </div>
+                    <div style={{ fontSize:12, color:"rgba(255,255,255,0.5)", marginTop:3 }}>
+                      Permanently inducted · Curated by NextBigTool editors · The best products, forever
+                    </div>
+                  </div>
+                </div>
+
+                {tools.length === 0 ? (
+                  <div style={{ textAlign:"center", padding:"60px 0" }}>
+                    <div style={{ fontSize:40, marginBottom:12 }}>🏆</div>
+                    <div style={{ fontSize:16, fontWeight:800, color:"#0f0f10", marginBottom:8 }}>No inductees yet</div>
+                    <div style={{ fontSize:13, color:"#9090a0" }}>The first Hall of Fame products will appear here once inducted.</div>
+                  </div>
+                ) : (
+                  <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:14 }}>
+                    {hofEntries.filter(e => e.tools).map((entry, i) => {
+                      const t = entry.tools!;
+                      const tags = t.tool_tags.map(tt => tt.tags?.name).filter(Boolean) as string[];
+                      return (
+                        <a key={t.id} href={`/tools/${t.slug}`} style={{ textDecoration:"none" }}>
+                          <div style={{
+                            background:"#fff",
+                            border:"1.5px solid rgba(255,215,0,0.4)",
+                            borderRadius:14, padding:"16px 16px 14px",
+                            position:"relative", overflow:"hidden",
+                            transition:"box-shadow 0.15s,transform 0.1s",
+                          }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.boxShadow="0 4px 24px rgba(255,215,0,0.18)"; (e.currentTarget as HTMLDivElement).style.transform="translateY(-2px)"; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.boxShadow="none"; (e.currentTarget as HTMLDivElement).style.transform="translateY(0)"; }}
+                          >
+                            {/* Gold top border */}
+                            <div style={{ position:"absolute",top:0,left:0,right:0,height:3,background:"linear-gradient(90deg,#ffd700,#ff8c00,#ffd700)" }} />
+                            {/* Rank */}
+                            <div style={{ position:"absolute",bottom:12,right:14,fontSize:26,fontWeight:900,color:"rgba(0,0,0,0.04)",letterSpacing:"-0.04em" }}>#{i+1}</div>
+
+                            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12 }}>
+                              <div style={{
+                                width:44,height:44,borderRadius:12,flexShrink:0,
+                                background: t.logo_url ? "transparent" : `hsl(${t.name.charCodeAt(0)*7%360},60%,50%)`,
+                                display:"flex",alignItems:"center",justifyContent:"center",
+                                fontSize:18,fontWeight:800,color:"#fff",overflow:"hidden",
+                                border:"1.5px solid rgba(255,215,0,0.3)",
+                              }}>
+                                {t.logo_url ? <img src={t.logo_url} alt={t.name} style={{ width:"100%",height:"100%",objectFit:"cover" }} /> : t.name[0]}
+                              </div>
+                              <span style={{ fontSize:11,fontWeight:700,padding:"2px 8px",borderRadius:20,background:"rgba(255,215,0,0.12)",color:"#9a6a00",border:"1px solid rgba(255,215,0,0.3)" }}>
+                                🏆 Inducted
+                              </span>
+                            </div>
+
+                            <div style={{ fontSize:14,fontWeight:700,color:"#0f0f10",marginBottom:4 }}>{t.name}</div>
+                            <div style={{ fontSize:11.5,color:"#6b6b70",lineHeight:1.45,marginBottom:10,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical" as const,overflow:"hidden" }}>{t.tagline}</div>
+
+                            <div style={{ display:"flex",gap:5,flexWrap:"wrap" as const }}>
+                              {tags.slice(0,2).map(tag => (
+                                <span key={tag} style={{ padding:"2px 8px",borderRadius:20,background:"#F5F5F5",fontSize:10,color:"#6b6b70" }}>{tag}</span>
+                              ))}
+                              <span style={{ padding:"2px 8px",borderRadius:20,background:"rgba(255,215,0,0.1)",fontSize:10,fontWeight:700,color:"#9a6a00" }}>
+                                ▲ {t.upvote_count}
+                              </span>
+                            </div>
+
+                            {entry.inducted_at && (
+                              <div style={{ marginTop:8,fontSize:10,color:"#9090a0" }}>
+                                Inducted {new Date(entry.inducted_at).toLocaleDateString("en-US",{month:"short",year:"numeric"})}
+                              </div>
+                            )}
+                          </div>
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ) : !isSearchMode && tab === "categories" ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
                 {CATEGORIES.map((cat) => (
                   <div key={cat}>

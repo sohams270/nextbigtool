@@ -51,6 +51,21 @@ export async function rejectBlogRequest(requestId: string) {
   revalidatePath("/admin");
 }
 
+export async function inductHofNomination(nominationId: string) {
+  const { supabase } = await getAdminUser();
+  await supabase.from("hall_of_fame")
+    .update({ status: "approved", inducted_at: new Date().toISOString() })
+    .eq("id", nominationId);
+  revalidatePath("/admin");
+  revalidatePath("/");
+}
+
+export async function rejectHofNomination(nominationId: string) {
+  const { supabase } = await getAdminUser();
+  await supabase.from("hall_of_fame").update({ status: "rejected" }).eq("id", nominationId);
+  revalidatePath("/admin");
+}
+
 export async function publishBlogRequest(requestId: string, blogUrl: string) {
   const { supabase } = await getAdminUser();
   await supabase.from("blog_post_requests").update({ status: "published", blog_url: blogUrl }).eq("id", requestId);
