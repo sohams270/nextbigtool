@@ -453,9 +453,34 @@ export default function NewsletterPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 20, alignItems: "start" }}>
 
-        {/* ── Issues list ────────────────────────────────────────────── */}
+        {/* ── Sidebar (left) ──────────────────────────────────────────── */}
+        <aside style={{ display: "flex", flexDirection: "column", gap: 16 }} id="submit-form-anchor">
+
+          {/* Submit card */}
+          <div style={{ ...card, padding: "20px 20px 22px" }}>
+            <h3 style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)", margin: "0 0 4px", letterSpacing: "-0.01em" }}>
+              Submit an update
+            </h3>
+            <p style={{ fontSize: 12.5, color: "var(--ink-muted)", margin: "0 0 18px", lineHeight: 1.55 }}>
+              Got a launch, milestone, or story? The NBT editorial team reviews for the next issue.
+            </p>
+
+            {!profile ? (
+              <div style={{ height: 80, background: "var(--surface-alt)", borderRadius: 8, animation: "pulse 1.5s infinite" }} />
+            ) : !canFeature(plan) ? (
+              <FreeGate />
+            ) : userId ? (
+              <SubmitForm tools={tools} plan={plan} userId={userId} />
+            ) : null}
+          </div>
+
+          {/* How featuring works */}
+          <HowItWorks plan={plan} />
+        </aside>
+
+        {/* ── Issues list (right) ─────────────────────────────────────── */}
         <div style={{ ...card, padding: 0, overflow: "hidden" }}>
           <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-faint)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Past issues</h2>
@@ -563,31 +588,6 @@ export default function NewsletterPage() {
             })
           )}
         </div>
-
-        {/* ── Sidebar ────────────────────────────────────────────────── */}
-        <aside style={{ display: "flex", flexDirection: "column", gap: 16 }} id="submit-form-anchor">
-
-          {/* Submit card */}
-          <div style={{ ...card, padding: "20px 20px 22px" }}>
-            <h3 style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)", margin: "0 0 4px", letterSpacing: "-0.01em" }}>
-              Submit an update
-            </h3>
-            <p style={{ fontSize: 12.5, color: "var(--ink-muted)", margin: "0 0 18px", lineHeight: 1.55 }}>
-              Got a launch, milestone, or story? The NBT editorial team reviews for the next issue.
-            </p>
-
-            {!profile ? (
-              <div style={{ height: 80, background: "var(--surface-alt)", borderRadius: 8, animation: "pulse 1.5s infinite" }} />
-            ) : !canFeature(plan) ? (
-              <FreeGate />
-            ) : userId ? (
-              <SubmitForm tools={tools} plan={plan} userId={userId} />
-            ) : null}
-          </div>
-
-          {/* How featuring works */}
-          <HowItWorks plan={plan} />
-        </aside>
       </div>
     </main>
   );
