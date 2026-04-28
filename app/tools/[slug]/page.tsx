@@ -28,20 +28,19 @@ export default async function ToolPage({ params }: Props) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: tool } = await supabase
+  const { data: tool, error: toolErr } = await supabase
     .from("tools")
     .select(`
       id, slug, name, tagline, description, website_url, logo_url, pricing,
       status, upvote_count, maker_comment, demo_url, twitter_url,
-      github_url, contact_email, created_at,
-      tool_tags ( tags ( name ) ),
-      profiles ( full_name, avatar_url, username )
+      github_url, contact_email, created_at, submitter_id,
+      tool_tags ( tags ( name ) )
     `)
     .eq("slug", slug)
     .eq("status", "approved")
     .maybeSingle();
 
-  if (!tool) notFound();
+  if (toolErr || !tool) notFound();
 
   let isUpvoted = false;
   if (user) {
@@ -57,9 +56,6 @@ export default async function ToolPage({ params }: Props) {
   const tags = ((tool.tool_tags ?? []) as any[])
     .map((tt: any) => tt.tags?.name)
     .filter(Boolean) as string[];
-
-  const submitter = tool.profiles as any;
-  const makerName = submitter?.full_name || submitter?.username || null;
 
   // Clearbit logo fallback
   let logoSrc: string | null = tool.logo_url;
@@ -229,7 +225,6 @@ export default async function ToolPage({ params }: Props) {
                   <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#FF6B35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                   <h2 style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.01em", color: "var(--ink)", margin: 0 }}>
                     Founder&apos;s note
-                    {makerName && <span style={{ fontWeight: 500, color: "var(--ink-muted)", marginLeft: 6 }}>from {makerName}</span>}
                   </h2>
                 </div>
                 <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.75, margin: 0, fontStyle: "italic" }}>
