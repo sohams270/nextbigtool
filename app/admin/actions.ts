@@ -26,3 +26,15 @@ export async function rejectTool(toolId: string) {
   await supabase.from("tools").update({ status: "rejected" }).eq("id", toolId);
   revalidatePath("/admin");
 }
+
+export async function approveSubmission(submissionId: string) {
+  const { supabase } = await getAdminUser();
+  await supabase.from("newsletter_submissions").update({ status: "approved" }).eq("id", submissionId);
+  revalidatePath("/admin");
+}
+
+export async function rejectSubmission(submissionId: string) {
+  const { supabase } = await getAdminUser();
+  await supabase.from("newsletter_submissions").update({ status: "rejected" }).eq("id", submissionId);
+  revalidatePath("/admin");
+}

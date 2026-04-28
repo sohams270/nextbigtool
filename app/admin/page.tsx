@@ -2,8 +2,21 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import ReviewButtons from "./ReviewButtons";
+import SubmissionButtons from "./SubmissionButtons";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "";
+
+type NewsletterSubmission = {
+  id: string;
+  headline: string;
+  story: string;
+  link: string | null;
+  status: string;
+  created_at: string;
+  user_id: string;
+  profiles: { full_name: string | null; email: string | null } | null;
+  tools: { name: string } | null;
+};
 
 type Tool = {
   id: string;
@@ -67,6 +80,24 @@ export default async function AdminPage() {
     .eq("status", "rejected")
     .order("created_at", { ascending: false })
     .limit(10);
+
+  const { data: pendingNewsletterRaw } = await supabase
+    .from("newsletter_submissions")
+    .select("id, headline, story, link, status, created_at, user_id, tools(name)")
+    .eq("status", "pending")
+    .order("created_at", { ascending: false });
+
+  // enrich with profiles separately
+  const submitterIds = [...new Set((pendingNewsletterRaw ?? []).map((s: any) => s.user_id))];
+  const { data: submitterProfiles } = submitterIds.length > 0
+    ? await supabase.from("profiles").select("id, full_name, email").in("id", submitterIds)
+    : { data: [] };
+  const profileMap = Object.fromEntries((submitterProfiles ?? []).map((p: any) => [p.id, p]));
+
+  const pendingNewsletter: NewsletterSubmission[] = (pendingNewsletterRaw ?? []).map((s: any) => ({
+    ...s,
+    profiles: profileMap[s.user_id] ?? null,
+  }));
 
   const tools = (pending ?? []) as Tool[];
 
@@ -202,6 +233,82 @@ export default async function AdminPage() {
                   ))}
                 </div>
               )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Newsletter Submissions ── */}
+      <div style={{ margin: "44px 0 10px", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+        <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink-muted)", whiteSpace: "nowrap" }}>
+          Newsletter Featuring Requests
+        </span>
+        <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+      </div>
+
+      <div style={{ marginBottom: 8, fontSize: 14, fontWeight: 700, color: "var(--ink)", display: "flex", alignItems: "center", gap: 8, marginTop: 20 }}>
+        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#ff6a3d", display: "inline-block" }} />
+        Pending Submissions ({pendingNewsletter.length})
+      </div>
+
+      {pendingNewsletter.length === 0 ? (
+        <div style={{ ...card, textAlign: "center", padding: "40px 20px", color: "var(--ink-muted)", marginBottom: 36 }}>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>📭</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", marginBottom: 4 }}>No pending newsletter submissions</div>
+          <div style={{ fontSize: 13 }}>When founders submit featuring requests, they&apos;ll appear here.</div>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 36 }}>
+          {pendingNewsletter.map(s => (
+            <div key={s.id} style={{ ...card, display: "flex", flexDirection: "column", gap: 12 }}>
+              {/* Top row */}
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {/* Submitter + tool */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>
+                      {s.profiles?.full_name ?? s.profiles?.email ?? "Unknown user"}
+                    </span>
+                    {s.tools?.name && (
+                      <span style={{
+                        padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700,
+                        background: "var(--orange-soft)", color: "#ff6a3d",
+                      }}>
+                        {s.tools.name}
+                      </span>
+                    )}
+                    <span style={{ fontSize: 11, color: "var(--ink-muted)", marginLeft: "auto" }}>
+                      {timeAgo(s.created_at)}
+                    </span>
+                  </div>
+
+                  {/* Headline */}
+                  <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)", marginBottom: 4, letterSpacing: "-0.01em" }}>
+                    {s.headline}
+                  </div>
+
+                  {/* Story */}
+                  <div style={{
+                    fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.6,
+                    padding: "8px 12px", borderRadius: 8,
+                    background: "var(--surface-alt)", borderLeft: "3px solid var(--border)",
+                  }}>
+                    {s.story}
+                  </div>
+
+                  {/* Link */}
+                  {s.link && (
+                    <a href={s.link} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize: 12, color: "#3b7fff", textDecoration: "none", fontWeight: 500, marginTop: 6, display: "inline-block" }}>
+                      {s.link.replace(/^https?:\/\//, "")} ↗
+                    </a>
+                  )}
+                </div>
+
+                {/* Action buttons */}
+                <SubmissionButtons submissionId={s.id} />
+              </div>
             </div>
           ))}
         </div>
