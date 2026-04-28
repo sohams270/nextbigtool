@@ -133,6 +133,7 @@ export default function ProfilePage() {
     }
 
     const { error: saveErr } = await supabase.from("profiles").update({
+      email:        userEmail || null,
       full_name:    profile.full_name?.trim() ?? "",
       username:     profile.username?.trim().toLowerCase() ?? "",
       company:      profile.company?.trim() ?? "",

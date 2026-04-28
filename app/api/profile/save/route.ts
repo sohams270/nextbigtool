@@ -41,6 +41,7 @@ export async function POST(request: Request) {
     }
 
     const payload = {
+      email:        user.email ?? null,   // always pulled from auth, never from client input
       full_name:    full_name.trim(),
       username:     username.trim().toLowerCase(),
       company:      company.trim(),
