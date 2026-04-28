@@ -177,7 +177,7 @@ function SubmitForm({ tools, userId, existingRequest }: {
         </div>
       ) : (
         <div style={{ padding: "10px 12px", borderRadius: 9, background: "var(--surface-alt)", border: "1px solid var(--border)", fontSize: 12.5, color: "var(--ink-muted)" }}>
-          No approved products yet. <Link href="/dashboard/submit" style={{ color: "#ff6a3d", fontWeight: 600, textDecoration: "none" }}>Submit a tool →</Link>
+          No approved products yet. <Link href="/dashboard/products" style={{ color: "#ff6a3d", fontWeight: 600, textDecoration: "none" }}>Add your tool →</Link>
         </div>
       )}
 
@@ -293,7 +293,7 @@ function SubmitForm({ tools, userId, existingRequest }: {
           fontFamily: "inherit", transition: "opacity 0.15s",
         }}
       >
-        {submitting ? "Submitting…" : "Request featured blog post"}
+        {submitting ? "Submitting…" : "Trigger Featured Blog Post"}
       </button>
     </form>
   );
@@ -418,7 +418,32 @@ export default function BlogPage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 20, alignItems: "start" }}>
+
+        {/* ── Sidebar (left) ──────────────────────────────────────────── */}
+        <aside style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+          {/* Submit card */}
+          <div style={{ ...card, padding: "20px 20px 22px" }}>
+            <h3 style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)", margin: "0 0 4px", letterSpacing: "-0.01em" }}>
+              Submit your story
+            </h3>
+            <p style={{ fontSize: 12.5, color: "var(--ink-muted)", margin: "0 0 18px", lineHeight: 1.55 }}>
+              Our editors will craft a full blog post about your company, product, or milestone.
+            </p>
+
+            {loading ? (
+              <div style={{ height: 80, background: "var(--surface-alt)", borderRadius: 8 }} />
+            ) : !isCore ? (
+              <CoreGate />
+            ) : userId ? (
+              <SubmitForm tools={tools} userId={userId} existingRequest={thisMonthRequest} />
+            ) : null}
+          </div>
+
+          {/* How it works */}
+          <HowItWorks />
+        </aside>
 
         {/* ── Past posts list ─────────────────────────────────────────── */}
         <div style={{ ...card, padding: 0, overflow: "hidden" }}>
@@ -511,30 +536,6 @@ export default function BlogPage() {
           )}
         </div>
 
-        {/* ── Sidebar ─────────────────────────────────────────────────── */}
-        <aside style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-          {/* Submit card */}
-          <div style={{ ...card, padding: "20px 20px 22px" }}>
-            <h3 style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)", margin: "0 0 4px", letterSpacing: "-0.01em" }}>
-              Submit your story
-            </h3>
-            <p style={{ fontSize: 12.5, color: "var(--ink-muted)", margin: "0 0 18px", lineHeight: 1.55 }}>
-              Our editors will craft a full blog post about your company, product, or milestone.
-            </p>
-
-            {loading ? (
-              <div style={{ height: 80, background: "var(--surface-alt)", borderRadius: 8 }} />
-            ) : !isCore ? (
-              <CoreGate />
-            ) : userId ? (
-              <SubmitForm tools={tools} userId={userId} existingRequest={thisMonthRequest} />
-            ) : null}
-          </div>
-
-          {/* How it works */}
-          <HowItWorks />
-        </aside>
       </div>
     </main>
   );
