@@ -110,6 +110,12 @@ export default function OnboardingModal({ userId, userEmail, onComplete }: {
     setTimeout(() => { setStep(s => s - 1); setError(""); setAnimating(false); }, 200);
   }
 
+  async function handleSignOut() {
+    const client = createClient();
+    await client.auth.signOut();
+    window.location.href = "/";
+  }
+
   async function handleComplete() {
     setSaving(true);
     const client = createClient();
@@ -181,6 +187,27 @@ export default function OnboardingModal({ userId, userEmail, onComplete }: {
             transition: "width .35s cubic-bezier(.4,0,.2,1)",
           }} />
         </div>
+
+        {/* Sign out button — top right */}
+        <button
+          onClick={handleSignOut}
+          title="Sign out"
+          style={{
+            position: "absolute", top: 12, right: 14,
+            background: "none", border: "none", cursor: "pointer",
+            display: "flex", alignItems: "center", gap: 5,
+            fontSize: 11.5, fontWeight: 600, color: "var(--ink-muted)",
+            fontFamily: "inherit", padding: "4px 8px", borderRadius: 7,
+            transition: "color .15s, background .15s",
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "#dc2626"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(220,38,38,.08)"; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-muted)"; (e.currentTarget as HTMLButtonElement).style.background = "none"; }}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Sign out
+        </button>
 
         <div style={{ padding: "28px 32px 32px" }}>
           {/* Step dots */}
