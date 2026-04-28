@@ -118,45 +118,34 @@ export default function OnboardingModal({ userId, userEmail, onComplete }: {
 
   async function handleComplete() {
     setSaving(true);
-    const client = createClient();
     const fullName = `${fields.first_name.trim()} ${fields.last_name.trim()}`.trim();
 
-    const payload = {
-      full_name:    fullName,
-      username:     fields.username.trim().toLowerCase(),
-      company:      fields.company.trim(),
-      role:         fields.role.trim(),
-      bio:          fields.bio.trim() || null,
-      website_url:  fields.website_url.trim() || null,
-      twitter_url:  fields.twitter_url.trim() || null,
-      linkedin_url: fields.linkedin_url.trim() || null,
-    };
+    try {
+      const res = await fetch("/api/profile/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name:    fullName,
+          username:     fields.username.trim().toLowerCase(),
+          company:      fields.company.trim(),
+          role:         fields.role.trim(),
+          bio:          fields.bio.trim() || null,
+          website_url:  fields.website_url.trim() || null,
+          twitter_url:  fields.twitter_url.trim() || null,
+          linkedin_url: fields.linkedin_url.trim() || null,
+        }),
+      });
 
-    // 1️⃣ Try UPDATE first — the profile page already proves UPDATE RLS works.
-    //    .select() lets us confirm how many rows were actually written.
-    const { data: updated, error: updateErr } = await client
-      .from("profiles")
-      .update(payload)
-      .eq("id", userId)
-      .select("id");
-
-    if (updateErr) {
-      setSaving(false);
-      setError(`Save failed: ${updateErr.message}`);
-      return;
-    }
-
-    // 2️⃣ If UPDATE matched 0 rows the profile row doesn't exist yet — INSERT it.
-    if (!updated || updated.length === 0) {
-      const { error: insertErr } = await client
-        .from("profiles")
-        .insert({ id: userId, ...payload });
-
-      if (insertErr) {
+      const json = await res.json();
+      if (!res.ok) {
         setSaving(false);
-        setError(`Save failed: ${insertErr.message}`);
+        setError(json.error ?? "Something went wrong. Please try again.");
         return;
       }
+    } catch {
+      setSaving(false);
+      setError("Network error — please check your connection and try again.");
+      return;
     }
 
     setSaving(false);
