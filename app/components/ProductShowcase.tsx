@@ -232,92 +232,102 @@ function BadgeFeatured() {
 /* ─────────────────────────────────────────────────────────────────────── */
 /* HALL OF FAME CARD                                                       */
 /* ─────────────────────────────────────────────────────────────────────── */
-function HofCard({ entry, rank, userId, isUpvoted }: {
+function HofCard({ entry, rank }: {
   entry: HofEntry; rank: number; userId: string | null; isUpvoted: boolean;
 }) {
   const t = tags(entry.tool);
-  const year = entry.inducted_at
-    ? new Date(entry.inducted_at).getFullYear()
-    : new Date().getFullYear();
-  const meta = [
-    `EST. ${year}`,
-    ...t.slice(0, 2).map(s => s.toUpperCase()),
-  ].join(" · ");
+  const meta = t.slice(0, 2).map(s => s.toUpperCase()).join(" · ");
 
   return (
-    <article style={{
-      background: "var(--surface)",
-      border: "1.5px solid rgba(255,215,0,0.45)",
-      borderRadius: 16,
-      padding: "18px 18px 16px",
-      position: "relative",
-      overflow: "hidden",
-      display: "flex",
-      flexDirection: "column",
-      gap: 0,
-      transition: "box-shadow .15s, transform .15s",
-    }}
+    <article
+      style={{
+        background: [
+          "linear-gradient(rgba(255,215,0,0.038) 1px, transparent 1px)",
+          "linear-gradient(90deg, rgba(255,215,0,0.038) 1px, transparent 1px)",
+          "linear-gradient(145deg, #0D0E22 0%, #1A0D2E 55%, #0D0E22 100%)",
+        ].join(", "),
+        backgroundSize: "26px 26px, 26px 26px, 100% 100%",
+        border: "1.5px solid rgba(255,215,0,0.35)",
+        borderRadius: 16,
+        padding: "18px 18px 16px",
+        position: "relative",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        boxShadow: "0 2px 16px rgba(0,0,0,0.35)",
+        transition: "box-shadow .15s, transform .15s",
+      }}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 28px rgba(255,215,0,0.18)";
+        (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 32px rgba(255,215,0,0.18), 0 2px 16px rgba(0,0,0,0.35)";
         (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
       }}
       onMouseLeave={e => {
-        (e.currentTarget as HTMLElement).style.boxShadow = "none";
+        (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 16px rgba(0,0,0,0.35)";
         (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
       }}
     >
       {/* Gold top bar */}
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg,#ffd700,#ff8c00,#ffd700)" }} />
 
+      {/* Corner radial glow */}
+      <div style={{
+        position: "absolute", top: -40, right: -40,
+        width: 130, height: 130, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(255,180,0,0.13) 0%, transparent 70%)",
+        pointerEvents: "none",
+      }} />
+
       {/* Rank watermark */}
-      <div style={{ position: "absolute", top: 10, right: 14, fontSize: 11, fontWeight: 800, color: "rgba(255,215,0,0.9)", letterSpacing: "0.04em" }}>
-        # {String(rank).padStart(2, "0")}
+      <div style={{ position: "absolute", top: 12, right: 14, fontSize: 10.5, fontWeight: 800, color: "rgba(255,215,0,0.75)", letterSpacing: "0.05em" }}>
+        #{String(rank).padStart(2, "0")}
       </div>
 
       {/* Logo + name + PREMIUM badge */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 12, paddingTop: 6 }}>
-        <ProductLogo tool={entry.tool} size={48} radius={12} />
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 10, paddingTop: 6 }}>
+        <ProductLogo tool={entry.tool} size={46} radius={11} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" as const, marginBottom: 4 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 800, letterSpacing: "-0.02em", color: "var(--ink)", margin: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" as const, marginBottom: 3 }}>
+            <h3 style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: "#ffffff", margin: 0 }}>
               {entry.tool.name}
             </h3>
             <span style={{
-              fontSize: 9, fontWeight: 800, padding: "2px 7px", borderRadius: 20,
-              background: "rgba(255,215,0,0.15)", color: "#9a6a00",
-              border: "1px solid rgba(255,215,0,0.4)", letterSpacing: "0.06em", textTransform: "uppercase" as const,
+              fontSize: 8.5, fontWeight: 800, padding: "2px 6px", borderRadius: 20,
+              background: "rgba(255,215,0,0.12)", color: "#FFD700",
+              border: "1px solid rgba(255,215,0,0.38)", letterSpacing: "0.07em", textTransform: "uppercase" as const,
             }}>PREMIUM</span>
           </div>
-          <p style={{ fontSize: 12.5, color: "var(--ink-2)", margin: 0, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.52)", margin: 0, lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
             {entry.tool.tagline}
           </p>
         </div>
       </div>
 
-      {/* Meta */}
-      <div style={{ fontSize: 10, fontWeight: 600, color: "var(--ink-faint)", letterSpacing: "0.05em", marginBottom: 14 }}>
-        {meta}
-      </div>
+      {/* Category meta */}
+      {meta && (
+        <div style={{ fontSize: 9.5, fontWeight: 600, color: "rgba(255,215,0,0.45)", letterSpacing: "0.07em", marginBottom: 14 }}>
+          {meta}
+        </div>
+      )}
 
       {/* Actions */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: "auto" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, color: "var(--ink-muted)", fontWeight: 600 }}>
-          <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 15l6-6 6 6"/></svg>
+        <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12.5, color: "rgba(255,255,255,0.45)", fontWeight: 600 }}>
+          <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 15l6-6 6 6"/></svg>
           {entry.tool.upvote_count}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, color: "var(--ink-muted)", fontWeight: 600 }}>
-          <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a4 4 0 0 1-4 4H8l-5 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
+        <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12.5, color: "rgba(255,255,255,0.45)", fontWeight: 600 }}>
+          <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a4 4 0 0 1-4 4H8l-5 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
           0
         </div>
         <Link href={`/tools/${entry.tool.slug}`} target="_blank" rel="noopener noreferrer" style={{
           marginLeft: "auto", display: "inline-flex", alignItems: "center", gap: 5,
-          padding: "6px 14px", borderRadius: 9,
-          background: "linear-gradient(90deg,rgba(255,215,0,0.15),rgba(255,140,0,0.1))",
-          border: "1px solid rgba(255,215,0,0.4)",
-          fontSize: 12, fontWeight: 700, color: "#9a6a00", textDecoration: "none",
+          padding: "5px 13px", borderRadius: 8,
+          background: "linear-gradient(90deg,rgba(255,215,0,0.16),rgba(255,140,0,0.1))",
+          border: "1px solid rgba(255,215,0,0.42)",
+          fontSize: 11.5, fontWeight: 700, color: "#FFD700", textDecoration: "none",
         }}>
           Visit
-          <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
+          <svg width={9} height={9} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
         </Link>
       </div>
     </article>
@@ -563,7 +573,6 @@ export default function ProductShowcase({
   }
 
   const [hero, mini1, mini2, ...rest] = tools;
-  const miniCards = [mini1, mini2].filter(Boolean);
   const DELTAS = [24, 18, 12, 9, 7, 5, 4, 3, 2, 1];
 
   return (
@@ -656,21 +665,21 @@ export default function ProductShowcase({
             </div>
           </div>
 
-          {/* Mosaic: hero + 2 mini */}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: miniCards.length > 0 ? "1.5fr 1fr" : "1fr",
-            gap: 16, alignItems: "stretch",
+          {/* Ranked list — same layout as Trending */}
+          <ol style={{
+            display: "flex", flexDirection: "column", gap: 0,
+            border: "1px solid var(--border)", borderRadius: 16,
+            background: "var(--surface)", overflow: "hidden",
+            listStyle: "none", margin: 0, padding: 0,
           }}>
-            {hero && <MosaicHero tool={hero} rank={1} userId={userId} isUpvoted={userUpvotedIds.includes(hero.id)} />}
-            {miniCards.length > 0 && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {miniCards.map((t, i) => (
-                  <MosaicMini key={t.id} tool={t} rank={i + 2} userId={userId} isUpvoted={userUpvotedIds.includes(t.id)} />
-                ))}
-              </div>
-            )}
-          </div>
+            {[hero, mini1, mini2].filter((t): t is ShowcaseTool => !!t).map((t, i) => (
+              <RankedRow
+                key={t.id} tool={t} rank={i + 1}
+                delta={DELTAS[i] ?? 1}
+                userId={userId} isUpvoted={userUpvotedIds.includes(t.id)}
+              />
+            ))}
+          </ol>
         </div>
       )}
 
