@@ -6,16 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 import DashTopbar from "@/app/components/DashTopbar";
 import Btn from "@/app/components/Btn";
 
-const CATEGORIES = [
-  "AI Tools","Analytics & Monitoring","Automation & Workflow","Creator Economy",
-  "Cybersecurity & Privacy","Data & Infrastructure","Design Tools","Developer Tools",
-  "E-Commerce","Education & Learning","FinTech","Gaming & Game Dev",
-  "Hardware & IoT","Health & Wellness","HR & Recruiting","Legal & Compliance",
-  "Mobile Apps","No-Code / Low-Code","Open Source","Productivity & Notes",
-  "Product Marketing","SEO & Content Marketing","Social Media & Influencer Tools",
-  "Video & Audio Tools","Web3 / Blockchain","Website & Landing Page Builders",
-  "Writing & Documentation",
-];
+// Categories loaded from DB — no hardcoded list needed
 
 const PRICING_OPTIONS = ["free", "freemium", "paid", "contact"] as const;
 
@@ -63,6 +54,9 @@ export default function EditToolPage() {
   const [success, setSuccess]   = useState(false);
   const [userId, setUserId]     = useState<string | null>(null);
 
+  // Categories from DB (same source as the submit form)
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+
   // Read-only display
   const [toolName, setToolName] = useState("");
   const [toolUrl, setToolUrl]   = useState("");
@@ -88,7 +82,7 @@ export default function EditToolPage() {
   const [form, setForm] = useState({
     tagline:       "",
     description:   "",
-    category:      "",
+    category_id:   "",
     pricing:       "free" as typeof PRICING_OPTIONS[number],
     contact_email: "",
     demo_url:      "",
@@ -104,6 +98,14 @@ export default function EditToolPage() {
     setForm(f => ({ ...f, [k]: v }));
   }
 
+  // ── Load categories from DB (same source as submit form) ───────────────────
+  useEffect(() => {
+    supabase.from("categories").select("id, name").order("name").then(({ data }) => {
+      if (data) setCategories(data);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ── Load tool data ──────────────────────────────────────────────────────────
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
@@ -117,7 +119,6 @@ export default function EditToolPage() {
           pricing, category_id, contact_email,
           twitter_url, linkedin_url, youtube_url, instagram_url,
           github_url, maker_comment, demo_url, submitter_id,
-          categories(name),
           tool_tags(tags(name)),
           screenshots(id, url, position)
         `)
@@ -142,7 +143,7 @@ export default function EditToolPage() {
       setForm({
         tagline:       tool.tagline       ?? "",
         description:   tool.description   ?? "",
-        category:      (tool.categories as unknown as { name: string } | null)?.name ?? "",
+        category_id:   tool.category_id   ?? "",   // UUID — matches the DB select options
         pricing:       (tool.pricing as typeof PRICING_OPTIONS[number]) ?? "free",
         contact_email: (tool as unknown as { contact_email?: string }).contact_email ?? "",
         twitter_url:   tool.twitter_url   ?? "",
@@ -208,18 +209,7 @@ export default function EditToolPage() {
         if (!upErr) logo_url = supabase.storage.from("tool-logos").getPublicUrl(path).data.publicUrl;
       }
 
-      // 2. Category upsert
-      let category_id: string | null = null;
-      if (form.category) {
-        const slug = toSlug(form.category);
-        const { data: catRow } = await supabase
-          .from("categories")
-          .upsert({ name: form.category, slug }, { onConflict: "slug" })
-          .select("id").single();
-        category_id = catRow?.id ?? null;
-      }
-
-      // 3. Update tool
+      // 2. Update tool (category_id is already a UUID from the DB select)
       const { error: updateErr } = await supabase
         .from("tools")
         .update({
@@ -227,7 +217,7 @@ export default function EditToolPage() {
           description:   form.description,
           logo_url,
           pricing:       form.pricing,
-          category_id,
+          category_id:   form.category_id || null,
           contact_email: form.contact_email || null,
           twitter_url:   form.twitter_url   || null,
           linkedin_url:  form.linkedin_url  || null,
@@ -370,9 +360,9 @@ export default function EditToolPage() {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <Field label="Category">
-                <select style={{ ...inp, appearance: "none" }} value={form.category} onChange={e => set("category", e.target.value)}>
+                <select style={{ ...inp, appearance: "none" }} value={form.category_id} onChange={e => set("category_id", e.target.value)}>
                   <option value="">Select category…</option>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </Field>
               <Field label="Pricing model">
