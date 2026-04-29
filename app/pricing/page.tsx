@@ -28,7 +28,7 @@ function Toggle({ yearly, onChange }: { yearly: boolean; onChange: (v: boolean) 
       <span style={{
         background: "#d1fae5", color: "#065f46", fontSize: 12, fontWeight: 700,
         padding: "3px 10px", borderRadius: 999, letterSpacing: "0.01em",
-      }}>Save 38%</span>
+      }}>Save 41%</span>
     </div>
   );
 }
@@ -78,7 +78,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Can I switch between monthly and yearly on Core?",
-    a: "Yes. Start monthly at $79/month and switch to yearly at $9/month anytime. Savings apply immediately to your next billing cycle.",
+    a: "Yes. Start monthly at $49/month and switch to yearly at $29/month anytime. Savings apply immediately to your next billing cycle.",
   },
 ];
 
@@ -119,7 +119,7 @@ function FaqAccordion() {
 /* ─── Main Page ───────────────────────────────────────────────────────── */
 export default function PricingPage() {
   const [yearly, setYearly] = useState(false);
-  const corePrice = yearly ? "$49" : "$79";
+  const corePrice = yearly ? "$29" : "$49";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)", fontFamily: "Inter, sans-serif" }}>
@@ -178,8 +178,8 @@ export default function PricingPage() {
             </div>
             <div style={{ fontSize: 13, color: "#d1fae5", fontWeight: 600, marginBottom: 16 }}>
               {yearly
-                ? "Billed as $588/year"
-                : "Or $49/month billed yearly — save $360/year."}
+                ? "Billed as $348/year"
+                : "Or $29/month billed yearly — save $240/year."}
             </div>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.9)", lineHeight: 1.6, margin: "0 0 20px" }}>
               For serious builders turning discovery into real pipeline and traction.

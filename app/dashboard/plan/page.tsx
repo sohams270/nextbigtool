@@ -104,7 +104,7 @@ export default async function PlanPage() {
                     {isAdmin && <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 700, color: "#ff6a3d", background: "rgba(255,106,61,.1)", padding: "2px 8px", borderRadius: 20 }}>Admin</span>}
                   </div>
                   <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2 }}>
-                    {currentPlan === "core" ? "Billed monthly · $79/mo" : "Active plan"}
+                    {currentPlan === "core" ? "Billed monthly · $49/mo or $29/mo yearly" : "Active plan"}
                   </div>
                 </div>
               </div>

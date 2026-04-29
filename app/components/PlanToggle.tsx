@@ -56,14 +56,14 @@ const BASE_PLANS: Plan[] = [
   {
     id: "core",
     label: "CORE",
-    price: "$79",
-    priceYearly: "$49",
+    price: "$49",
+    priceYearly: "$29",
     per: "/month",
     perYearly: "/month",
     subPrice: (yearly: boolean) =>
       yearly
-        ? <span style={{ fontSize: 12, color: "#d1fae5", fontWeight: 600 }}>Billed as $588/year</span>
-        : <span style={{ fontSize: 12, color: "#d1fae5", fontWeight: 600 }}>Or $49/month billed yearly — save $360/year.</span>,
+        ? <span style={{ fontSize: 12, color: "#d1fae5", fontWeight: 600 }}>Billed as $348/year</span>
+        : <span style={{ fontSize: 12, color: "#d1fae5", fontWeight: 600 }}>Or $29/month billed yearly — save $240/year.</span>,
     desc: "",
     bodyText: "For serious builders turning discovery into real pipeline and traction.",
     featuresHeader: "EVERYTHING IN FREE, PLUS",
@@ -120,7 +120,7 @@ export default function PlanToggle({ currentPlan = "free" }: { currentPlan?: "fr
           }} />
         </button>
         <span style={{ fontSize: 13, fontWeight: 600, color: yearly ? "#0f0f10" : "#9090a0" }}>Yearly</span>
-        <span style={{ background: "#d1fae5", color: "#065f46", fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 999 }}>Save 38%</span>
+        <span style={{ background: "#d1fae5", color: "#065f46", fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 999 }}>Save 41%</span>
       </div>
 
       {/* Cards */}
