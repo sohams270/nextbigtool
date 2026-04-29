@@ -6,6 +6,19 @@ import { createClient } from "@/utils/supabase/client";
 import DashTopbar from "@/app/components/DashTopbar";
 import Btn from "@/app/components/Btn";
 
+// ── Same CATEGORIES list as the submit form ───────────────────────────────────
+const CATEGORIES = [
+  "AI Tools","Analytics & Monitoring","Automation & Workflow","Baby Face",
+  "Couple Photo","Creator Economy","Cybersecurity & Privacy","Data & Infrastructure",
+  "Design Tools","Developer Tools","E-Commerce","Education & Learning",
+  "FinTech","Food & Travel","Future Child","Gaming & Game Dev",
+  "Hardware & IoT","Health & Wellness","HR & Recruiting","Legal & Compliance",
+  "Mobile Apps","Mock Interview","No-Code / Low-Code","Open Source",
+  "Photo Merger","Productivity & Notes","Product Marketing","SEO & Content Marketing",
+  "Social Media & Influencer Tools","Video & Audio Tools","Web3 / Blockchain",
+  "Website & Landing Page Builders","Writing & Documentation",
+];
+
 // ── Same USE_CASES list as the submit form ────────────────────────────────────
 const USE_CASES = [
   "A/B Testing","AI Agents","AI Analytics","AI Automation","AI Code Assistant",
@@ -160,8 +173,7 @@ export default function EditToolPage() {
   const [toolName, setToolName] = useState("");
   const [toolUrl, setToolUrl]   = useState("");
 
-  // Categories
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  // (categories come from the shared CATEGORIES constant above)
 
   // Logo
   const [existingLogoUrl, setExistingLogoUrl] = useState<string | null>(null);
@@ -187,7 +199,7 @@ export default function EditToolPage() {
   const [form, setForm] = useState({
     tagline:        "",   // = "One-line Description"
     about:          "",   // = "About the Tool" (stored as description)
-    category_id:    "",
+    category:       "",   // category name string (same as submit form)
     pricing:        "free" as "free" | "freemium" | "paid",
     pricing_amount: "",   // stored as maker_comment "~$X/mo"
     linkedin_url:   "",
@@ -199,14 +211,6 @@ export default function EditToolPage() {
   function set<K extends keyof typeof form>(k: K, v: typeof form[K]) {
     setForm(f => ({ ...f, [k]: v }));
   }
-
-  // ── Load categories ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    supabase.from("categories").select("id, name").order("name").then(({ data }) => {
-      if (data) setCategories(data);
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // ── Load tool ───────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -221,6 +225,7 @@ export default function EditToolPage() {
           pricing, category_id, maker_comment, demo_url,
           twitter_url, linkedin_url, youtube_url, instagram_url,
           screenshots, submitter_id,
+          categories(name),
           tool_tags(tags(name))
         `)
         .eq("id", id)
@@ -242,10 +247,13 @@ export default function EditToolPage() {
       const tagRows = (tool.tool_tags as unknown as { tags: { name: string } | null }[] | null) ?? [];
       setUseCases(tagRows.map(r => r.tags?.name ?? "").filter(Boolean));
 
+      // Resolve category name from the joined categories row
+      const catName = (tool.categories as unknown as { name: string } | null)?.name ?? "";
+
       setForm({
         tagline:        tool.tagline       ?? "",
         about:          tool.description   ?? "",
-        category_id:    tool.category_id   ?? "",
+        category:       catName,
         pricing:        (tool.pricing as "free" | "freemium" | "paid") ?? "free",
         pricing_amount: parsePricingAmount(tool.maker_comment ?? null),
         twitter_url:    tool.twitter_url   ?? "",
@@ -319,7 +327,18 @@ export default function EditToolPage() {
         ? `~$${form.pricing_amount}/mo`
         : null;
 
-      // 5. Update tool
+      // 5. Upsert category by name (same as submit form) to get its UUID
+      let category_id: string | null = null;
+      if (form.category) {
+        const { data: catRow } = await supabase
+          .from("categories")
+          .upsert({ name: form.category, slug: toSlug(form.category) }, { onConflict: "slug" })
+          .select("id")
+          .single();
+        category_id = catRow?.id ?? null;
+      }
+
+      // 6. Update tool
       const { error: updateErr } = await supabase
         .from("tools")
         .update({
@@ -328,7 +347,7 @@ export default function EditToolPage() {
           logo_url,
           demo_url,
           pricing:       form.pricing,
-          category_id:   form.category_id || null,
+          category_id,
           maker_comment,
           screenshots:   allScreenshots.length ? allScreenshots : null,
           twitter_url:   form.twitter_url   || null,
@@ -340,7 +359,7 @@ export default function EditToolPage() {
 
       if (updateErr) throw new Error(updateErr.message);
 
-      // 6. Use cases → sync tool_tags
+      // 7. Use cases → sync tool_tags
       await supabase.from("tool_tags").delete().eq("tool_id", id);
       for (const uc of useCases) {
         const { data: tagRow } = await supabase
@@ -504,9 +523,9 @@ export default function EditToolPage() {
             <SectionHeader n={2} title="Classification" />
 
             <Field label="Category" required>
-              <select style={{ ...inp, appearance: "none" }} value={form.category_id} onChange={e => set("category_id", e.target.value)}>
+              <select style={{ ...inp, appearance: "none" }} value={form.category} onChange={e => set("category", e.target.value)}>
                 <option value="">Select a category…</option>
-                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </Field>
 
