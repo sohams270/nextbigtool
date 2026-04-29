@@ -452,7 +452,7 @@ function MosaicMini({
 }) {
   const t = tags(tool);
   return (
-    <article style={{
+    <article className="showcase-mini" style={{
       display: "grid",
       gridTemplateColumns: "28px 44px 1fr auto",
       gap: 12,
@@ -498,7 +498,7 @@ function MosaicMini({
       </div>
 
       {/* Stats */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
+      <div className="showcase-stats" style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end" }}>
         <UpvoteButton
           toolId={tool.id}
           userId={userId}
@@ -506,8 +506,8 @@ function MosaicMini({
           initialActive={isUpvoted}
           size="sm"
         />
-        <CommentBtn count={0} />
-        <RedirectBtn subtle href={`/tools/${tool.slug}`} />
+        <span className="showcase-comment-btn"><CommentBtn count={0} /></span>
+        <span className="showcase-redirect-btn"><RedirectBtn subtle href={`/tools/${tool.slug}`} /></span>
       </div>
     </article>
   );
@@ -525,7 +525,7 @@ function RankedRow({
 
   if (compact) {
     return (
-      <li style={{
+      <li className="showcase-ranked-row-compact" style={{
         display: "grid",
         gridTemplateColumns: "40px 36px 1fr auto",
         gap: 12,
@@ -564,7 +564,7 @@ function RankedRow({
         </div>
 
         {/* Stats */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <div className="showcase-stats" style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <UpvoteButton
             toolId={tool.id}
             userId={userId}
@@ -572,14 +572,14 @@ function RankedRow({
             initialActive={isUpvoted}
             size="sm"
           />
-          <RedirectBtn subtle href={`/tools/${tool.slug}`} />
+          <span className="showcase-redirect-btn"><RedirectBtn subtle href={`/tools/${tool.slug}`} /></span>
         </div>
       </li>
     );
   }
 
   return (
-    <li style={{
+    <li className="showcase-ranked-row" style={{
       display: "grid",
       gridTemplateColumns: "56px 52px 1fr auto",
       gap: 18,
@@ -623,8 +623,8 @@ function RankedRow({
       </div>
 
       {/* Stats */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <CommentBtn count={0} />
+      <div className="showcase-stats" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span className="showcase-comment-btn"><CommentBtn count={0} /></span>
         <UpvoteButton
           toolId={tool.id}
           userId={userId}
@@ -632,7 +632,7 @@ function RankedRow({
           initialActive={isUpvoted}
           size="sm"
         />
-        <RedirectBtn subtle href={`/tools/${tool.slug}`} />
+        <span className="showcase-redirect-btn"><RedirectBtn subtle href={`/tools/${tool.slug}`} /></span>
       </div>
     </li>
   );
@@ -694,7 +694,7 @@ export default function ProductShowcase({
           </div>
 
           {/* 3-col gold grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+          <div className="showcase-hof-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
             {hofEntries.slice(0, 3).map((entry, i) => (
               <HofCard
                 key={entry.tool.id}

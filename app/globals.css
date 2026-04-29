@@ -447,3 +447,31 @@ body {
 @media (max-width: 768px) {
   body { padding-bottom: env(safe-area-inset-bottom); }
 }
+
+/* ── ProductShowcase card responsive fixes ──────────────────────────── */
+@media (max-width: 768px) {
+  /* Full ranked row: tighten cols, hide comment + redirect btns */
+  .showcase-ranked-row {
+    grid-template-columns: 42px 42px 1fr auto !important;
+    gap: 10px !important;
+    padding: 14px 14px !important;
+  }
+  /* Compact ranked row */
+  .showcase-ranked-row-compact {
+    grid-template-columns: 32px 34px 1fr auto !important;
+    gap: 8px !important;
+    padding: 10px 12px !important;
+  }
+  /* MosaicMini */
+  .showcase-mini {
+    grid-template-columns: 26px 40px 1fr auto !important;
+    gap: 8px !important;
+    padding: 12px 12px !important;
+  }
+  /* Hide bulky buttons on mobile — keeps only the upvote */
+  .showcase-comment-btn { display: none !important; }
+  .showcase-redirect-btn { display: none !important; }
+
+  /* HoF 3-col → 1-col on mobile */
+  .showcase-hof-grid { grid-template-columns: 1fr !important; }
+}
