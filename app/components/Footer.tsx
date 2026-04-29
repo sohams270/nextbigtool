@@ -1,17 +1,22 @@
-import Link from "next/link";
-import NBTWordmark from "./NBTWordmark";
+"use client";
 
-const PRODUCT_LINKS = [
-  { label: "Browse Tools",    href: "/" },
-  { label: "Submit a Tool",   href: "/dashboard/submit" },
-  { label: "Pricing",         href: "/pricing" },
-  { label: "Hall of Fame",    href: "/#hall-of-fame" },
-  { label: "Weekly Digest",   href: "/#digest" },
+import Link from "next/link";
+import { useState } from "react";
+import NBTWordmark from "./NBTWordmark";
+import AuthModal from "./AuthModal";
+
+const DISCOVER_LINKS = [
+  { label: "Categories",   href: "/discover?tab=categories" },
+  { label: "Use Cases",    href: "/discover?tab=use-cases" },
+  { label: "Free Tools",   href: "/discover?tab=free" },
+  { label: "Hall of Fame", href: "/discover?tab=hall-of-fame" },
 ];
 
 const COMPANY_LINKS = [
   { label: "About",           href: "/about" },
   { label: "Blog",            href: "/blog" },
+  { label: "Press Release",   href: "/press" },
+  { label: "Pricing",         href: "/pricing" },
   { label: "Contact",         href: "/contact" },
   { label: "Privacy Policy",  href: "/privacy" },
   { label: "Terms of Service",href: "/terms" },
@@ -37,256 +42,300 @@ const SOCIAL_LINKS = [
     ),
   },
   {
-    label: "GitHub",
-    href: "https://github.com/sohams270/nextbigtool",
+    label: "Instagram",
+    href: "https://instagram.com/nextbigtool",
     icon: (
       <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
       </svg>
     ),
   },
 ];
 
 export default function Footer() {
+  const [showAuth, setShowAuth] = useState(false);
+
   return (
-    <footer
-      className="site-footer"
-      style={{
-        background: "#0A0B1A",
-        borderTop: "1px solid rgba(255,255,255,0.07)",
-        padding: "52px 40px 28px",
-        marginTop: 64,
-      }}
-    >
-      <div style={{ maxWidth: 1160, margin: "0 auto" }}>
-        {/* Top row */}
-        <div
-          className="footer-grid"
-          style={{
-            marginBottom: 48,
-          }}
-        >
-          {/* Brand col */}
-          <div>
-            <div style={{ marginBottom: 14 }}>
-              <NBTWordmark height={44} dark />
-            </div>
-            <p
-              style={{
-                fontSize: 12,
-                color: "rgba(255,255,255,0.45)",
-                lineHeight: 1.65,
-                maxWidth: 240,
-                margin: "0 0 20px",
-              }}
-            >
-              Where indie founders launch and buyers discover the tools worth knowing about — before they go mainstream.
-            </p>
-            {/* Social icons */}
-            <div style={{ display: "flex", gap: 10 }}>
-              {SOCIAL_LINKS.map(({ label, href, icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 8,
-                    background: "rgba(255,255,255,0.07)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "rgba(255,255,255,0.5)",
-                    textDecoration: "none",
-                    transition: "background 0.15s, color 0.15s",
-                  }}
-                  className="footer-social-btn"
-                >
-                  {icon}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Product col */}
-          <div>
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                color: "rgba(255,255,255,0.3)",
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                display: "block",
-                marginBottom: 14,
-              }}
-            >
-              Product
-            </span>
-            <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 10 }}>
-              {PRODUCT_LINKS.map(({ label, href }) => (
-                <li key={label}>
-                  <Link
-                    href={href}
-                    style={{
-                      fontSize: 12,
-                      color: "rgba(255,255,255,0.55)",
-                      textDecoration: "none",
-                      fontWeight: 500,
-                      transition: "color 0.15s",
-                    }}
-                    className="footer-link"
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company col */}
-          <div>
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                color: "rgba(255,255,255,0.3)",
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                display: "block",
-                marginBottom: 14,
-              }}
-            >
-              Company
-            </span>
-            <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 10 }}>
-              {COMPANY_LINKS.map(({ label, href }) => (
-                <li key={label}>
-                  <Link
-                    href={href}
-                    style={{
-                      fontSize: 12,
-                      color: "rgba(255,255,255,0.55)",
-                      textDecoration: "none",
-                      fontWeight: 500,
-                      transition: "color 0.15s",
-                    }}
-                    className="footer-link"
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Newsletter col */}
-          <div>
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                color: "rgba(255,255,255,0.3)",
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                display: "block",
-                marginBottom: 14,
-              }}
-            >
-              Weekly Digest
-            </span>
-            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", lineHeight: 1.6, marginBottom: 12, marginTop: 0 }}>
-              5 tools worth checking this week. No spam.
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <input
-                type="email"
-                placeholder="you@founder.co"
+    <>
+      <footer
+        className="site-footer"
+        style={{
+          background: "#0A0B1A",
+          borderTop: "1px solid rgba(255,255,255,0.07)",
+          padding: "52px 40px 28px",
+          marginTop: 64,
+          width: "100%",
+        }}
+      >
+        <div style={{ maxWidth: 1160, margin: "0 auto" }}>
+          {/* Top row */}
+          <div
+            className="footer-grid"
+            style={{ marginBottom: 48 }}
+          >
+            {/* Brand col */}
+            <div>
+              <div style={{ marginBottom: 14 }}>
+                <NBTWordmark height={44} dark />
+              </div>
+              <p
                 style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  borderRadius: 7,
-                  padding: "8px 10px",
-                  fontSize: 11,
-                  color: "#fff",
-                  outline: "none",
-                  fontFamily: "inherit",
-                  width: "100%",
-                  boxSizing: "border-box",
+                  fontSize: 12,
+                  color: "rgba(255,255,255,0.45)",
+                  lineHeight: 1.65,
+                  maxWidth: 240,
+                  margin: "0 0 16px",
                 }}
-              />
+              >
+                Where indie founders launch and buyers discover the tools worth knowing about — before they go mainstream.
+              </p>
+
+              {/* Submit Your Tool CTA */}
               <button
+                onClick={() => setShowAuth(true)}
                 style={{
-                  background: "#FF6B35",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "linear-gradient(135deg,#ff6a3d,#ff3d88)",
                   border: "none",
-                  borderRadius: 7,
-                  padding: "8px 0",
-                  fontSize: 11,
+                  borderRadius: 8,
+                  padding: "8px 14px",
+                  fontSize: 12,
                   fontWeight: 700,
                   color: "#fff",
                   cursor: "pointer",
                   fontFamily: "inherit",
-                  width: "100%",
+                  marginBottom: 16,
                   transition: "opacity 0.15s",
                 }}
-                className="footer-subscribe-btn"
+                className="footer-submit-btn"
               >
-                Subscribe
+                <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Submit Your Tool
               </button>
+
+              {/* Social icons */}
+              <div style={{ display: "flex", gap: 10 }}>
+                {SOCIAL_LINKS.map(({ label, href, icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      background: "rgba(255,255,255,0.07)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "rgba(255,255,255,0.5)",
+                      textDecoration: "none",
+                      transition: "background 0.15s, color 0.15s",
+                    }}
+                    className="footer-social-btn"
+                  >
+                    {icon}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Discover col */}
+            <div>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: "rgba(255,255,255,0.3)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  display: "block",
+                  marginBottom: 14,
+                }}
+              >
+                Discover
+              </span>
+              <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+                {DISCOVER_LINKS.map(({ label, href }) => (
+                  <li key={label}>
+                    <Link
+                      href={href}
+                      style={{
+                        fontSize: 12,
+                        color: label === "Hall of Fame" ? "#ff6a3d" : "rgba(255,255,255,0.55)",
+                        textDecoration: "none",
+                        fontWeight: label === "Hall of Fame" ? 700 : 500,
+                        transition: "color 0.15s",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 5,
+                      }}
+                      className="footer-link"
+                    >
+                      {label === "Hall of Fame" && "🏆 "}
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Company col */}
+            <div>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: "rgba(255,255,255,0.3)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  display: "block",
+                  marginBottom: 14,
+                }}
+              >
+                Company
+              </span>
+              <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+                {COMPANY_LINKS.map(({ label, href }) => (
+                  <li key={label}>
+                    <Link
+                      href={href}
+                      style={{
+                        fontSize: 12,
+                        color: "rgba(255,255,255,0.55)",
+                        textDecoration: "none",
+                        fontWeight: 500,
+                        transition: "color 0.15s",
+                      }}
+                      className="footer-link"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Newsletter col */}
+            <div>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: "rgba(255,255,255,0.3)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  display: "block",
+                  marginBottom: 14,
+                }}
+              >
+                Weekly Digest
+              </span>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", lineHeight: 1.6, marginBottom: 12, marginTop: 0 }}>
+                5 tools worth checking this week. No spam.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <input
+                  type="email"
+                  placeholder="you@founder.co"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    borderRadius: 7,
+                    padding: "8px 10px",
+                    fontSize: 11,
+                    color: "#fff",
+                    outline: "none",
+                    fontFamily: "inherit",
+                    width: "100%",
+                    boxSizing: "border-box",
+                  }}
+                />
+                <button
+                  style={{
+                    background: "#FF6B35",
+                    border: "none",
+                    borderRadius: 7,
+                    padding: "8px 0",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: "#fff",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    width: "100%",
+                    transition: "opacity 0.15s",
+                  }}
+                  className="footer-subscribe-btn"
+                >
+                  Subscribe
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: "rgba(255,255,255,0.07)", marginBottom: 20 }} />
+
+          {/* Bottom row */}
+          <div
+            className="footer-bottom-row"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: 12,
+            }}
+          >
+            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>
+              © {new Date().getFullYear()} Next Big Tool. All rights reserved.
+            </span>
+            <div style={{ display: "flex", gap: 20 }}>
+              {[
+                { label: "Privacy", href: "/privacy" },
+                { label: "Terms",   href: "/terms" },
+                { label: "Contact", href: "/contact" },
+              ].map(({ label, href }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  style={{
+                    fontSize: 11,
+                    color: "rgba(255,255,255,0.25)",
+                    textDecoration: "none",
+                    transition: "color 0.15s",
+                  }}
+                  className="footer-link"
+                >
+                  {label}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: "rgba(255,255,255,0.07)", marginBottom: 20 }} />
+        <style>{`
+          .footer-link:hover { color: rgba(255,255,255,0.85) !important; }
+          .footer-social-btn:hover { background: rgba(255,107,53,0.2) !important; color: #FF6B35 !important; border-color: rgba(255,107,53,0.4) !important; }
+          .footer-subscribe-btn:hover { opacity: 0.88; }
+          .footer-submit-btn:hover { opacity: 0.88; }
+        `}</style>
+      </footer>
 
-        {/* Bottom row */}
-        <div
-          className="footer-bottom-row"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: 12,
-          }}
-        >
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>
-            © {new Date().getFullYear()} Next Big Tool. All rights reserved.
-          </span>
-          <div style={{ display: "flex", gap: 20 }}>
-            {[
-              { label: "Privacy", href: "/privacy" },
-              { label: "Terms",   href: "/terms" },
-              { label: "Contact", href: "/contact" },
-            ].map(({ label, href }) => (
-              <Link
-                key={label}
-                href={href}
-                style={{
-                  fontSize: 11,
-                  color: "rgba(255,255,255,0.25)",
-                  textDecoration: "none",
-                  transition: "color 0.15s",
-                }}
-                className="footer-link"
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <style>{`
-        .footer-link:hover { color: rgba(255,255,255,0.85) !important; }
-        .footer-social-btn:hover { background: rgba(255,107,53,0.2) !important; color: #FF6B35 !important; border-color: rgba(255,107,53,0.4) !important; }
-        .footer-subscribe-btn:hover { opacity: 0.88; }
-      `}</style>
-    </footer>
+      {showAuth && (
+        <AuthModal
+          title="Launch your product"
+          subtitle="Sign up in seconds and submit your tool to thousands of early adopters."
+          onClose={() => setShowAuth(false)}
+        />
+      )}
+    </>
   );
 }

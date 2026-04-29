@@ -62,6 +62,11 @@
 html {
   scroll-behavior: smooth;
   zoom: 1.25;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 body {
