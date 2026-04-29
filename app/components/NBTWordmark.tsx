@@ -1,27 +1,27 @@
 /**
  * NBTWordmark — NEXTBIGTOOL brand wordmark, pixel-perfect at any size.
  *
- * The source PNGs (851×315 px) have ~28% transparent padding top & bottom
- * and ~6% left & right. This component crops that whitespace mathematically
- * so the `height` prop controls the *visible text height*, not the full image.
+ * The source PNGs (3960×990 px) have ~6% transparent padding top & bottom
+ * and ~2–3% left & right. This component crops that whitespace mathematically
+ * so the `height` prop controls the *visible logo height*, not the full image.
  *
- * Result: text fills the container, no wasted space, infinitely sharp.
+ * Result: logo fills the container, no wasted space, crisp at any size.
  *
  * Props:
- *   height   — desired text height in px (default 26)
+ *   height   — desired logo height in px (default 32)
  *   dark     — white + orange version for dark backgrounds (default false)
  *   priority — hint browser to preload (use on above-the-fold logos)
  */
 
 // ── Source PNG measurements (in px) ──────────────────────────────────────
-// Full image:  851 × 315
-// Text region: x ≈ 50–805  →  width ≈ 755 px
-//              y ≈ 88–223  →  height ≈ 135 px
-const PNG_W   = 851;
-const PNG_H   = 315;
-const TXT_Y0  = 88;   // top of text in source image
-const TXT_H   = 135;  // height of text in source image
-const TXT_W   = 755;  // width  of text in source image
+// Full image:  3960 × 990
+// Logo region: x ≈ 105–3855  →  width ≈ 3750 px
+//              y ≈ 55–935    →  height ≈ 880 px
+const PNG_W   = 3960;
+const PNG_H   = 990;
+const TXT_Y0  = 55;   // top of logo content in source image
+const TXT_H   = 880;  // height of logo content in source image
+const TXT_W   = 3750; // width  of logo content in source image
 
 // Derived ratios (used in the formula below)
 const TEXT_RATIO    = TXT_W / TXT_H;          // ≈ 5.59  — container aspect ratio
@@ -30,7 +30,7 @@ const TOP_FRAC      = TXT_Y0 / PNG_H;         // ≈ 0.279 — top padding fract
 const TXT_H_FRAC    = TXT_H  / PNG_H;         // ≈ 0.429 — text height fraction
 
 export default function NBTWordmark({
-  height = 26,
+  height = 32,
   dark = false,
   priority = false,
 }: {

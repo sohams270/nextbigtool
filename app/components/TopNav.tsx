@@ -418,7 +418,7 @@ export default function TopNav({ dark }: { dark?: boolean }) {
           {/* ── Logo (left zone, flex:1) ── */}
           <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
             <Link href="/" aria-label="NextBigTool home" style={{ textDecoration: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
-              <NBTWordmark height={26} dark={dark} priority />
+              <NBTWordmark height={32} dark={dark} priority />
             </Link>
           </div>
 

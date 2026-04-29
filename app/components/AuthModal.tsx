@@ -76,7 +76,7 @@ export default function AuthModal({
 
           {/* Logo */}
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
-            <NBTWordmark height={24} />
+            <NBTWordmark height={28} />
           </div>
 
           <div style={{ fontSize: 19, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
