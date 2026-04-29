@@ -10,7 +10,6 @@ export default function CopyLinkButton({ slug }: { slug: string }) {
     try {
       await navigator.clipboard.writeText(url);
     } catch {
-      // fallback for older browsers
       const el = document.createElement("textarea");
       el.value = url;
       document.body.appendChild(el);
@@ -19,38 +18,44 @@ export default function CopyLinkButton({ slug }: { slug: string }) {
       document.body.removeChild(el);
     }
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 2500);
   }
 
   return (
     <button
       onClick={handleCopy}
-      title="Copy page link"
       style={{
-        display: "flex", alignItems: "center", gap: 10,
-        width: "100%", padding: "10px 14px", borderRadius: 10,
-        border: copied ? "1px solid #bbf7d0" : "1px solid #e8e8e6",
-        background: copied ? "#f0fdf4" : "#fafaf8",
+        display: "flex", alignItems: "center", justifyContent: "center", gap: 9,
+        width: "100%", padding: "11px 16px", borderRadius: 10,
+        border: copied ? "1.5px solid #86efac" : "1.5px solid #FF6B35",
+        background: copied
+          ? "linear-gradient(135deg, #f0fdf4, #dcfce7)"
+          : "linear-gradient(135deg, #fff7f4, #fff0eb)",
         cursor: "pointer", fontFamily: "inherit",
-        transition: "all 0.15s",
+        transition: "all 0.2s",
+        boxShadow: copied ? "none" : "0 2px 8px rgba(255,107,53,0.15)",
       }}
     >
       {copied ? (
-        <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M5 12l5 5 9-11"/>
-        </svg>
+        <>
+          <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 12l5 5 9-11"/>
+          </svg>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#16a34a" }}>Link copied!</span>
+        </>
       ) : (
-        <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="#6b6b78" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-        </svg>
+        <>
+          {/* Share icon */}
+          <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="#FF6B35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#FF6B35" }}>Share this tool</span>
+        </>
       )}
-      <span style={{
-        fontSize: 13, fontWeight: 600,
-        color: copied ? "#16a34a" : "#3a3a45",
-      }}>
-        {copied ? "Link copied!" : "Copy page link"}
-      </span>
     </button>
   );
 }
