@@ -68,7 +68,6 @@ const BASE_PLANS: Plan[] = [
     bodyText: "For serious builders turning discovery into real pipeline and traction.",
     featuresHeader: "EVERYTHING IN FREE, PLUS",
     features: [
-      "One follow-up message per interested user",
       "Unlimited product listings",
       "Unlimited Build in Public posts",
       "CSV export of your data",
@@ -80,14 +79,13 @@ const BASE_PLANS: Plan[] = [
 ];
 
 const COMPARISON = [
-  { feature: "Products listed",            free: "1",    core: "Unlimited" },
-  { feature: "Build in Public posts",       free: "5",    core: "Unlimited" },
-  { feature: "Featured on homepage",        free: "—",    core: "48 hours" },
-  { feature: "Founder CRM",                free: "—",    core: "✓" },
-  { feature: "Hall of Fame placement",      free: "—",    core: "✓" },
-  { feature: "1 Press Release",            free: "—",    core: "✓" },
-  { feature: "CSV export",                 free: "—",    core: "✓" },
-  { feature: "Basic analytics",            free: "✓",    core: "✓" },
+  { feature: "Products listed",                    free: "1",    core: "Unlimited" },
+  { feature: "Build in Public posts",               free: "5",    core: "Unlimited" },
+  { feature: "Hall of Fame placement",              free: "—",    core: "✓" },
+  { feature: "Founder CRM (full contact data)",     free: "—",    core: "✓" },
+  { feature: "1 Press Release (Customizable)",      free: "—",    core: "✓" },
+  { feature: "CSV export",                         free: "—",    core: "✓" },
+  { feature: "Basic analytics",                    free: "✓",    core: "✓" },
 ];
 
 export default function PlanToggle({ currentPlan = "free" }: { currentPlan?: "free" | "core" }) {
@@ -166,9 +164,9 @@ export default function PlanToggle({ currentPlan = "free" }: { currentPlan?: "fr
                 <div style={{ background: "#0f0f10", borderRadius: 10, padding: "12px 14px", marginBottom: 16 }}>
                   <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: "rgba(255,255,255,0.4)", marginBottom: 10 }}>★ CORE EXCLUSIVES</div>
                   {[
-                    { title: "Founder CRM", desc: "See exactly who upvoted or followed your product." },
-                    { title: "Hall of Fame Placement", desc: "Permanent evergreen visibility." },
-                    { title: "1 Press Release", desc: "Professionally written and published about your product." },
+                    { title: "Founder CRM", desc: "Complete data — names, email, company, designation — of everyone who interacted with your product." },
+                    { title: "Hall of Fame Placement", desc: "Evergreen discoverability by everyone." },
+                    { title: "1 Press Release (Customizable)", desc: "Professionally written and published about your tool." },
                   ].map((ex) => (
                     <div key={ex.title} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
                       <div style={{ width: 26, height: 26, borderRadius: 7, background: "#FF6B35", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>

@@ -209,7 +209,7 @@ export default function PricingPage() {
 
             <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255,255,255,0.5)", marginBottom: 12 }}>EVERYTHING IN FREE, PLUS</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28, flex: 1 }}>
-              {["One follow-up message per interested user", "Unlimited product listings", "Unlimited Build in Public posts", "CSV export of your data"].map((f) => (
+              {["Unlimited product listings", "Unlimited Build in Public posts", "CSV export of your data"].map((f) => (
                 <div key={f} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                   <Check dark />
                   <span style={{ fontSize: 13, color: "rgba(255,255,255,0.9)", lineHeight: 1.45 }}>{f}</span>
@@ -274,15 +274,13 @@ export default function PricingPage() {
                 rows: [
                   { feature: "Products listed", sub: null, free: "1", core: <span style={{ color: "#FF6B35", fontWeight: 800 }}>Unlimited</span> },
                   { feature: "Lifetime free listing", sub: null, free: <TCheck />, core: <TCheck /> },
-                  { feature: "High authority backlink", sub: "DR 70+ dofollow link", free: <TCheck />, core: <TCheck /> },
+                  { feature: "High authority backlink", sub: null, free: <TCheck />, core: <TCheck /> },
                 ],
               },
               {
                 section: "DISCOVERY & VISIBILITY",
                 rows: [
-                  { feature: "Featured on homepage for 48 hours", sub: null, free: <TDash />, core: <TCheck /> },
-                  { feature: "Re-launch option", sub: "Fresh boost for major updates", free: <TDash />, core: <TCheck /> },
-                  { feature: <span><span style={{ color: "#FF6B35" }}>★ </span>Hall of Fame placement</span>, sub: "Permanent evergreen discoverability", free: <TDash />, core: <TCheck /> },
+                  { feature: <span><span style={{ color: "#FF6B35" }}>★ </span>Hall of Fame placement</span>, sub: "Evergreen discoverability by everyone", free: <TDash />, core: <TCheck /> },
                 ],
               },
               {
@@ -295,15 +293,14 @@ export default function PricingPage() {
                 section: "FOUNDER CRM",
                 sectionColor: "#FF6B35",
                 rows: [
-                  { feature: <span style={{ color: "#FF6B35" }}>★ See who upvoted or followed your product</span>, sub: "Names, profiles, contact — consent-based", free: <TDash />, core: <TCheck /> },
-                  { feature: "One follow-up message per interested user", sub: null, free: <TDash />, core: <TCheck /> },
+                  { feature: <span style={{ color: "#FF6B35" }}>★ Complete data of who upvoted or interacted with your product</span>, sub: "Names, email ID, Company name, Designation", free: <TDash />, core: <TCheck /> },
                 ],
               },
               {
                 section: "PRESS RELEASE",
                 sectionColor: "#FF6B35",
                 rows: [
-                  { feature: <span style={{ color: "#FF6B35" }}>★ 1 Press Release written about you</span>, sub: "Published and distributed professionally", free: <TDash />, core: <TCheck /> },
+                  { feature: <span style={{ color: "#FF6B35" }}>★ 1 Press Release written about your tool (Customizable)</span>, sub: "Published and distributed professionally", free: <TDash />, core: <TCheck /> },
                 ],
               },
               {
