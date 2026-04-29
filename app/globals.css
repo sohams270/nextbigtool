@@ -54,6 +54,11 @@
 
 * { box-sizing: border-box; }
 
+/* ── Logo auto-switching (light ↔ dark theme) ──────────────────────── */
+.nbt-logo-dark  { display: none; }
+[data-theme="dark"] .nbt-logo-light { display: none; }
+[data-theme="dark"] .nbt-logo-dark  { display: block; }
+
 html {
   scroll-behavior: smooth;
   zoom: 1.25;

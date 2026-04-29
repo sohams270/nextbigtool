@@ -1,5 +1,5 @@
 import Link from "next/link";
-import NMark from "./NMark";
+import NBTWordmark from "./NBTWordmark";
 
 const PRODUCT_LINKS = [
   { label: "Browse Tools",    href: "/" },
@@ -68,18 +68,8 @@ export default function Footer() {
         >
           {/* Brand col */}
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-              <NMark size={28} />
-              <span
-                style={{
-                  fontSize: 15,
-                  fontWeight: 800,
-                  color: "#fff",
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                Next Big Tool
-              </span>
+            <div style={{ marginBottom: 14 }}>
+              <NBTWordmark height={44} dark />
             </div>
             <p
               style={{
