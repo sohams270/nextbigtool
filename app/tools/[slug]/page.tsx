@@ -5,6 +5,7 @@ import TopNav from "@/app/components/TopNav";
 import Footer from "@/app/components/Footer";
 import UpvoteButton from "@/app/components/UpvoteButton";
 import CommentSection from "./CommentSection";
+import CopyLinkButton from "./CopyLinkButton";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -20,6 +21,10 @@ function pricingBadge(p: string): React.CSSProperties {
   return { background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.15)" };
 }
 
+function isVideoUrl(url: string) {
+  return /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url);
+}
+
 export default async function ToolPage({ params }: Props) {
   const { slug } = await params;
   const { cookies } = await import("next/headers");
@@ -33,7 +38,7 @@ export default async function ToolPage({ params }: Props) {
     .select(`
       id, slug, name, tagline, description, website_url, logo_url, pricing,
       status, upvote_count, maker_comment, demo_url, twitter_url,
-      github_url, contact_email, created_at, submitter_id,
+      github_url, contact_email, created_at, submitter_id, screenshots,
       tool_tags ( tags ( name ) ),
       categories ( name )
     `)
@@ -42,12 +47,6 @@ export default async function ToolPage({ params }: Props) {
     .maybeSingle();
 
   if (toolErr || !tool) notFound();
-
-  const { data: screenshots } = await supabase
-    .from("screenshots")
-    .select("id, url, position")
-    .eq("tool_id", tool.id)
-    .order("position");
 
   let isUpvoted = false;
   if (user) {
@@ -65,7 +64,11 @@ export default async function ToolPage({ params }: Props) {
     .filter(Boolean) as string[];
 
   const categoryName = (tool.categories as any)?.name ?? null;
-  const shots = (screenshots ?? []) as { id: string; url: string; position: number }[];
+
+  // Screenshots: from the JSON array stored on the tool row
+  const shots: string[] = Array.isArray(tool.screenshots)
+    ? (tool.screenshots as string[]).filter(Boolean)
+    : [];
 
   // Logo
   let logoSrc: string | null = tool.logo_url;
@@ -76,7 +79,7 @@ export default async function ToolPage({ params }: Props) {
     } catch { /* no-op */ }
   }
 
-  // Social links (only show fields actually filled)
+  // Social links
   type SocialLink = { label: string; href: string; svgPath: string };
   const socialLinks: SocialLink[] = [];
   if (tool.twitter_url) socialLinks.push({
@@ -102,12 +105,10 @@ export default async function ToolPage({ params }: Props) {
         position: "relative",
         overflow: "hidden",
       }}>
-        {/* Subtle radial glow */}
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
           background: "radial-gradient(ellipse 70% 60% at 60% 50%, rgba(255,107,53,0.12) 0%, transparent 70%)",
         }} />
-        {/* Dot grid texture */}
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none", opacity: 0.4,
           backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
@@ -116,7 +117,7 @@ export default async function ToolPage({ params }: Props) {
 
         <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 24px" }}>
           {/* Back link */}
-          <div style={{ paddingTop: 24, paddingBottom: 0 }}>
+          <div style={{ paddingTop: 24 }}>
             <Link href="/" style={{
               display: "inline-flex", alignItems: "center", gap: 6,
               fontSize: 12, color: "rgba(255,255,255,0.45)", textDecoration: "none", fontWeight: 500,
@@ -126,7 +127,7 @@ export default async function ToolPage({ params }: Props) {
             </Link>
           </div>
 
-          {/* Main hero content */}
+          {/* Hero content */}
           <div style={{ padding: "32px 0 40px", display: "flex", gap: 28, alignItems: "flex-start", flexWrap: "wrap" as const }}>
             {/* Logo */}
             <div style={{
@@ -149,21 +150,17 @@ export default async function ToolPage({ params }: Props) {
 
             {/* Name + tagline + badges */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              {/* Badges row */}
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const, marginBottom: 10 }}>
                 {categoryName && (
                   <span style={{
                     fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20,
                     background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.65)",
-                    border: "1px solid rgba(255,255,255,0.14)", letterSpacing: "0.01em",
+                    border: "1px solid rgba(255,255,255,0.14)",
                   }}>
                     {categoryName}
                   </span>
                 )}
-                <span style={{
-                  fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20,
-                  letterSpacing: "0.01em", ...pb,
-                }}>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, ...pb }}>
                   {pricingLabel(tool.pricing)}
                 </span>
                 {tags.slice(0, 3).map((t) => (
@@ -174,18 +171,11 @@ export default async function ToolPage({ params }: Props) {
                   }}>{t}</span>
                 ))}
               </div>
-
-              <h1 style={{
-                fontSize: 34, fontWeight: 900, letterSpacing: "-0.04em", color: "#fff",
-                margin: "0 0 10px", lineHeight: 1.1,
-              }}>
+              <h1 style={{ fontSize: 34, fontWeight: 900, letterSpacing: "-0.04em", color: "#fff", margin: "0 0 10px", lineHeight: 1.1 }}>
                 {tool.name}
               </h1>
               {tool.tagline && (
-                <p style={{
-                  fontSize: 16, color: "rgba(255,255,255,0.6)", margin: 0,
-                  lineHeight: 1.55, maxWidth: 560, fontWeight: 400,
-                }}>
+                <p style={{ fontSize: 16, color: "rgba(255,255,255,0.6)", margin: 0, lineHeight: 1.55, maxWidth: 560 }}>
                   {tool.tagline}
                 </p>
               )}
@@ -194,19 +184,14 @@ export default async function ToolPage({ params }: Props) {
             {/* CTAs */}
             <div style={{ display: "flex", flexDirection: "column", gap: 10, flexShrink: 0, alignItems: "flex-end" }}>
               {tool.website_url && (
-                <a
-                  href={tool.website_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: 8,
-                    padding: "11px 22px", borderRadius: 11,
-                    background: "#FF6B35", color: "#fff",
-                    fontSize: 13, fontWeight: 700, textDecoration: "none",
-                    boxShadow: "0 4px 16px rgba(255,107,53,0.4)",
-                    whiteSpace: "nowrap" as const,
-                  }}
-                >
+                <a href={tool.website_url} target="_blank" rel="noopener noreferrer" style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  padding: "11px 22px", borderRadius: 11,
+                  background: "#FF6B35", color: "#fff",
+                  fontSize: 13, fontWeight: 700, textDecoration: "none",
+                  boxShadow: "0 4px 16px rgba(255,107,53,0.4)",
+                  whiteSpace: "nowrap" as const,
+                }}>
                   Visit website
                   <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
                 </a>
@@ -233,119 +218,139 @@ export default async function ToolPage({ params }: Props) {
             {/* About */}
             {tool.description && (
               <div style={{ background: "#fff", border: "1px solid #e8e8e6", borderRadius: 16, padding: "26px 28px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 16 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 8, background: "#fff7f4", border: "1px solid #ffe4d9", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="#FF6B35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                  </div>
-                  <h2 style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-0.01em", color: "#0f0f10", margin: 0 }}>About</h2>
-                </div>
+                <SectionHeader icon={
+                  <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="#FF6B35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                } iconBg="#fff7f4" iconBorder="#ffe4d9" title="About" />
                 <p style={{ fontSize: 14.5, color: "#3a3a45", lineHeight: 1.8, margin: 0, whiteSpace: "pre-wrap" }}>
                   {tool.description}
                 </p>
               </div>
             )}
 
+            {/* Classification */}
+            {(categoryName || tags.length > 0) && (
+              <div style={{ background: "#fff", border: "1px solid #e8e8e6", borderRadius: 16, padding: "26px 28px" }}>
+                <SectionHeader icon={
+                  <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                } iconBg="#f5f3ff" iconBorder="#ddd6fe" title="Classification" />
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  {categoryName && (
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "#9090a0", textTransform: "uppercase" as const, letterSpacing: "0.06em", marginBottom: 8 }}>Category</div>
+                      <span style={{
+                        display: "inline-block", fontSize: 12, fontWeight: 600,
+                        padding: "5px 14px", borderRadius: 20,
+                        background: "#f0f0fe", color: "#4f46e5",
+                        border: "1px solid #c7d2fe",
+                      }}>
+                        {categoryName}
+                      </span>
+                    </div>
+                  )}
+                  {tags.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "#9090a0", textTransform: "uppercase" as const, letterSpacing: "0.06em", marginBottom: 8 }}>Use Cases</div>
+                      <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 7 }}>
+                        {tags.map(t => (
+                          <span key={t} style={{
+                            fontSize: 12, fontWeight: 500, padding: "5px 12px", borderRadius: 20,
+                            background: "#f5f5f3", color: "#3a3a45", border: "1px solid #e8e8e6",
+                          }}>{t}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Screenshots */}
             {shots.length > 0 && (
               <div style={{ background: "#fff", border: "1px solid #e8e8e6", borderRadius: 16, padding: "26px 28px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 18 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 8, background: "#f0f4ff", border: "1px solid #dce6ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                  </div>
-                  <h2 style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-0.01em", color: "#0f0f10", margin: 0 }}>Screenshots</h2>
-                </div>
+                <SectionHeader icon={
+                  <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                } iconBg="#f0f9ff" iconBorder="#bae6fd" title="Product Screenshots" />
                 <div style={{
                   display: "grid",
                   gridTemplateColumns: shots.length === 1 ? "1fr" : "repeat(2, 1fr)",
                   gap: 12,
                 }}>
-                  {shots.map((s, i) => (
-                    <div key={s.id} style={{
+                  {shots.map((url, i) => (
+                    <div key={i} style={{
                       borderRadius: 10, overflow: "hidden",
-                      border: "1px solid #e8e8e6",
-                      background: "#f9f9f7",
+                      border: "1px solid #e8e8e6", background: "#f9f9f7",
                       gridColumn: shots.length === 1 || (shots.length === 3 && i === 0) ? "1 / -1" : undefined,
                       aspectRatio: shots.length === 1 ? "16 / 9" : "4 / 3",
                     }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={s.url} alt={`Screenshot ${i + 1}`} style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }} />
+                      <img src={url} alt={`Screenshot ${i + 1}`} style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }} />
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Demo video */}
-            {tool.demo_url && (
-              <div style={{ background: "#fff", border: "1px solid #e8e8e6", borderRadius: 16, padding: "26px 28px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 16 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 8, background: "#fff7f4", border: "1px solid #ffe4d9", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <svg width={13} height={13} viewBox="0 0 24 24" fill="#FF6B35"><path d="M8 5v14l11-7z"/></svg>
-                  </div>
-                  <h2 style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-0.01em", color: "#0f0f10", margin: 0 }}>Demo</h2>
-                </div>
-                <a
-                  href={tool.demo_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: "flex", alignItems: "center", gap: 14,
-                    padding: "14px 16px", borderRadius: 12,
-                    background: "linear-gradient(135deg, #0f0f10 0%, #1c1c1f 100%)",
-                    textDecoration: "none",
-                    border: "1px solid #2a2a2f",
-                  }}
-                >
-                  <div style={{
-                    width: 44, height: 44, borderRadius: 11,
-                    background: "#FF6B35",
-                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                    boxShadow: "0 4px 12px rgba(255,107,53,0.35)",
-                  }}>
-                    <svg width={16} height={16} viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>Watch demo video</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>{tool.demo_url}</div>
-                  </div>
-                  <svg style={{ flexShrink: 0 }} width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
-                </a>
-              </div>
-            )}
-
-            {/* Founder's note */}
-            {tool.maker_comment && (
-              <div style={{
-                background: "linear-gradient(135deg, #fff7f4 0%, #fff 100%)",
-                border: "1px solid #ffd9cc",
-                borderRadius: 16, padding: "26px 28px",
-                position: "relative", overflow: "hidden",
-              }}>
-                {/* Big quote mark decoration */}
+            {/* Product Video */}
+            <div style={{ background: "#fff", border: "1px solid #e8e8e6", borderRadius: 16, padding: "26px 28px" }}>
+              <SectionHeader icon={
+                <svg width={13} height={13} viewBox="0 0 24 24" fill="#FF6B35"><path d="M8 5v14l11-7z"/></svg>
+              } iconBg="#fff7f4" iconBorder="#ffe4d9" title="Product Video" />
+              {tool.demo_url ? (
+                isVideoUrl(tool.demo_url) ? (
+                  <video
+                    controls
+                    style={{ width: "100%", borderRadius: 10, border: "1px solid #e8e8e6", background: "#000", display: "block" }}
+                  >
+                    <source src={tool.demo_url} />
+                  </video>
+                ) : (
+                  <a
+                    href={tool.demo_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "flex", alignItems: "center", gap: 14,
+                      padding: "14px 16px", borderRadius: 12,
+                      background: "linear-gradient(135deg, #0f0f10 0%, #1c1c1f 100%)",
+                      textDecoration: "none",
+                      border: "1px solid #2a2a2f",
+                    }}
+                  >
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 11,
+                      background: "#FF6B35",
+                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                      boxShadow: "0 4px 12px rgba(255,107,53,0.35)",
+                    }}>
+                      <svg width={16} height={16} viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>Watch demo video</div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>{tool.demo_url}</div>
+                    </div>
+                    <svg style={{ flexShrink: 0 }} width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
+                  </a>
+                )
+              ) : (
                 <div style={{
-                  position: "absolute", top: -8, right: 20,
-                  fontSize: 120, lineHeight: 1, color: "rgba(255,107,53,0.07)",
-                  fontFamily: "Georgia, serif", fontWeight: 900, pointerEvents: "none",
-                  userSelect: "none",
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "16px", borderRadius: 12,
+                  background: "#fafaf8", border: "1px dashed #e0e0dd",
                 }}>
-                  &ldquo;
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 16, position: "relative" }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 8, background: "#fff0eb", border: "1px solid #ffc8b4", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="#FF6B35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  <div style={{
+                    width: 38, height: 38, borderRadius: 9,
+                    background: "#f0f0ee", border: "1px solid #e8e8e6",
+                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                  }}>
+                    <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="#c0c0c8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 5v14l11-7z"/></svg>
                   </div>
-                  <h2 style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-0.01em", color: "#0f0f10", margin: 0 }}>
-                    Founder&apos;s note
-                  </h2>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#9090a0" }}>Not updated yet</div>
+                    <div style={{ fontSize: 11, color: "#b0b0b8", marginTop: 2 }}>The maker hasn&apos;t added a demo video.</div>
+                  </div>
                 </div>
-                <p style={{
-                  fontSize: 15, color: "#3a3a45", lineHeight: 1.8, margin: 0,
-                  fontStyle: "italic", position: "relative",
-                }}>
-                  &ldquo;{tool.maker_comment}&rdquo;
-                </p>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Comments */}
             <div style={{ background: "#fff", border: "1px solid #e8e8e6", borderRadius: 16, padding: "26px 28px" }}>
@@ -363,8 +368,8 @@ export default async function ToolPage({ params }: Props) {
                   Product info
                 </div>
               </div>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                {/* Upvotes — prominent row */}
+              <div>
+                {/* Upvotes tile */}
                 <div style={{
                   margin: "0 14px 14px",
                   padding: "12px 14px", borderRadius: 10,
@@ -382,16 +387,6 @@ export default async function ToolPage({ params }: Props) {
                 <div style={{ padding: "0 18px 18px", display: "flex", flexDirection: "column", gap: 10 }}>
                   <InfoRow label="Pricing" value={pricingLabel(tool.pricing)} />
                   {categoryName && <InfoRow label="Category" value={categoryName} />}
-                  {tags.length > 0 && (
-                    <div>
-                      <div style={{ fontSize: 11, color: "#9090a0", fontWeight: 600, marginBottom: 6 }}>Tags</div>
-                      <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 5 }}>
-                        {tags.map(t => (
-                          <span key={t} style={{ fontSize: 11, padding: "2px 8px", borderRadius: 6, background: "#f5f5f3", color: "#3a3a45", border: "1px solid #e8e8e6", fontWeight: 500 }}>{t}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                   {tool.created_at && (
                     <InfoRow label="Listed" value={new Date(tool.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })} />
                   )}
@@ -426,24 +421,16 @@ export default async function ToolPage({ params }: Props) {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {socialLinks.map(({ label, href, svgPath }) => (
-                    <a
-                      key={label}
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: "flex", alignItems: "center", gap: 10,
-                        padding: "9px 12px", borderRadius: 9,
-                        border: "1px solid #e8e8e6", background: "#fafaf8",
-                        textDecoration: "none", color: "#0f0f10",
-                        fontSize: 12, fontWeight: 600,
-                      }}
-                    >
-                      <div style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor">
-                          <path d={svgPath} />
-                        </svg>
-                      </div>
+                    <a key={label} href={href} target="_blank" rel="noopener noreferrer" style={{
+                      display: "flex", alignItems: "center", gap: 10,
+                      padding: "9px 12px", borderRadius: 9,
+                      border: "1px solid #e8e8e6", background: "#fafaf8",
+                      textDecoration: "none", color: "#0f0f10",
+                      fontSize: 12, fontWeight: 600,
+                    }}>
+                      <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor">
+                        <path d={svgPath} />
+                      </svg>
                       {label}
                       <svg style={{ marginLeft: "auto", opacity: 0.35 }} width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
                     </a>
@@ -452,12 +439,12 @@ export default async function ToolPage({ params }: Props) {
               </div>
             )}
 
-            {/* Share */}
+            {/* Share — copy link only */}
             <div style={{ background: "#fff", border: "1px solid #e8e8e6", borderRadius: 16, padding: "16px 18px" }}>
               <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#9090a0", marginBottom: 12 }}>
                 Share
               </div>
-              <ShareButtons name={tool.name} slug={tool.slug} />
+              <CopyLinkButton slug={tool.slug} />
             </div>
 
           </div>
@@ -471,52 +458,33 @@ export default async function ToolPage({ params }: Props) {
 
 /* ── Helpers ────────────────────────────────────────────────────────────── */
 
+function SectionHeader({
+  icon, iconBg, iconBorder, title,
+}: {
+  icon: React.ReactNode;
+  iconBg: string;
+  iconBorder: string;
+  title: string;
+}) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 16 }}>
+      <div style={{
+        width: 28, height: 28, borderRadius: 8,
+        background: iconBg, border: `1px solid ${iconBorder}`,
+        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+      }}>
+        {icon}
+      </div>
+      <h2 style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-0.01em", color: "#0f0f10", margin: 0 }}>{title}</h2>
+    </div>
+  );
+}
+
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
       <span style={{ fontSize: 11, color: "#9090a0", fontWeight: 600 }}>{label}</span>
       <span style={{ fontSize: 12, fontWeight: 700, color: "#0f0f10" }}>{value}</span>
-    </div>
-  );
-}
-
-function ShareButtons({ name, slug }: { name: string; slug: string }) {
-  const url = `https://nextbigtool.vercel.app/tools/${slug}`;
-  const text = encodeURIComponent(`Check out ${name} on NextBigTool`);
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <a
-        href={`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(url)}`}
-        target="_blank" rel="noopener noreferrer"
-        style={{
-          display: "flex", alignItems: "center", gap: 10,
-          padding: "9px 12px", borderRadius: 9,
-          border: "1px solid #e8e8e6", background: "#fafaf8",
-          textDecoration: "none", color: "#0f0f10",
-          fontSize: 12, fontWeight: 600,
-        }}
-      >
-        <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor">
-          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.73-8.835L1.254 2.25H8.08l4.259 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-        </svg>
-        Share on X
-      </a>
-      <a
-        href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}
-        target="_blank" rel="noopener noreferrer"
-        style={{
-          display: "flex", alignItems: "center", gap: 10,
-          padding: "9px 12px", borderRadius: 9,
-          border: "1px solid #e8e8e6", background: "#fafaf8",
-          textDecoration: "none", color: "#0f0f10",
-          fontSize: 12, fontWeight: 600,
-        }}
-      >
-        <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-        </svg>
-        Share on LinkedIn
-      </a>
     </div>
   );
 }
