@@ -433,16 +433,14 @@ export default function AddYourToolPage() {
               value={form.website_url} onChange={e => set("website_url", e.target.value)} />
           </Field>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            <Field label="Product Name" required>
-              <input style={inp} placeholder="e.g. Raycast"
-                value={form.name} onChange={e => set("name", e.target.value)} />
-            </Field>
-            <Field label="One-line Description" required hint={`${form.tagline.length}/80 characters`}>
-              <input style={inp} maxLength={80} placeholder="The best way to do X for Y"
-                value={form.tagline} onChange={e => set("tagline", e.target.value)} />
-            </Field>
-          </div>
+          <Field label="Product Name" required>
+            <input style={inp} placeholder="e.g. Raycast"
+              value={form.name} onChange={e => set("name", e.target.value)} />
+          </Field>
+          <Field label="One-line Description" required hint={`${form.tagline.length}/100 characters`}>
+            <input style={inp} maxLength={100} placeholder="The best way to do X for Y"
+              value={form.tagline} onChange={e => set("tagline", e.target.value)} />
+          </Field>
         </div>
 
         {/* ── Section 2: Brand Assets ── */}
@@ -593,10 +591,10 @@ export default function AddYourToolPage() {
             About & Pricing
           </div>
 
-          <Field label="About the Tool" required hint={`${form.about.length}/400 characters — explain what it does and who it's for`}>
+          <Field label="About the Tool" required hint={`${form.about.length}/700 characters — explain what it does and who it's for`}>
             <textarea
               style={{ ...inp, minHeight: 110, resize: "vertical", lineHeight: 1.6 }}
-              maxLength={400}
+              maxLength={700}
               placeholder="Describe your product — what problem it solves, who benefits, and what makes it different…"
               value={form.about}
               onChange={e => set("about", e.target.value)}

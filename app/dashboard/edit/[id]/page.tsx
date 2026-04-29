@@ -538,14 +538,14 @@ export default function EditToolPage() {
           <div style={section}>
             <SectionHeader n={3} title="About & Pricing" />
 
-            <Field label="One-line Description" required hint={`${form.tagline.length}/80 characters`}>
-              <input style={inp} maxLength={80} placeholder="The best way to do X for Y"
+            <Field label="One-line Description" required hint={`${form.tagline.length}/100 characters`}>
+              <input style={inp} maxLength={100} placeholder="The best way to do X for Y"
                 value={form.tagline} onChange={e => set("tagline", e.target.value)} />
             </Field>
 
-            <Field label="About the Tool" required hint={`${form.about.length}/400 characters — explain what it does and who it's for`}>
+            <Field label="About the Tool" required hint={`${form.about.length}/700 characters — explain what it does and who it's for`}>
               <textarea style={{ ...inp, minHeight: 110, resize: "vertical", lineHeight: 1.6 }}
-                maxLength={400}
+                maxLength={700}
                 placeholder="Describe your product — what problem it solves, who benefits, and what makes it different…"
                 value={form.about} onChange={e => set("about", e.target.value)} />
             </Field>
