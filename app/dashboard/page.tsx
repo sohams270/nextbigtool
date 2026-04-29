@@ -296,7 +296,6 @@ export default async function DashboardPage() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={logoSrc} alt={t.name}
                         style={{ position: "absolute", top: "-15%", left: "-15%", width: "130%", height: "130%", objectFit: "cover" }}
-                        onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                       />
                     ) : t.name[0]}
                   </div>
