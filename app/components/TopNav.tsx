@@ -430,8 +430,9 @@ export default function TopNav({ dark }: { dark?: boolean }) {
     <>
       <nav style={{
         background: navBg,
-        borderBottom: `1px solid ${navBorder}`,
-        flexShrink: 0, position: "sticky", top: 0, zIndex: 200,
+        borderBottom: "1px solid rgba(0,0,0,0.09)",
+        position: "fixed", top: 0, left: 0, right: 0, width: "100%",
+        zIndex: 200,
       }}>
         <div style={{
           maxWidth: 1200, margin: "0 auto",
@@ -735,6 +736,9 @@ export default function TopNav({ dark }: { dark?: boolean }) {
           </div>
         </div>
       </nav>
+
+      {/* Spacer — keeps content from hiding behind the fixed nav */}
+      <div style={{ height: 60, flexShrink: 0 }} />
 
       {/* ── Mobile full-screen drawer ── */}
       {mobileMenuOpen && (
