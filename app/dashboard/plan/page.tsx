@@ -9,14 +9,12 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "sohams270@gmail.com";
 
 const PLAN_META: Record<string, { label: string; color: string; bg: string; borderColor: string }> = {
   free:  { label: "Free",  color: "var(--ink-muted)",  bg: "var(--surface-alt)",        borderColor: "var(--border)" },
-  basic: { label: "Basic", color: "#3b7fff",            bg: "rgba(59,127,255,.1)",        borderColor: "rgba(59,127,255,.3)" },
   core:  { label: "Core",  color: "#ff6a3d",            bg: "rgba(255,106,61,.1)",        borderColor: "rgba(255,106,61,.3)" },
 };
 
 const PLAN_DESCRIPTIONS: Record<string, string> = {
-  free:  "Upgrade to unlock Founder CRM, unlimited listings, and Hall of Fame placement.",
-  basic: "You have boosted visibility and CSV exports. Upgrade to Core for Founder CRM and unlimited listings.",
-  core:  "You have full access to all features including Founder CRM, Hall of Fame, and unlimited everything.",
+  free:  "Upgrade to Core to unlock Founder CRM, unlimited listings, Hall of Fame placement, and a Press Release.",
+  core:  "You have full access to all features including Founder CRM, Hall of Fame, Press Release, and unlimited everything.",
 };
 
 export default async function PlanPage() {
@@ -70,7 +68,7 @@ export default async function PlanPage() {
       </div>
 
       {/* Plan cards + comparison */}
-      <PlanToggle currentPlan={currentPlan as "free" | "basic" | "core"} />
+      <PlanToggle currentPlan={currentPlan as "free" | "core"} />
 
       {/* Billing & invoices */}
       <div style={{ marginTop: 24, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: 24 }}>
@@ -106,7 +104,7 @@ export default async function PlanPage() {
                     {isAdmin && <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 700, color: "#ff6a3d", background: "rgba(255,106,61,.1)", padding: "2px 8px", borderRadius: 20 }}>Admin</span>}
                   </div>
                   <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2 }}>
-                    {currentPlan === "core" ? "Billed monthly · $79/mo" : "One-time payment · $19 per product"}
+                    {currentPlan === "core" ? "Billed monthly · $79/mo" : "Active plan"}
                   </div>
                 </div>
               </div>

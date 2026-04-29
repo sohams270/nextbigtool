@@ -77,10 +77,6 @@ const FAQ_ITEMS = [
     a: "The Hall of Fame is a dedicated section showcasing the best products on the platform. Unlike the trending feed which resets, Hall of Fame is permanent — giving you evergreen visibility that compounds over time.",
   },
   {
-    q: "Is Basic a one-time fee?",
-    a: "Yes. $19 is a one-time payment per product. No recurring charges, ever.",
-  },
-  {
     q: "Can I switch between monthly and yearly on Core?",
     a: "Yes. Start monthly at $79/month and switch to yearly at $9/month anytime. Savings apply immediately to your next billing cycle.",
   },
@@ -141,8 +137,8 @@ export default function PricingPage() {
           <p style={{ fontSize: 16, color: "#6b6b78", margin: 0 }}>From your first launch to building serious traction.</p>
         </div>
 
-        {/* ── Three pricing cards ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, marginBottom: 24, alignItems: "start" }}>
+        {/* ── Two pricing cards ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24, alignItems: "start", maxWidth: 780, margin: "0 auto 24px" }}>
 
           {/* FREE */}
           <div style={{ background: "var(--surface-alt)", border: "1px solid var(--border)", borderRadius: 16, padding: 28, display: "flex", flexDirection: "column", gap: 0 }}>
@@ -155,7 +151,7 @@ export default function PricingPage() {
               Perfect for exploring the platform and sharing your first product with the world.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-              {["List 1 product", "Lifetime free listing", "High authority backlink", "1 post on Build in Public wall", "Basic analytics (upvotes + comments)"].map((f) => (
+              {["List 1 product", "Lifetime free listing", "High authority backlink", "5 posts on Build in Public wall", "Basic analytics (upvotes + comments)"].map((f) => (
                 <div key={f} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                   <Check />
                   <span style={{ fontSize: 13, color: "var(--ink-2)", lineHeight: 1.45 }}>{f}</span>
@@ -165,32 +161,6 @@ export default function PricingPage() {
             <Link href="/auth/login" style={{ textDecoration: "none" }}>
               <button style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "1.5px solid var(--border)", background: "transparent", fontSize: 14, fontWeight: 700, color: "var(--ink-2)", cursor: "pointer", fontFamily: "inherit" }}>
                 Get Started Free
-              </button>
-            </Link>
-          </div>
-
-          {/* BASIC */}
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: 28, display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ink-muted)", marginBottom: 10 }}>BASIC</div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: "-0.04em", color: "var(--ink)" }}>$19</span>
-            </div>
-            <div style={{ fontSize: 13, color: "#6b6b78", marginBottom: 16 }}>One-time per product. Pay once, keep forever.</div>
-            <p style={{ fontSize: 13, color: "var(--ink-2)", lineHeight: 1.6, margin: "0 0 20px" }}>
-              For founders who want more visibility and a boost on launch day.
-            </p>
-            <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ink-muted)", marginBottom: 12 }}>EVERYTHING IN FREE, PLUS</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28, flex: 1 }}>
-              {["Featured for 48 hours on launch", "Featured in weekly newsletter (once)", "Re-launch option", "5 posts on Build in Public wall", "CSV export of your data"].map((f) => (
-                <div key={f} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <Check />
-                  <span style={{ fontSize: 13, color: "var(--ink-2)", lineHeight: 1.45 }}>{f}</span>
-                </div>
-              ))}
-            </div>
-            <Link href="/auth/login" style={{ textDecoration: "none" }}>
-              <button style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "1.5px solid #FF6B35", background: "transparent", fontSize: 14, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
-                Upgrade to Basic →
               </button>
             </Link>
           </div>
@@ -221,6 +191,7 @@ export default function PricingPage() {
               {[
                 { title: "Founder CRM", desc: "See exactly who upvoted or followed your product. Turn interest into pipeline." },
                 { title: "Hall of Fame Placement", desc: "Permanent evergreen visibility that compounds over time." },
+                { title: "1 Press Release", desc: "A professionally written press release published about your product." },
               ].map((ex) => (
                 <div key={ex.title} style={{ display: "flex", gap: 12, marginBottom: 12, alignItems: "flex-start" }}>
                   <div style={{ width: 30, height: 30, borderRadius: 8, background: "#FF6B35", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -236,9 +207,9 @@ export default function PricingPage() {
               ))}
             </div>
 
-            <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255,255,255,0.5)", marginBottom: 12 }}>EVERYTHING IN BASIC, PLUS</div>
+            <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "rgba(255,255,255,0.5)", marginBottom: 12 }}>EVERYTHING IN FREE, PLUS</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28, flex: 1 }}>
-              {["One follow-up message per interested user", "Weekly newsletter placement", "Unlimited product listings", "Unlimited Build in Public posts", "1 featured blog post written about you"].map((f) => (
+              {["One follow-up message per interested user", "Unlimited product listings", "Unlimited Build in Public posts", "CSV export of your data"].map((f) => (
                 <div key={f} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                   <Check dark />
                   <span style={{ fontSize: 13, color: "rgba(255,255,255,0.9)", lineHeight: 1.45 }}>{f}</span>
@@ -267,7 +238,7 @@ export default function PricingPage() {
 
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, overflow: "hidden" }}>
             {/* Header row */}
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderBottom: "2px solid #e5e5e3" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", borderBottom: "2px solid #e5e5e3" }}>
               <div style={{ padding: "20px 24px" }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>All plans compared</div>
                 <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2 }}>Full feature breakdown</div>
@@ -280,17 +251,6 @@ export default function PricingPage() {
                 <Link href="/auth/login" style={{ textDecoration: "none" }}>
                   <button style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "1.5px solid var(--border)", background: "transparent", fontSize: 12, fontWeight: 700, color: "var(--ink-2)", cursor: "pointer", fontFamily: "inherit" }}>
                     Get Started
-                  </button>
-                </Link>
-              </div>
-              {/* BASIC col header */}
-              <div style={{ padding: "20px 16px", borderLeft: "1px solid #e5e5e3", textAlign: "center" }}>
-                <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>BASIC</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: "var(--ink)", letterSpacing: "-0.03em", marginBottom: 2 }}>$19</div>
-                <div style={{ fontSize: 11, color: "var(--ink-muted)", marginBottom: 12 }}>one-time / product</div>
-                <Link href="/auth/login" style={{ textDecoration: "none" }}>
-                  <button style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "1.5px solid #FF6B35", background: "transparent", fontSize: 12, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
-                    Upgrade
                   </button>
                 </Link>
               </div>
@@ -312,52 +272,51 @@ export default function PricingPage() {
               {
                 section: "LISTING",
                 rows: [
-                  { feature: "Products listed", sub: null, free: "1", basic: "1", core: <span style={{ color: "#FF6B35", fontWeight: 800 }}>Unlimited</span> },
-                  { feature: "Lifetime free listing", sub: null, free: <TCheck />, basic: <TCheck />, core: <TCheck /> },
-                  { feature: "High authority backlink", sub: "DR 70+ dofollow link", free: <TCheck />, basic: <TCheck />, core: <TCheck /> },
+                  { feature: "Products listed", sub: null, free: "1", core: <span style={{ color: "#FF6B35", fontWeight: 800 }}>Unlimited</span> },
+                  { feature: "Lifetime free listing", sub: null, free: <TCheck />, core: <TCheck /> },
+                  { feature: "High authority backlink", sub: "DR 70+ dofollow link", free: <TCheck />, core: <TCheck /> },
                 ],
               },
               {
                 section: "DISCOVERY & VISIBILITY",
                 rows: [
-                  { feature: "Featured on homepage for 48 hours", sub: null, free: <TDash />, basic: <TCheck />, core: <TCheck /> },
-                  { feature: "Re-launch option", sub: "Fresh boost for major updates", free: <TDash />, basic: <TCheck />, core: <TCheck /> },
-                  { feature: <span><span style={{ color: "#FF6B35" }}>★ </span>Hall of Fame placement</span>, sub: "Permanent evergreen discoverability", free: <TDash />, basic: <TDash />, core: <TCheck /> },
-                ],
-              },
-              {
-                section: "NEWSLETTER (14,200+ SUBSCRIBERS)",
-                rows: [
-                  { feature: "One-time newsletter feature", sub: null, free: <TDash />, basic: <TCheck />, core: <TCheck /> },
-                  { feature: "Weekly newsletter placement", sub: "Recurring weekly slot", free: <TDash />, basic: <TDash />, core: <TCheck /> },
-                  { feature: "Featured blog post written about you", sub: null, free: <TDash />, basic: <TDash />, core: <TCheck /> },
+                  { feature: "Featured on homepage for 48 hours", sub: null, free: <TDash />, core: <TCheck /> },
+                  { feature: "Re-launch option", sub: "Fresh boost for major updates", free: <TDash />, core: <TCheck /> },
+                  { feature: <span><span style={{ color: "#FF6B35" }}>★ </span>Hall of Fame placement</span>, sub: "Permanent evergreen discoverability", free: <TDash />, core: <TCheck /> },
                 ],
               },
               {
                 section: "BUILD IN PUBLIC WALL",
                 rows: [
-                  { feature: "Posts on Build in Public wall", sub: null, free: "1 post", basic: "5 posts", core: <span style={{ color: "#FF6B35", fontWeight: 800 }}>Unlimited</span> },
+                  { feature: "Posts on Build in Public wall", sub: null, free: "5 posts", core: <span style={{ color: "#FF6B35", fontWeight: 800 }}>Unlimited</span> },
                 ],
               },
               {
                 section: "FOUNDER CRM",
                 sectionColor: "#FF6B35",
                 rows: [
-                  { feature: <span style={{ color: "#FF6B35" }}>★ See who upvoted or followed your product</span>, sub: "Names, profiles, contact — consent-based", free: <TDash />, basic: <TDash />, core: <TCheck /> },
-                  { feature: "One follow-up message per interested user", sub: null, free: <TDash />, basic: <TDash />, core: <TCheck /> },
+                  { feature: <span style={{ color: "#FF6B35" }}>★ See who upvoted or followed your product</span>, sub: "Names, profiles, contact — consent-based", free: <TDash />, core: <TCheck /> },
+                  { feature: "One follow-up message per interested user", sub: null, free: <TDash />, core: <TCheck /> },
+                ],
+              },
+              {
+                section: "PRESS RELEASE",
+                sectionColor: "#FF6B35",
+                rows: [
+                  { feature: <span style={{ color: "#FF6B35" }}>★ 1 Press Release written about you</span>, sub: "Published and distributed professionally", free: <TDash />, core: <TCheck /> },
                 ],
               },
               {
                 section: "ANALYTICS & DATA",
                 rows: [
-                  { feature: "Basic analytics", sub: "Upvotes and comments", free: <TCheck />, basic: <TCheck />, core: <TCheck /> },
-                  { feature: "CSV data export", sub: null, free: <TDash />, basic: <TCheck />, core: <TCheck /> },
+                  { feature: "Basic analytics", sub: "Upvotes and comments", free: <TCheck />, core: <TCheck /> },
+                  { feature: "CSV data export", sub: null, free: <TDash />, core: <TCheck /> },
                 ],
               },
             ].map((group, gi) => (
               <div key={gi}>
                 {/* Section header */}
-                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", background: "#f9f9f7", borderTop: "1px solid #e5e5e3" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", background: "#f9f9f7", borderTop: "1px solid #e5e5e3" }}>
                   <div style={{ padding: "10px 24px", gridColumn: "1 / -1" }}>
                     <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: group.sectionColor || "#6b6b78" }}>
                       {group.section}
@@ -366,16 +325,13 @@ export default function PricingPage() {
                 </div>
                 {/* Feature rows */}
                 {group.rows.map((row, ri) => (
-                  <div key={ri} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid var(--border-faint)" }}>
+                  <div key={ri} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", borderTop: "1px solid var(--border-faint)" }}>
                     <div style={{ padding: "14px 24px" }}>
                       <div style={{ fontSize: 13, color: "var(--ink)", fontWeight: 500 }}>{row.feature}</div>
                       {row.sub && <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 2 }}>{row.sub}</div>}
                     </div>
                     <div style={{ padding: "14px 16px", borderLeft: "1px solid var(--border-faint)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       {typeof row.free === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-2)" }}>{row.free}</span> : row.free}
-                    </div>
-                    <div style={{ padding: "14px 16px", borderLeft: "1px solid var(--border-faint)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {typeof row.basic === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-2)" }}>{row.basic}</span> : row.basic}
                     </div>
                     <div style={{ padding: "14px 16px", borderLeft: "1px solid var(--border-faint)", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,107,53,0.03)" }}>
                       {typeof row.core === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-2)" }}>{row.core}</span> : row.core}

@@ -47,28 +47,10 @@ const BASE_PLANS: Plan[] = [
       "List 1 product",
       "Lifetime free listing",
       "High authority backlink",
-      "1 post on Build in Public wall",
+      "5 posts on Build in Public wall",
       "Basic analytics (upvotes + comments)",
     ],
     cta: "Current plan",
-    ctaHref: "/dashboard/plan",
-  },
-  {
-    id: "basic",
-    label: "BASIC",
-    price: "$19",
-    per: "one-time per product",
-    desc: "One-time per product. Pay once, keep forever.",
-    bodyText: "For founders who want more visibility and a boost on launch day.",
-    featuresHeader: "EVERYTHING IN FREE, PLUS",
-    features: [
-      "Featured for 48 hours on launch",
-      "Featured in weekly newsletter (once)",
-      "Re-launch option",
-      "5 posts on Build in Public wall",
-      "CSV export of your data",
-    ],
-    cta: "Upgrade to Basic →",
     ctaHref: "/dashboard/plan",
   },
   {
@@ -84,13 +66,12 @@ const BASE_PLANS: Plan[] = [
         : <span style={{ fontSize: 12, color: "#d1fae5", fontWeight: 600 }}>Or $49/month billed yearly — save $360/year.</span>,
     desc: "",
     bodyText: "For serious builders turning discovery into real pipeline and traction.",
-    featuresHeader: "EVERYTHING IN BASIC, PLUS",
+    featuresHeader: "EVERYTHING IN FREE, PLUS",
     features: [
       "One follow-up message per interested user",
-      "Weekly newsletter placement",
       "Unlimited product listings",
       "Unlimited Build in Public posts",
-      "1 featured blog post written about you",
+      "CSV export of your data",
     ],
     cta: "Upgrade to Core →",
     ctaHref: "/dashboard/plan",
@@ -99,27 +80,25 @@ const BASE_PLANS: Plan[] = [
 ];
 
 const COMPARISON = [
-  { feature: "Products listed",            free: "1",         basic: "1",       core: "Unlimited" },
-  { feature: "Build in Public posts",       free: "1",         basic: "5",       core: "Unlimited" },
-  { feature: "Featured on homepage",        free: "—",         basic: "48 hours", core: "48 hours" },
-  { feature: "Newsletter placement",        free: "—",         basic: "Once",    core: "Weekly" },
-  { feature: "Founder CRM",                free: "—",         basic: "—",       core: "✓" },
-  { feature: "Hall of Fame placement",      free: "—",         basic: "—",       core: "✓" },
-  { feature: "CSV export",                 free: "—",         basic: "✓",       core: "✓" },
-  { feature: "Basic analytics",            free: "✓",         basic: "✓",       core: "✓" },
+  { feature: "Products listed",            free: "1",    core: "Unlimited" },
+  { feature: "Build in Public posts",       free: "5",    core: "Unlimited" },
+  { feature: "Featured on homepage",        free: "—",    core: "48 hours" },
+  { feature: "Founder CRM",                free: "—",    core: "✓" },
+  { feature: "Hall of Fame placement",      free: "—",    core: "✓" },
+  { feature: "1 Press Release",            free: "—",    core: "✓" },
+  { feature: "CSV export",                 free: "—",    core: "✓" },
+  { feature: "Basic analytics",            free: "✓",    core: "✓" },
 ];
 
-export default function PlanToggle({ currentPlan = "free" }: { currentPlan?: "free" | "basic" | "core" }) {
+export default function PlanToggle({ currentPlan = "free" }: { currentPlan?: "free" | "core" }) {
   const [yearly, setYearly] = useState(false);
 
   const PLANS = BASE_PLANS.map(p => ({
     ...p,
     isCurrent: p.id === currentPlan,
-    // Hide upgrade CTAs for plans the user is already on or below
     cta: p.id === currentPlan
       ? "Current plan"
       : (currentPlan === "core" && p.id !== "core") ? "Included in your plan"
-      : (currentPlan === "basic" && p.id === "free") ? "Included in your plan"
       : p.cta,
   }));
 
@@ -147,7 +126,7 @@ export default function PlanToggle({ currentPlan = "free" }: { currentPlan?: "fr
       </div>
 
       {/* Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 16, marginBottom: 24 }}>
         {PLANS.map((plan) => {
           const price = plan.isCore ? (yearly ? plan.priceYearly! : plan.price) : plan.price;
           const per = plan.isCore ? (yearly ? plan.perYearly! : plan.per) : plan.per;
@@ -189,6 +168,7 @@ export default function PlanToggle({ currentPlan = "free" }: { currentPlan?: "fr
                   {[
                     { title: "Founder CRM", desc: "See exactly who upvoted or followed your product." },
                     { title: "Hall of Fame Placement", desc: "Permanent evergreen visibility." },
+                    { title: "1 Press Release", desc: "Professionally written and published about your product." },
                   ].map((ex) => (
                     <div key={ex.title} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
                       <div style={{ width: 26, height: 26, borderRadius: 7, background: "#FF6B35", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -243,18 +223,18 @@ export default function PlanToggle({ currentPlan = "free" }: { currentPlan?: "fr
 
       {/* Comparison table */}
       <div style={{ background: "#fff", border: "1px solid #e5e5e3", borderRadius: 14, overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", background: "#f9f9f7", borderBottom: "1px solid #e5e5e3" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", background: "#f9f9f7", borderBottom: "1px solid #e5e5e3" }}>
           <div style={{ padding: "12px 20px", fontSize: 11, fontWeight: 700, color: "#9090a0", textTransform: "uppercase" as const, letterSpacing: "0.06em" }}>Feature</div>
-          {["Free", "Basic", "Core"].map((t) => (
+          {["Free", "Core"].map((t) => (
             <div key={t} style={{ padding: "12px 12px", fontSize: 11, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.06em", color: t === "Core" ? "#FF6B35" : "#9090a0", textAlign: "center", borderLeft: "1px solid #e5e5e3" }}>
               {t}
             </div>
           ))}
         </div>
         {COMPARISON.map((row, i) => (
-          <div key={row.feature} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderTop: "1px solid #f5f5f3" }}>
+          <div key={row.feature} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", borderTop: "1px solid #f5f5f3" }}>
             <div style={{ padding: "11px 20px", fontSize: 12.5, color: "#3a3a45" }}>{row.feature}</div>
-            {[row.free, row.basic, row.core].map((val, j) => (
+            {[row.free, row.core].map((val, j) => (
               <div key={j} style={{ padding: "11px 12px", textAlign: "center", borderLeft: "1px solid #f5f5f3", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {val === "✓" ? (
                   <div style={{ width: 18, height: 18, borderRadius: "50%", background: "rgba(0,184,122,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -263,7 +243,7 @@ export default function PlanToggle({ currentPlan = "free" }: { currentPlan?: "fr
                 ) : val === "—" ? (
                   <span style={{ color: "#CFCFD4", fontWeight: 700 }}>—</span>
                 ) : (
-                  <span style={{ fontSize: 12, fontWeight: 600, color: j === 2 && (val === "Unlimited" || val === "Weekly") ? "#FF6B35" : "#3a3a45" }}>{val}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: j === 1 && val === "Unlimited" ? "#FF6B35" : "#3a3a45" }}>{val}</span>
                 )}
               </div>
             ))}
