@@ -145,7 +145,6 @@ export default async function DashboardPage() {
     { label: "Total Upvotes", value: totalUpvotes.toLocaleString(), delta: "across all products", color: "#ff6a3d" },
     { label: "Profile Views", value: totalViews.toLocaleString(),   delta: "all-time",            color: "#3b7fff" },
     { label: "Live Products", value: liveTools.toString(),          delta: `of ${myTools.length} submitted`, color: "#00b87a" },
-    { label: "Followers",     value: "—",                          delta: "coming soon",          color: "var(--ink-muted)" },
   ];
 
   return (
