@@ -61,14 +61,18 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
-  /* match body background so no white edges show at any zoom level */
-  background: var(--bg);
 }
 
+/* html and body stay at natural viewport width — zero side gaps possible */
 body {
   overflow-x: hidden;
+}
+
+/* All page content lives inside this wrapper; zoom applied here, not on
+   html/body, so the browser never shows gaps outside the root element. */
+.zoom-root {
   zoom: 1.25;
+  overflow-x: hidden;
 }
 
 body {

@@ -31,9 +31,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="h-full antialiased" data-theme="dark" suppressHydrationWarning>
       <body className="min-h-full">
         <ThemeProvider>
-          {children}
-          <ThemeToggle />
-          <OnboardingGate />
+          {/* zoom wrapper — keeps html/body at natural 100vw so no side gaps */}
+          <div className="zoom-root">
+            {children}
+            <ThemeToggle />
+            <OnboardingGate />
+          </div>
         </ThemeProvider>
       </body>
     </html>
