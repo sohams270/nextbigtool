@@ -97,7 +97,7 @@ export default function EditToolPage() {
       setForm({
         tagline:       tool.tagline       ?? "",
         description:   tool.description   ?? "",
-        category:      (tool.categories as { name: string } | null)?.name ?? "",
+        category:      (tool.categories as unknown as { name: string } | null)?.name ?? "",
         pricing:       (tool.pricing as "free" | "freemium" | "paid") ?? "free",
         twitter_url:   tool.twitter_url   ?? "",
         linkedin_url:  tool.linkedin_url  ?? "",
