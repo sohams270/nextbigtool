@@ -155,7 +155,7 @@ export default async function DashboardPage() {
           <h1 style={h1}>Welcome back, {displayName} 👋</h1>
           <p style={sub}>Here&apos;s a snapshot of your products and activity.</p>
         </div>
-        <Link href="/dashboard/submit" style={btnPrimary}>
+        <Link href="/dashboard/products" style={btnPrimary}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
           Add new product
         </Link>
