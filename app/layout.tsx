@@ -4,6 +4,12 @@ import ThemeProvider from "./components/ThemeProvider";
 import ThemeToggle from "./components/ThemeToggle";
 import OnboardingGate from "./components/OnboardingGate";
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
   title: "Next Big Tool — Where Builders Launch. Where Buyers Discover.",
   description: "Find the next big thing before it goes mainstream. Or launch your product to an audience that gets it.",

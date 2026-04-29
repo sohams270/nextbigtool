@@ -138,7 +138,7 @@ export default function PricingPage() {
         </div>
 
         {/* ── Two pricing cards ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24, alignItems: "start", maxWidth: 780, margin: "0 auto 24px" }}>
+        <div className="pricing-grid r-grid-2" style={{ gap: 20, marginBottom: 24, alignItems: "start", maxWidth: 780, margin: "0 auto 24px" }}>
 
           {/* FREE */}
           <div style={{ background: "var(--surface-alt)", border: "1px solid var(--border)", borderRadius: 16, padding: 28, display: "flex", flexDirection: "column", gap: 0 }}>

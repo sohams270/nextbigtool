@@ -100,6 +100,7 @@ export default function HeroSection() {
     <>
     <div
       ref={containerRef}
+      className="hero-inner"
       style={{
         position: "relative",
         background: "#0A0B1A",
@@ -151,6 +152,7 @@ export default function HeroSection() {
         </Pill>
 
         <h1
+          className="hero-title"
           style={{
             fontSize: 42,
             fontWeight: 800,
@@ -158,7 +160,6 @@ export default function HeroSection() {
             lineHeight: 1.15,
             maxWidth: 720,
             margin: "0 auto 12px",
-            whiteSpace: "nowrap",
           }}
         >
           <span style={{ color: "rgba(255,255,255,0.9)" }}>Where </span>
@@ -167,6 +168,7 @@ export default function HeroSection() {
         </h1>
 
         <p
+          className="hero-sub"
           style={{
             fontSize: 12,
             color: "rgba(255,255,255,0.6)",

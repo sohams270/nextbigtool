@@ -165,7 +165,7 @@ export default async function ToolPage({ params }: Props) {
             </Link>
           </div>
 
-          <div style={{ padding: "28px 0 36px", display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" as const }}>
+          <div className="tool-hero-inner" style={{ padding: "28px 0 36px", display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" as const }}>
             {/* Logo */}
             <div style={{
               width: 88, height: 88, borderRadius: 20, flexShrink: 0,
@@ -208,7 +208,7 @@ export default async function ToolPage({ params }: Props) {
             </div>
 
             {/* CTAs */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, flexShrink: 0, alignItems: "flex-end" }}>
+            <div className="tool-hero-ctas" style={{ display: "flex", flexDirection: "column", gap: 10, flexShrink: 0, alignItems: "flex-end" }}>
               {tool.website_url && (
                 <a href={tool.website_url} target="_blank" rel="noopener noreferrer" style={{
                   display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 22px", borderRadius: 11,
@@ -267,10 +267,10 @@ export default async function ToolPage({ params }: Props) {
 
       {/* ── 3-COLUMN CONTENT ──────────────────────────────────────────────── */}
       <div style={{ flex: 1, maxWidth: 1160, margin: "0 auto", width: "100%", padding: "28px 24px 80px", boxSizing: "border-box" as const }}>
-        <div style={{ display: "grid", gridTemplateColumns: "220px 1fr 280px", gap: 20, alignItems: "start" }}>
+        <div className="tool-page-grid" style={{ display: "grid", gridTemplateColumns: "220px 1fr 280px", gap: 20, alignItems: "start" }}>
 
           {/* ── LEFT SIDEBAR ──────────────────────────────────────────────── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div className="tool-page-left-sidebar" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
             {/* Hall of Fame */}
             <div style={{ background: "#fff", border: "1.5px solid rgba(255,215,0,0.4)", borderRadius: 16, overflow: "hidden" }}>
@@ -439,7 +439,7 @@ export default async function ToolPage({ params }: Props) {
           </div>
 
           {/* ── RIGHT SIDEBAR ─────────────────────────────────────────────── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="tool-page-right-sidebar" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
 
             {/* Product info */}
             <div style={{ background: "#fff", border: "1px solid #e8e8e6", borderRadius: 16, overflow: "hidden" }}>

@@ -55,8 +55,7 @@
 * { box-sizing: border-box; }
 
 html {
-  zoom: 1.5;
-  min-width: 680px;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -300,4 +299,151 @@ body {
 .theme-toggle:hover {
   transform: scale(1.08);
   box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   RESPONSIVE UTILITIES  –  mobile-first breakpoints
+   sm  = 640px   (large phones / small tablets)
+   md  = 768px   (tablet portrait)
+   lg  = 1024px  (tablet landscape / small desktop)
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── layout helpers ─────────────────────────────────────────────────── */
+.r-grid-2   { display: grid; grid-template-columns: repeat(2,1fr); }
+.r-grid-3   { display: grid; grid-template-columns: repeat(3,1fr); }
+.r-grid-4   { display: grid; grid-template-columns: repeat(4,1fr); }
+.r-stack    { display: flex; flex-direction: row; }
+.r-hide-sm  { }   /* visible by default */
+.r-show-sm  { display: none !important; }
+
+/* ── nav helpers ────────────────────────────────────────────────────── */
+.nav-desktop-links  { display: flex; }
+.nav-mobile-trigger { display: none !important; }
+.nav-mobile-menu    { display: none !important; }
+.nav-mobile-menu.open { display: flex !important; }
+
+/* ── product overview 3-col ─────────────────────────────────────────── */
+.tool-page-grid { display: grid; grid-template-columns: 220px 1fr 280px; gap: 20px; align-items: start; }
+.tool-page-left-sidebar  {}
+.tool-page-right-sidebar {}
+
+/* ── footer grid ────────────────────────────────────────────────────── */
+.footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px; }
+
+/* ── hero row ───────────────────────────────────────────────────────── */
+.hero-row { display: flex; align-items: flex-start; gap: 24px; }
+
+/* ── homepage 2-col main/sidebar grid ──────────────────────────────── */
+.home-content-grid { display: grid; grid-template-columns: 1fr 280px; gap: 28px; }
+
+/* ── page wrapper ───────────────────────────────────────────────────── */
+.page-pad { padding: 0 40px; }
+.page-pad-sm { padding: 0 24px; }
+
+/* ── filter bar ─────────────────────────────────────────────────────── */
+.filter-bar-inner { scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.filter-bar-inner::-webkit-scrollbar { display: none; }
+
+/* ══ TABLET  (max 1024px) ═══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .r-grid-4  { grid-template-columns: repeat(2,1fr) !important; }
+  .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 28px !important; }
+  .tool-page-grid { grid-template-columns: 1fr 260px !important; }
+  .tool-page-left-sidebar { display: none !important; }
+  .page-pad { padding: 0 24px !important; }
+  .home-content-grid { grid-template-columns: 1fr !important; }
+  .home-content-grid > div:last-child { display: none !important; }
+}
+
+/* ══ MOBILE  (max 768px) ════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* layout */
+  .r-grid-2  { grid-template-columns: 1fr !important; }
+  .r-grid-3  { grid-template-columns: 1fr !important; }
+  .r-grid-4  { grid-template-columns: 1fr 1fr !important; }
+  .r-stack   { flex-direction: column !important; }
+  .r-hide-sm { display: none !important; }
+  .r-show-sm { display: flex !important; }
+
+  /* nav */
+  .nav-desktop-links  { display: none !important; }
+  .nav-mobile-trigger { display: flex !important; }
+
+  /* tool page */
+  .tool-page-grid { grid-template-columns: 1fr !important; }
+  .tool-page-left-sidebar  { display: none !important; }
+  .tool-page-right-sidebar { order: -1; }
+
+  /* footer */
+  .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 24px !important; }
+
+  /* hero */
+  .hero-row { flex-direction: column !important; align-items: stretch !important; }
+
+  /* general spacing */
+  .page-pad   { padding: 0 16px !important; }
+  .page-pad-sm { padding: 0 16px !important; }
+
+  /* hero section inner padding */
+  .hero-inner { padding: 28px 16px 32px !important; }
+  .hero-title  { font-size: 28px !important; }
+  .hero-sub    { font-size: 14px !important; }
+
+  /* product page hero */
+  .tool-hero-inner { padding: 20px 0 28px !important; flex-wrap: wrap !important; }
+  .tool-hero-ctas  { width: 100% !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; flex-wrap: wrap !important; gap: 8px !important; }
+  .tool-hero-social { justify-content: flex-start !important; }
+
+  /* homepage sidebar — also hidden on mobile */
+  .home-content-grid > div:last-child { display: none !important; }
+
+  /* filter bar */
+  .filter-bar-inner { padding: 8px 16px !important; }
+
+  /* cards & sections */
+  .pricing-grid { grid-template-columns: 1fr !important; }
+  .blog-grid    { grid-template-columns: 1fr !important; }
+  .discover-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* stat badges */
+  .stats-row { flex-wrap: wrap !important; gap: 8px !important; }
+  .stat-badge { min-width: calc(50% - 4px) !important; }
+}
+
+/* ══ SMALL MOBILE  (max 480px) ══════════════════════════════════════ */
+@media (max-width: 480px) {
+  .r-grid-4    { grid-template-columns: 1fr !important; }
+  .footer-grid { grid-template-columns: 1fr !important; }
+  .discover-grid { grid-template-columns: 1fr !important; }
+  .hero-title  { font-size: 24px !important; }
+  .filter-bar-inner { padding: 8px 16px !important; }
+}
+
+/* ── Dashboard mobile/desktop visibility ────────────────────────────── */
+.dashboard-mobile-block  { display: none !important; }
+.dashboard-desktop-only  { display: flex; }
+
+@media (max-width: 1024px) {
+  .dashboard-mobile-block  { display: flex !important; }
+  .dashboard-desktop-only  { display: none !important; }
+}
+
+/* ── Footer mobile adjustments ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .site-footer { padding: 40px 20px 28px !important; margin-top: 40px !important; }
+}
+
+/* ── HoF strip — allow horizontal scroll on all sizes ───────────────── */
+.hof-strip { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.hof-strip::-webkit-scrollbar { display: none; }
+
+/* ── Smart search — full width on mobile ────────────────────────────── */
+@media (max-width: 768px) {
+  .smart-search-wrap { width: 100% !important; }
+  .ss-input { font-size: 14px !important; }
+}
+
+/* ── Mobile bottom spacing ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  body { padding-bottom: env(safe-area-inset-bottom); }
 }

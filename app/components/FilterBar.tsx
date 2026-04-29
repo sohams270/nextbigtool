@@ -51,11 +51,12 @@ export default function FilterBar({ categories }: { categories: string[] }) {
   }, []);
 
   return (
-    <div style={{
+    <div className="filter-bar-inner" style={{
       display: "flex", alignItems: "center", justifyContent: "space-between",
       padding: "8px 40px", borderBottom: "1px solid var(--border)",
       background: "var(--surface)", position: "sticky", top: 0, zIndex: 100,
       opacity: isPending ? 0.65 : 1, transition: "opacity 0.15s",
+      overflowX: "auto",
     }}>
 
       {/* ── Left: sort tabs ── */}

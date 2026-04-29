@@ -213,8 +213,9 @@ export default async function HomePage({
       </Suspense>
 
       {/* Main content */}
-      <div style={{ flex: 1, overflow: "auto", padding: "24px 40px 0" }}>
+      <div className="page-pad" style={{ flex: 1, overflow: "auto", padding: "24px 40px 0" }}>
         <div
+          className="home-content-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 280px",

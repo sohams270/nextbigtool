@@ -50,6 +50,7 @@ const SOCIAL_LINKS = [
 export default function Footer() {
   return (
     <footer
+      className="site-footer"
       style={{
         background: "#0A0B1A",
         borderTop: "1px solid rgba(255,255,255,0.07)",
@@ -60,10 +61,8 @@ export default function Footer() {
       <div style={{ maxWidth: 1160, margin: "0 auto" }}>
         {/* Top row */}
         <div
+          className="footer-grid"
           style={{
-            display: "grid",
-            gridTemplateColumns: "1.6fr 1fr 1fr 1fr",
-            gap: 40,
             marginBottom: 48,
           }}
         >
@@ -257,10 +256,13 @@ export default function Footer() {
 
         {/* Bottom row */}
         <div
+          className="footer-bottom-row"
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
           }}
         >
           <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>

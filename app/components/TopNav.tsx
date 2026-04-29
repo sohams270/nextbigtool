@@ -247,6 +247,7 @@ type NotifItem = { id: string; icon: string; text: string; time: string; ts: num
 /* ─── TopNav ─────────────────────────────────────────────────────────── */
 export default function TopNav({ dark }: { dark?: boolean }) {
   const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showAuth, setShowAuth]   = useState(false);
   const [authMessage, setAuthMessage] = useState<{ title: string; subtitle: string } | null>(null);
   const [userId, setUserId]       = useState<string | null | undefined>(undefined);
@@ -421,9 +422,9 @@ export default function TopNav({ dark }: { dark?: boolean }) {
             </Link>
           </div>
 
-          {/* ── Pill Rail (center zone, auto width) ── */}
-          <div style={{
-            display: "flex", alignItems: "center",
+          {/* ── Pill Rail (center zone, hidden on mobile) ── */}
+          <div className="nav-desktop-links" style={{
+            alignItems: "center",
             background: railBg,
             borderRadius: 999, padding: 3, gap: 1,
             color: railTxt,
@@ -434,6 +435,24 @@ export default function TopNav({ dark }: { dark?: boolean }) {
             <RailDropBtn label="Resources"  items={RESOURCES_ITEMS} hero={RESOURCES_HERO} />
             <RailDropBtn label="Pricing"    href="/pricing" />
           </div>
+
+          {/* ── Hamburger (mobile only) ── */}
+          <button
+            className="nav-mobile-trigger"
+            onClick={() => setMobileMenuOpen(o => !o)}
+            aria-label="Toggle menu"
+            style={{
+              background: "none", border: "none", cursor: "pointer", padding: 6,
+              display: "none", alignItems: "center", justifyContent: "center",
+              color: "var(--ink)", borderRadius: 8,
+            }}
+          >
+            {mobileMenuOpen ? (
+              <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            ) : (
+              <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+            )}
+          </button>
 
           {/* ── Actions (right zone, flex:1, right-aligned) ── */}
           <style>{`
@@ -461,7 +480,7 @@ export default function TopNav({ dark }: { dark?: boolean }) {
             }
             .dash-btn-inner:hover { background: var(--surface-alt); }
           `}</style>
-          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8, flexShrink: 0 }}>
+          <div className="nav-desktop-links" style={{ flex: 1, alignItems: "center", justifyContent: "flex-end", gap: 8, flexShrink: 0 }}>
             {isSignedIn ? (
               /* Signed-in: Dashboard + Bell + Settings */
               <>
@@ -691,6 +710,79 @@ export default function TopNav({ dark }: { dark?: boolean }) {
           </div>
         </div>
       </nav>
+
+      {/* ── Mobile full-screen drawer ── */}
+      {mobileMenuOpen && (
+        <div style={{
+          position: "fixed", top: 60, left: 0, right: 0, bottom: 0,
+          background: "var(--surface)", zIndex: 199,
+          overflowY: "auto", padding: "20px 20px 40px",
+          display: "flex", flexDirection: "column", gap: 4,
+          borderTop: "1px solid var(--border)",
+        }}>
+          {/* Nav links */}
+          {[
+            { label: "Discover", href: "/discover" },
+            { label: "Press Release", href: "/newsletter" },
+            { label: "Blog", href: "/blog" },
+            { label: "FAQs", href: "/faq" },
+            { label: "Pricing", href: "/pricing" },
+            { label: "Hall of Fame", href: "/discover?tab=hall-of-fame" },
+          ].map(item => (
+            <Link key={item.href} href={item.href}
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                display: "block", padding: "13px 14px", borderRadius: 10,
+                fontSize: 15, fontWeight: 600, color: "var(--ink)",
+                textDecoration: "none", borderBottom: "1px solid var(--border-faint)",
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
+
+          <div style={{ height: 12 }} />
+
+          {/* CTA buttons */}
+          {isSignedIn ? (
+            <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} style={{ textDecoration: "none" }}>
+              <button style={{
+                width: "100%", padding: "14px 0", borderRadius: 12,
+                background: "linear-gradient(90deg,#ff6a3d,#ff3d88)",
+                border: "none", fontSize: 14, fontWeight: 700, color: "#fff",
+                cursor: "pointer", fontFamily: "inherit",
+              }}>
+                Go to Dashboard
+              </button>
+            </Link>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <button
+                onClick={() => { setMobileMenuOpen(false); openAuthModal("Welcome back", "Sign in to your NextBigTool account."); }}
+                style={{
+                  width: "100%", padding: "13px 0", borderRadius: 12,
+                  border: "1px solid var(--border)", background: "var(--surface)",
+                  fontSize: 14, fontWeight: 600, color: "var(--ink)",
+                  cursor: "pointer", fontFamily: "inherit",
+                }}
+              >
+                Sign in
+              </button>
+              <button
+                onClick={() => { setMobileMenuOpen(false); handleSubmitClick(); }}
+                style={{
+                  width: "100%", padding: "13px 0", borderRadius: 12,
+                  background: "linear-gradient(90deg,#ff6a3d,#ff3d88)",
+                  border: "none", fontSize: 14, fontWeight: 700, color: "#fff",
+                  cursor: "pointer", fontFamily: "inherit",
+                }}
+              >
+                🚀 Submit Your Tool
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {showAuth && (
         <AuthModal

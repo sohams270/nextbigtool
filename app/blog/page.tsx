@@ -36,7 +36,7 @@ export default function BlogPage() {
         </div>
 
         {/* Rest of posts */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <div className="blog-grid r-grid-2" style={{ gap: 14 }}>
           {rest.map((post) => (
             <div key={post.slug} style={{ background: "#fff", border: "1px solid #CFCFD4", borderRadius: 10, padding: 18, cursor: "pointer" }}>
               <Pill color={CATEGORY_COLORS[post.category] ?? "gray"} size="xs" style={{ marginBottom: 10 }}>{post.category}</Pill>
