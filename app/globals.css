@@ -55,9 +55,9 @@
 * { box-sizing: border-box; }
 
 /* ── Logo auto-switching (light ↔ dark theme) ──────────────────────── */
-.nbt-logo-dark  { display: none; }
-[data-theme="dark"] .nbt-logo-light { display: none; }
-[data-theme="dark"] .nbt-logo-dark  { display: block; }
+.nbt-logo-dark  { display: none !important; }
+[data-theme="dark"] .nbt-logo-light { display: none !important; }
+[data-theme="dark"] .nbt-logo-dark  { display: block !important; }
 
 html {
   scroll-behavior: smooth;
