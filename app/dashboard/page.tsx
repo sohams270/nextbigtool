@@ -10,6 +10,8 @@ type Tool = {
   upvote_count: number;
   view_count: number;
   status: string;
+  logo_url: string | null;
+  website_url: string | null;
 };
 
 /* ─── shared dash styles ─── */
@@ -79,7 +81,7 @@ export default async function DashboardPage() {
 
   const { data: toolsData } = await supabase
     .from("tools")
-    .select("id, name, tagline, upvote_count, view_count, status")
+    .select("id, name, tagline, upvote_count, view_count, status, logo_url, website_url")
     .eq("submitter_id", user.id)
     .order("upvote_count", { ascending: false });
 
@@ -252,58 +254,97 @@ export default async function DashboardPage() {
 
       {/* My Products preview */}
       <div style={card}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <div style={{ marginBottom: 16 }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>My Products</div>
-          <Link href="/dashboard/products" style={{ fontSize: 12, color: "#ff6a3d", fontWeight: 600, textDecoration: "none" }}>
-            View all →
-          </Link>
         </div>
         {myTools.length === 0 ? (
           <div style={{ textAlign: "center", padding: "24px 0", color: "var(--ink-muted)" }}>
             <div style={{ fontSize: 28, marginBottom: 8 }}>🚀</div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", marginBottom: 4 }}>No products yet</div>
             <div style={{ fontSize: 12, marginBottom: 16 }}>Submit your first product to start tracking engagement.</div>
-            <Link href="/dashboard/submit" style={btnPrimary}>Submit Your First Product →</Link>
+            <Link href="/dashboard/products" style={btnPrimary}>Submit Your First Product →</Link>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            {myTools.slice(0, 3).map((t, i) => (
-              <div key={t.id} style={{
-                display: "flex", alignItems: "center", gap: 14,
-                padding: "14px 0",
-                borderBottom: i < Math.min(myTools.length, 3) - 1 ? "1px solid var(--border-faint)" : "none",
-              }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-                  background: `hsl(${i * 60 + 20},80%,55%)`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 16, fontWeight: 800, color: "#fff",
+            {myTools.slice(0, 5).map((t, i) => {
+              // Logo: uploaded → Clearbit → gradient badge
+              let logoSrc: string | null = t.logo_url ?? null;
+              if (!logoSrc && t.website_url) {
+                try {
+                  const domain = new URL(t.website_url).hostname.replace(/^www\./, "");
+                  logoSrc = `https://logo.clearbit.com/${domain}`;
+                } catch { logoSrc = null; }
+              }
+              const gradients = ["linear-gradient(135deg,#7c3aed,#ec4899)","linear-gradient(135deg,#ef4444,#f97316)","linear-gradient(135deg,#3b82f6,#6366f1)","linear-gradient(135deg,#0ea5e9,#06b6d4)","linear-gradient(135deg,#10b981,#059669)"];
+
+              return (
+                <div key={t.id} style={{
+                  display: "flex", alignItems: "center", gap: 14,
+                  padding: "14px 0",
+                  borderBottom: i < Math.min(myTools.length, 5) - 1 ? "1px solid var(--border-faint)" : "none",
                 }}>
-                  {t.name[0]}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink)" }}>{t.name}</div>
-                  <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.tagline}</div>
-                </div>
-                <div style={{ display: "flex", gap: 20, flexShrink: 0 }}>
-                  <div style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "#ff6a3d" }}>{t.upvote_count ?? 0}</div>
-                    <div style={{ fontSize: 10, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Upvotes</div>
+                  {/* Logo */}
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                    overflow: "hidden", position: "relative",
+                    background: logoSrc ? "#fff" : gradients[i % gradients.length],
+                    border: logoSrc ? "1px solid rgba(0,0,0,0.08)" : "none",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 16, fontWeight: 800, color: "#fff",
+                  }}>
+                    {logoSrc ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={logoSrc} alt={t.name}
+                        style={{ position: "absolute", top: "-15%", left: "-15%", width: "130%", height: "130%", objectFit: "cover" }}
+                        onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                      />
+                    ) : t.name[0]}
                   </div>
-                  <div style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "#3b7fff" }}>{t.view_count ?? 0}</div>
-                    <div style={{ fontSize: 10, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Views</div>
+
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink)" }}>{t.name}</div>
+                    <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.tagline}</div>
                   </div>
+
+                  <div style={{ display: "flex", gap: 20, flexShrink: 0 }}>
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "#ff6a3d" }}>{t.upvote_count ?? 0}</div>
+                      <div style={{ fontSize: 10, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Upvotes</div>
+                    </div>
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "#3b7fff" }}>{t.view_count ?? 0}</div>
+                      <div style={{ fontSize: 10, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Views</div>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700,
+                    background: t.status === "approved" ? "rgba(0,184,122,0.12)" : t.status === "pending" ? "rgba(255,106,61,0.12)" : "var(--surface-alt)",
+                    color: t.status === "approved" ? "#00b87a" : t.status === "pending" ? "#b05a00" : "var(--ink-muted)",
+                  }}>
+                    {t.status === "approved" ? "Live" : t.status === "pending" ? "Pending" : "Draft"}
+                  </div>
+
+                  {/* Edit button — only for approved/live tools */}
+                  {t.status === "approved" && (
+                    <Link href={`/dashboard/edit/${t.id}`} style={{
+                      display: "inline-flex", alignItems: "center", gap: 5,
+                      padding: "5px 12px", borderRadius: 8,
+                      border: "1px solid var(--border)", background: "var(--surface)",
+                      fontSize: 12, fontWeight: 600, color: "var(--ink)",
+                      textDecoration: "none", flexShrink: 0,
+                      transition: "border-color 0.15s",
+                    }}>
+                      <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                      Edit
+                    </Link>
+                  )}
                 </div>
-                <div style={{
-                  padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700,
-                  background: t.status === "approved" ? "rgba(0,184,122,0.12)" : t.status === "pending" ? "rgba(255,106,61,0.12)" : "var(--surface-alt)",
-                  color: t.status === "approved" ? "#00b87a" : t.status === "pending" ? "#b05a00" : "var(--ink-muted)",
-                }}>
-                  {t.status === "approved" ? "Live" : t.status === "pending" ? "Pending" : "Draft"}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
