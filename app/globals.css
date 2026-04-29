@@ -61,12 +61,14 @@
 
 html {
   scroll-behavior: smooth;
-  zoom: 1.25;
   overflow-x: hidden;
+  /* match body background so no white edges show at any zoom level */
+  background: var(--bg);
 }
 
 body {
   overflow-x: hidden;
+  zoom: 1.25;
 }
 
 body {
