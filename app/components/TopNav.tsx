@@ -15,6 +15,7 @@ type DDItem = {
   icon: React.ReactNode;
   iconBg: string;
   iconColor: string;
+  highlight?: boolean; // renders with gradient accent row (Hall of Fame)
 };
 
 type HeroPanel = {
@@ -43,6 +44,9 @@ const IconHoF = () => (
 );
 const IconFreeTools = () => (
   <Svg><path d="M14.7 6.3a4 4 0 105.3 5.3L21 11l-8 8-7 1 1-7 8-8 1.7 1.3z"/></Svg>
+);
+const IconUseCases = () => (
+  <Svg><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></Svg>
 );
 const IconBlog = () => (
   <Svg><path d="M4 4h10a4 4 0 014 4v12H8a4 4 0 01-4-4V4zM4 16h14"/></Svg>
@@ -77,18 +81,18 @@ const IconRocket = () => (
 
 /* ─── menu data ──────────────────────────────────────────────────────── */
 const DISCOVER_ITEMS: DDItem[] = [
-  { label: "Featured",     sub: "Today's top picks",    href: "/discover?tab=featured",     icon: <IconFeatured />,   iconBg: "#fff1e6", iconColor: "#ff6a3d" },
-  { label: "Categories",   sub: "Browse by topic",      href: "/discover?tab=categories",   icon: <IconCategories />, iconBg: "#f1f2ff", iconColor: "#5b6bff" },
-  { label: "Hall of Fame", sub: "Top rated products",   href: "/discover?tab=hall-of-fame", icon: <IconHoF />,        iconBg: "#fff1f5", iconColor: "#ff3d88" },
-  { label: "Free Tools",   sub: "Developer utilities",  href: "/discover?tab=free",         icon: <IconFreeTools />,  iconBg: "#f0f6ff", iconColor: "#3d7aff" },
+  { label: "Categories",   sub: "Browse by topic",          href: "/discover?tab=categories",   icon: <IconCategories />, iconBg: "#f1f2ff", iconColor: "#5b6bff" },
+  { label: "Use Cases",    sub: "Find tools by use case",   href: "/discover?tab=use-cases",    icon: <IconUseCases />,   iconBg: "#ecfaf0", iconColor: "#15a35a" },
+  { label: "Free Tools",   sub: "Developer utilities",      href: "/discover?tab=free",         icon: <IconFreeTools />,  iconBg: "#f0f6ff", iconColor: "#3d7aff" },
+  { label: "Hall of Fame", sub: "Top rated products",       href: "/discover?tab=hall-of-fame", icon: <IconHoF />,        iconBg: "linear-gradient(135deg,#ff6a3d,#ff3d88)", iconColor: "#fff", highlight: true },
 ];
 
 const DISCOVER_HERO: HeroPanel = {
-  eyebrow:  "Featured this week",
-  heading:  "The 12 tools shipping AI agents builders actually use",
-  sub:      "Curated picks, updated every Monday.",
-  ctaLabel: "Read the roundup",
-  ctaHref:  "/discover?tab=featured",
+  eyebrow:  "Hall of Fame",
+  heading:  "The best tools, ranked by the community",
+  sub:      "Only the highest-rated products make it here.",
+  ctaLabel: "View Hall of Fame",
+  ctaHref:  "/discover?tab=hall-of-fame",
 };
 
 const RESOURCES_ITEMS: DDItem[] = [
@@ -131,14 +135,35 @@ function SplitDropdown({ items, hero }: { items: DDItem[]; hero: HeroPanel }) {
         {items.map((item) => (
           <Link key={item.label} href={item.href} style={{ textDecoration: "none" }}>
             <div
-              className="nav-dd-item"
-              style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 8px", borderRadius: 10, cursor: "pointer", transition: "background .12s" }}
+              className={item.highlight ? "nav-dd-item-hof" : "nav-dd-item"}
+              style={{
+                display: "flex", alignItems: "center", gap: 12, padding: "9px 8px",
+                borderRadius: 10, cursor: "pointer", transition: "background .12s",
+                ...(item.highlight ? {
+                  background: "linear-gradient(135deg, rgba(255,106,61,0.12), rgba(255,61,136,0.12))",
+                  border: "1px solid rgba(255,106,61,0.25)",
+                  marginTop: 6,
+                } : {}),
+              }}
             >
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: item.iconBg, color: item.iconColor, display: "grid", placeItems: "center", flexShrink: 0 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 10,
+                background: item.iconBg, color: item.iconColor,
+                display: "grid", placeItems: "center", flexShrink: 0,
+              }}>
                 {item.icon}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", lineHeight: 1.2 }}>{item.label}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: item.highlight ? "#ff6a3d" : "var(--ink)", lineHeight: 1.2 }}>
+                    {item.label}
+                  </span>
+                  {item.highlight && (
+                    <span style={{ fontSize: 10, fontWeight: 700, background: "linear-gradient(135deg,#ff6a3d,#ff3d88)", color: "#fff", borderRadius: 4, padding: "1px 5px", letterSpacing: "0.04em" }}>
+                      TOP
+                    </span>
+                  )}
+                </div>
                 <div style={{ fontSize: 12.5, color: "var(--ink-muted)", marginTop: 2 }}>{item.sub}</div>
               </div>
             </div>
