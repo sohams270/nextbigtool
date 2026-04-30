@@ -80,14 +80,14 @@ export default function Sidebar() {
           background: linear-gradient(90deg,rgba(220,38,38,0.22),rgba(239,68,68,0.18),rgba(185,28,28,0.22),rgba(220,38,38,0.22));
           background-size: 300% 100%;
           animation: gateShimmer 3s linear infinite, gatePulseRed 2.5s ease-in-out infinite;
-          cursor: pointer; display: flex; align-items: center; gap: 10; transition: opacity 0.15s;
+          cursor: pointer; display: flex; align-items: center; gap: 10px; transition: opacity 0.15s;
         }
         .gate-item-core {
           border-radius: 8px; padding: 8px 10px;
           background: linear-gradient(90deg,rgba(0,184,122,0.22),rgba(16,185,129,0.18),rgba(5,150,105,0.22),rgba(0,184,122,0.22));
           background-size: 300% 100%;
           animation: gateShimmer 3s linear infinite, gatePulseGreen 2.5s ease-in-out infinite;
-          cursor: pointer; display: flex; align-items: center; gap: 10; transition: opacity 0.15s;
+          cursor: pointer; display: flex; align-items: center; gap: 10px; transition: opacity 0.15s;
         }
         .gate-item-free:hover, .gate-item-core:hover { opacity: 0.85; }
       `}</style>
@@ -120,13 +120,16 @@ export default function Sidebar() {
                 style={{ textDecoration: "none" }}
                 onClick={needsGate ? (e) => handleGatedClick(e, gate!) : undefined}
               >
-                <div className="crm-nav-item" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <Icon size={15} color={active ? "#ff6a3d" : "#ff9f7a"} />
+                <div className={isCore ? "gate-item-core" : "gate-item-free"}>
+                  <Icon
+                    size={15}
+                    color={isCore ? "rgba(0,184,122,0.9)" : "rgba(239,68,68,0.9)"}
+                  />
                   <span style={{ flex: 1, fontSize: 12.5, fontWeight: 700, color: "#fff", letterSpacing: "-0.01em" }}>
                     {item.label}
                   </span>
                   {!isCore && (
-                    <span style={{ fontSize: 9, fontWeight: 800, color: "#ff6a3d", background: "rgba(255,106,61,0.2)", border: "1px solid rgba(255,106,61,0.4)", borderRadius: 4, padding: "1px 5px", letterSpacing: "0.04em" }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, color: "#ef4444", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.4)", borderRadius: 4, padding: "1px 5px", letterSpacing: "0.04em" }}>
                       CORE
                     </span>
                   )}
