@@ -220,25 +220,6 @@ function CommentBtn({ count }: { count: number }) {
   );
 }
 
-/* ─── TrendChip ──────────────────────────────────────────────────────── */
-function TrendChip({ delta }: { delta: number }) {
-  const hot = delta >= 10;
-  return (
-    <span style={{
-      display: "inline-flex", alignItems: "center", gap: 3,
-      fontSize: 10.5, fontWeight: 700,
-      color: hot ? "#b91c1c" : "#15703f",
-      background: hot ? "#fde8e8" : "#eaf6ec",
-      padding: "2px 6px", borderRadius: 5,
-      letterSpacing: ".02em",
-    }}>
-      <svg width={9} height={9} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-        <path d="M6 15l6-6 6 6" />
-      </svg>
-      +{delta}
-    </span>
-  );
-}
 
 /* ─── BadgeFeatured ──────────────────────────────────────────────────── */
 function BadgeFeatured() {
@@ -517,9 +498,9 @@ function MosaicMini({
 /* RANKED ROW                                                              */
 /* ─────────────────────────────────────────────────────────────────────── */
 function RankedRow({
-  tool, rank, delta = 0, userId, isUpvoted, compact = false,
+  tool, rank, userId, isUpvoted, compact = false,
 }: {
-  tool: ShowcaseTool; rank: number; delta?: number; userId: string | null; isUpvoted: boolean; compact?: boolean;
+  tool: ShowcaseTool; rank: number; userId: string | null; isUpvoted: boolean; compact?: boolean;
 }) {
   const t = tags(tool);
 
@@ -547,7 +528,6 @@ function RankedRow({
           }}>
             {String(rank).padStart(2, "0")}
           </span>
-          <TrendChip delta={delta} />
         </div>
 
         <ProductLogo tool={tool} size={36} radius={9} />
@@ -601,7 +581,6 @@ function RankedRow({
         }}>
           {String(rank).padStart(2, "0")}
         </span>
-        <TrendChip delta={delta} />
       </div>
 
       <ProductLogo tool={tool} size={48} radius={12} />
@@ -661,7 +640,6 @@ export default function ProductShowcase({
   }
 
   const [hero, mini1, mini2, ...rest] = tools;
-  const DELTAS = [24, 18, 12, 9, 7, 5, 4, 3, 2, 1];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
@@ -763,7 +741,6 @@ export default function ProductShowcase({
             {[hero, mini1, mini2].filter((t): t is ShowcaseTool => !!t).map((t, i) => (
               <RankedRow
                 key={t.id} tool={t} rank={i + 1}
-                delta={DELTAS[i] ?? 1}
                 userId={userId} isUpvoted={userUpvotedIds.includes(t.id)}
               />
             ))}
@@ -804,7 +781,6 @@ export default function ProductShowcase({
             {rest.slice(0, 10).map((t, i) => (
               <RankedRow
                 key={t.id} tool={t} rank={i + 4}
-                delta={DELTAS[i + 3] ?? 1}
                 userId={userId} isUpvoted={userUpvotedIds.includes(t.id)}
                 compact
               />
