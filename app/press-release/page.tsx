@@ -16,8 +16,8 @@ const BENEFITS = [
   },
   {
     icon: "⚡",
-    title: "Instant distribution",
-    desc: "Go live immediately. Your press release is published to the NBT community the moment you submit.",
+    title: "Published within 48 hours",
+    desc: "Submit your details and our editorial team reviews and publishes your press release within 48 hours.",
   },
   {
     icon: "🔗",
@@ -39,13 +39,13 @@ const HOW_IT_WORKS = [
   },
   {
     step: "02",
-    title: "Write your story",
-    desc: "Use our simple editor to craft your announcement — launch, funding, milestone, or feature drop.",
+    title: "Submit your details",
+    desc: "Fill in your announcement — launch, funding, milestone, or feature drop — and send it to our editorial team.",
   },
   {
     step: "03",
-    title: "Hit publish",
-    desc: "Your press release goes live to our full community of builders and early adopters instantly.",
+    title: "Go live within 48 hours",
+    desc: "Our team reviews your submission and publishes it to the NBT community within 48 hours of receipt.",
   },
 ];
 
