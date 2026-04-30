@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { notifyAdmin } from "@/app/lib/notifyAdmin";
 
 /* ── types ───────────────────────────────────────────────────────────────── */
 type BlogRequest = {
@@ -139,6 +140,17 @@ function SubmitForm({ tools, userId, existingRequest }: {
 
     setSubmitting(false);
     if (err) { setError(err.message); return; }
+
+    // Notify admin of blog post request
+    notifyAdmin({
+      type:        "blog_request",
+      founderName: userId ?? "Unknown",
+      companyName: companyName.trim(),
+      headline:    headline.trim(),
+      story:       story.trim(),
+      ...(link.trim() ? { link: link.trim() } : {}),
+    });
+
     setSuccess(true);
   }
 

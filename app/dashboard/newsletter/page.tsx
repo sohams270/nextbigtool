@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { notifyAdmin } from "@/app/lib/notifyAdmin";
 
 /* ── types ───────────────────────────────────────────────────────────────── */
 type Issue = {
@@ -118,6 +119,16 @@ function SubmitForm({ tools, plan, userId }: { tools: Tool[]; plan: string; user
 
     setSubmitting(false);
     if (err) { setError(err.message); return; }
+
+    // Notify admin of newsletter featuring request
+    notifyAdmin({
+      type:        "newsletter_request",
+      founderName: userId ?? "Unknown",
+      headline:    headline.trim(),
+      story:       story.trim(),
+      ...(link.trim() ? { link: link.trim() } : {}),
+    });
+
     setSuccess(true);
     setHeadline(""); setStory(""); setLink("");
   }

@@ -6,6 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 import DashTopbar from "../../components/DashTopbar";
 import Btn from "../../components/Btn";
 import Pill from "../../components/Pill";
+import { notifyAdmin } from "@/app/lib/notifyAdmin";
 
 /* ─── helpers ──────────────────────────────────────────────────────────────── */
 function toSlug(name: string) {
@@ -286,6 +287,17 @@ export default function SubmitPage() {
           await supabase.from("screenshots").insert({ tool_id: tool.id, url: scUrl.publicUrl, position: i });
         }
       }
+
+      // Notify admin of new tool submission
+      notifyAdmin({
+        type:         "tool_submission",
+        toolName:     form.name,
+        tagline:      form.tagline,
+        plan:         form.plan,
+        website:      form.website_url,
+        contactEmail: form.contact_email,
+        founderName:  form.name,
+      });
 
       setDone(true);
     } catch (err: unknown) {

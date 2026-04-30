@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { notifyAdmin } from "@/app/lib/notifyAdmin";
 
 /* ── types ───────────────────────────────────────────────────────────────── */
 type Nomination = {
@@ -102,6 +103,16 @@ function SubmitForm({ tools, userId, nominations }: {
 
     setSubmitting(false);
     if (err) { setError(err.message); return; }
+
+    // Notify admin of HoF nomination
+    const selectedTool = availableTools.find((t) => t.id === toolId);
+    notifyAdmin({
+      type:        "hof_nomination",
+      toolName:    selectedTool?.name ?? toolId,
+      pitch:       pitch.trim(),
+      founderName: userId,
+    });
+
     setSuccess(true);
   }
 
