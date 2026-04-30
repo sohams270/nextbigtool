@@ -125,7 +125,7 @@ export default function BlogHero() {
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}>
-            next wave of builders.
+            Next Wave of Builders
           </span>
         </h1>
 
