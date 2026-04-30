@@ -1,55 +1,93 @@
+import type { Metadata } from "next";
 import TopNav from "../components/TopNav";
-import Pill from "../components/Pill";
-import { BLOG_POSTS as POSTS } from "../lib/blog-posts";
+import Footer from "../components/Footer";
+import BlogGrid from "../components/BlogGrid";
 
-const CATEGORY_COLORS: Record<string, "orange" | "blue" | "green" | "gray"> = {
-  Growth: "orange", Strategy: "blue", "AI Tools": "green", Comparison: "gray", Sales: "orange",
+export const metadata: Metadata = {
+  title: "Blog — Next Big Tool",
+  description: "Guides, strategies, and founder insights from the team behind Next Big Tool. Learn how to launch, grow, and monetize your SaaS.",
 };
 
 export default function BlogPage() {
-  const [featured, ...rest] = POSTS;
-
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#F5F5F5" }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
       <TopNav />
 
-      <div style={{ background: "#0A0B1A", color: "#fff", padding: "44px 32px 36px", textAlign: "center" }}>
-        <h1 style={{ fontSize: 30, fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 8px" }}>The NBT Blog</h1>
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", margin: 0 }}>
-          Guides, stories, and insights for founders who ship.
-        </p>
-      </div>
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <div style={{
+        background: "var(--surface)",
+        borderBottom: "1px solid var(--border)",
+        padding: "56px 32px 48px",
+        textAlign: "center",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        {/* Background glow */}
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: "radial-gradient(ellipse 60% 80% at 50% -10%, rgba(255,107,53,0.12), transparent 70%)",
+        }} />
 
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 32px", width: "100%" }}>
-        {/* Featured post */}
-        <div style={{ background: "#fff", border: "1px solid #CFCFD4", borderRadius: 12, padding: 28, marginBottom: 20, cursor: "pointer" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-            <Pill color={CATEGORY_COLORS[featured.category] ?? "gray"} size="xs">{featured.category}</Pill>
-            <span style={{ fontSize: 10, color: "#6B6B70" }}>Featured Post</span>
+        <div style={{ position: "relative", zIndex: 1 }}>
+          {/* Label */}
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            padding: "4px 12px", borderRadius: 99,
+            background: "rgba(255,107,53,0.1)",
+            border: "1px solid rgba(255,107,53,0.25)",
+            fontSize: 10, fontWeight: 700, letterSpacing: "0.08em",
+            color: "#FF6B35", textTransform: "uppercase",
+            marginBottom: 16,
+          }}>
+            ✍️ The NBT Blog
           </div>
-          <h2 style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.01em", margin: "0 0 10px" }}>{featured.title}</h2>
-          <p style={{ fontSize: 12, color: "#6B6B70", margin: "0 0 14px", lineHeight: 1.6 }}>{featured.excerpt}</p>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ fontSize: 10, color: "#A8A8AD" }}>{featured.author} · {featured.date} · {featured.readTime} read</div>
-            <span style={{ fontSize: 11, color: "#FF6B35", fontWeight: 700 }}>Read article →</span>
-          </div>
-        </div>
 
-        {/* Rest of posts */}
-        <div className="blog-grid r-grid-2" style={{ gap: 14 }}>
-          {rest.map((post) => (
-            <div key={post.slug} style={{ background: "#fff", border: "1px solid #CFCFD4", borderRadius: 10, padding: 18, cursor: "pointer" }}>
-              <Pill color={CATEGORY_COLORS[post.category] ?? "gray"} size="xs" style={{ marginBottom: 10 }}>{post.category}</Pill>
-              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 8px", lineHeight: 1.4 }}>{post.title}</h3>
-              <p style={{ fontSize: 11, color: "#6B6B70", margin: "0 0 14px", lineHeight: 1.5 }}>{post.excerpt}</p>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 10, color: "#A8A8AD" }}>{post.date} · {post.readTime}</span>
-                <span style={{ fontSize: 11, color: "#FF6B35", fontWeight: 600 }}>Read →</span>
+          <h1 style={{
+            fontSize: 38, fontWeight: 900, letterSpacing: "-0.03em",
+            margin: "0 0 14px", lineHeight: 1.1,
+            color: "var(--ink)",
+          }}>
+            Built by founders,{" "}
+            <span style={{
+              background: "linear-gradient(90deg, #FF6B35, #FF4500)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}>
+              for founders.
+            </span>
+          </h1>
+
+          <p style={{
+            fontSize: 14, color: "var(--ink-2)", maxWidth: 520,
+            margin: "0 auto", lineHeight: 1.7, fontWeight: 400,
+          }}>
+            Real strategies on launching, growing, and monetizing your product —
+            written by the team behind Next Big Tool.
+          </p>
+
+          {/* Stats row */}
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "center",
+            gap: 28, marginTop: 28,
+          }}>
+            {[
+              { label: "Articles", value: "12+" },
+              { label: "Categories", value: "6" },
+              { label: "Avg. read time", value: "6 min" },
+            ].map(({ label, value }) => (
+              <div key={label} style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.02em" }}>{value}</div>
+                <div style={{ fontSize: 10, color: "var(--ink-muted)", fontWeight: 500, marginTop: 1 }}>{label}</div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
+
+      {/* ── Blog grid ────────────────────────────────────────────────────── */}
+      <BlogGrid />
+
+      <Footer />
     </div>
   );
 }

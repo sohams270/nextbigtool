@@ -7,6 +7,7 @@ export type BlogPost = {
   date: string;
   readTime: string;
   featured: boolean;
+  coverEmoji: string;
 };
 
 export const BLOG_POSTS: BlogPost[] = [
@@ -19,6 +20,7 @@ export const BLOG_POSTS: BlogPost[] = [
     date: "Apr 18, 2025",
     readTime: "6 min",
     featured: true,
+    coverEmoji: "🚀",
   },
   {
     slug: "build-in-public-guide",
@@ -29,6 +31,7 @@ export const BLOG_POSTS: BlogPost[] = [
     date: "Apr 11, 2025",
     readTime: "8 min",
     featured: false,
+    coverEmoji: "🏗️",
   },
   {
     slug: "ai-tools-worth-paying-for",
@@ -39,6 +42,7 @@ export const BLOG_POSTS: BlogPost[] = [
     date: "Apr 5, 2025",
     readTime: "5 min",
     featured: false,
+    coverEmoji: "🤖",
   },
   {
     slug: "product-hunt-vs-nextbigtool",
@@ -49,6 +53,7 @@ export const BLOG_POSTS: BlogPost[] = [
     date: "Mar 28, 2025",
     readTime: "4 min",
     featured: false,
+    coverEmoji: "⚖️",
   },
   {
     slug: "founder-crm-guide",
@@ -59,5 +64,83 @@ export const BLOG_POSTS: BlogPost[] = [
     date: "Mar 20, 2025",
     readTime: "5 min",
     featured: false,
+    coverEmoji: "📋",
+  },
+  {
+    slug: "pricing-your-saas",
+    category: "Growth",
+    title: "How to Price Your SaaS Without Leaving Money on the Table",
+    excerpt: "Most indie founders underprice out of fear. Here's a framework for setting prices that reflect your tool's real value.",
+    author: "The NBT Team",
+    date: "Mar 12, 2025",
+    readTime: "7 min",
+    featured: false,
+    coverEmoji: "💰",
+  },
+  {
+    slug: "solo-founder-marketing",
+    category: "Strategy",
+    title: "Marketing Your Tool as a Solo Founder (With No Budget)",
+    excerpt: "When you can't afford ads or a marketing team, these distribution tactics do the heavy lifting for you.",
+    author: "The NBT Team",
+    date: "Mar 5, 2025",
+    readTime: "6 min",
+    featured: false,
+    coverEmoji: "📣",
+  },
+  {
+    slug: "cold-outreach-that-works",
+    category: "Sales",
+    title: "Cold Outreach That Actually Works for Early-Stage Founders",
+    excerpt: "Cold DMs don't have to be cringe. Here's how founders are converting cold leads into paying customers with a simple 3-step approach.",
+    author: "The NBT Team",
+    date: "Feb 26, 2025",
+    readTime: "5 min",
+    featured: false,
+    coverEmoji: "✉️",
+  },
+  {
+    slug: "hall-of-fame-strategy",
+    category: "Growth",
+    title: "How to Get Featured in the Hall of Fame (And What Happens Next)",
+    excerpt: "Being nominated to the NBT Hall of Fame is a signal that matters. Here's what criteria we look at and how top tools stand out.",
+    author: "The NBT Team",
+    date: "Feb 18, 2025",
+    readTime: "4 min",
+    featured: false,
+    coverEmoji: "🏆",
+  },
+  {
+    slug: "validation-before-building",
+    category: "Strategy",
+    title: "Stop Building. Start Validating. Here's the Founder's Checklist.",
+    excerpt: "The #1 mistake early-stage founders make is building too much before confirming anyone wants it. Here's how to de-risk before you code.",
+    author: "The NBT Team",
+    date: "Feb 10, 2025",
+    readTime: "6 min",
+    featured: false,
+    coverEmoji: "✅",
+  },
+  {
+    slug: "from-side-project-to-saas",
+    category: "Launch",
+    title: "From Side Project to SaaS: The 90-Day Launch Playbook",
+    excerpt: "A step-by-step breakdown of how founders turn weekend projects into revenue-generating products — without quitting their day job.",
+    author: "The NBT Team",
+    date: "Feb 3, 2025",
+    readTime: "9 min",
+    featured: false,
+    coverEmoji: "🛠️",
+  },
+  {
+    slug: "retention-over-acquisition",
+    category: "Growth",
+    title: "Why Retention Beats Acquisition for Early SaaS (And How to Fix It)",
+    excerpt: "Chasing new users when existing ones are churning is a leaky bucket. Here's how to plug the holes first.",
+    author: "The NBT Team",
+    date: "Jan 27, 2025",
+    readTime: "5 min",
+    featured: false,
+    coverEmoji: "🔁",
   },
 ];

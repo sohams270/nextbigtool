@@ -329,6 +329,8 @@ body {
 .r-grid-2   { display: grid; grid-template-columns: repeat(2,1fr); }
 .r-grid-3   { display: grid; grid-template-columns: repeat(3,1fr); }
 .r-grid-4   { display: grid; grid-template-columns: repeat(4,1fr); }
+.blog-post-grid { display: grid; grid-template-columns: repeat(3,1fr); }
+.featured-card  { grid-template-columns: 1fr 1fr; }
 .r-stack    { display: flex; flex-direction: row; }
 .r-hide-sm  { }   /* visible by default */
 .r-show-sm  { display: none !important; }
@@ -370,6 +372,8 @@ body {
   .page-pad { padding: 0 24px !important; }
   .home-content-grid { grid-template-columns: 1fr !important; }
   .home-content-grid > div:last-child { display: none !important; }
+  .blog-post-grid { grid-template-columns: repeat(2,1fr) !important; }
+  .featured-card  { grid-template-columns: 1fr !important; }
 }
 
 /* ══ MOBILE  (max 768px) ════════════════════════════════════════════ */
@@ -419,7 +423,9 @@ body {
 
   /* cards & sections */
   .pricing-grid { grid-template-columns: 1fr !important; }
-  .blog-grid    { grid-template-columns: 1fr !important; }
+  .blog-grid        { grid-template-columns: 1fr !important; }
+  .blog-post-grid   { grid-template-columns: 1fr !important; }
+  .featured-card    { grid-template-columns: 1fr !important; }
   .discover-grid { grid-template-columns: 1fr 1fr !important; }
 
   /* stat badges */
