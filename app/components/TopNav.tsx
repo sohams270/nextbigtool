@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import AuthModal from "./AuthModal";
 import NBTWordmark from "./NBTWordmark";
 import { createClient } from "@/utils/supabase/client";
+import { useTheme } from "./ThemeProvider";
 
 /* ─── types ──────────────────────────────────────────────────────────── */
 type DDItem = {
@@ -270,7 +271,9 @@ function RailDropBtn({
 type NotifItem = { id: string; icon: string; text: string; time: string; ts: number };
 
 /* ─── TopNav ─────────────────────────────────────────────────────────── */
-export default function TopNav({ dark }: { dark?: boolean }) {
+export default function TopNav({ dark: darkProp }: { dark?: boolean }) {
+  const { theme } = useTheme();
+  const dark = darkProp ?? (theme === "dark");
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showAuth, setShowAuth]   = useState(false);
