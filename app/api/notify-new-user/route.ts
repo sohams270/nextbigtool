@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     const transporter = createTransporter();
     await transporter.sendMail({
       from: `"NBT Alerts" <${process.env.ZOHO_EMAIL}>`,
-      to: "soham@nextbigtool.com",
+      to: "sohams270@gmail.com",
       subject: `🎉 New signup: ${email}`,
       html: `
         <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#0A0B1A;color:#fff;border-radius:12px;">
