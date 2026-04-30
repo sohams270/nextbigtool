@@ -4,6 +4,7 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import TopNav from "@/app/components/TopNav";
 import Footer from "@/app/components/Footer";
+import AuthTriggerButton from "@/app/components/AuthTriggerButton";
 import { BLOG_POSTS } from "@/app/lib/blog-posts";
 
 export const metadata: Metadata = {
@@ -382,19 +383,20 @@ function AddYourToolBox() {
       <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", margin: "0 0 14px", lineHeight: 1.55 }}>
         List your product on Next Big Tool and get discovered by buyers who are actively looking.
       </p>
-      <Link
-        href="/auth/login"
+      <AuthTriggerButton
+        title="Launch your product"
+        subtitle="Sign up in seconds and submit your tool to thousands of early adopters."
         style={{
           display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
-          padding: "10px 0", borderRadius: 10,
+          padding: "10px 0", borderRadius: 10, width: "100%",
           background: "#FF6B35", color: "#fff",
-          fontSize: 12, fontWeight: 700, textDecoration: "none",
+          fontSize: 12, fontWeight: 700, border: "none", cursor: "pointer",
           boxShadow: "0 4px 14px rgba(255,107,53,0.35)",
         }}
       >
         <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         Sign up &amp; submit
-      </Link>
+      </AuthTriggerButton>
     </div>
   );
 }
@@ -422,18 +424,19 @@ function CtaBox() {
         <p style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", margin: "0 0 24px", lineHeight: 1.6 }}>
           Join hundreds of indie founders who have already launched on Next Big Tool and started building their audience.
         </p>
-        <Link
-          href="/auth/login"
+        <AuthTriggerButton
+          title="Launch your product"
+          subtitle="Sign up in seconds and submit your tool to thousands of early adopters."
           style={{
             display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 28px",
             borderRadius: 12, background: "#FF6B35", color: "#fff",
-            fontSize: 14, fontWeight: 700, textDecoration: "none",
+            fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer",
             boxShadow: "0 4px 20px rgba(255,107,53,0.4)",
           }}
         >
           Sign up today
           <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </Link>
+        </AuthTriggerButton>
       </div>
     </div>
   );
