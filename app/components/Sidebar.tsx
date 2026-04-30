@@ -14,7 +14,7 @@ const NAV = [
   { id: "interested", label: "Founder's CRM",  href: "/dashboard/interested",       icon: UsersIcon,    prime: true,  gate: "crm"  as GatedFeature },
   { id: "bip",        label: "Build In Public",href: "/dashboard/build-in-public",  icon: EditIcon },
   { id: "blog",       label: "Press Release",  href: "/dashboard/blog",             icon: FileTextIcon, prime: true,  gate: "blog" as GatedFeature },
-  { id: "hof",        label: "Hall of Fame",   href: "/dashboard/hall-of-fame",     icon: TrophyIcon,   locked: true, gate: "hof"  as GatedFeature },
+  { id: "hof",        label: "Hall of Fame",   href: "/dashboard/hall-of-fame",     icon: TrophyIcon },
   { id: "plan",       label: "My Plan",        href: "/dashboard/plan",             icon: StarIcon },
   { id: "profile",    label: "My Profile",     href: "/dashboard/profile",          icon: PersonIcon },
   { id: "settings",   label: "Settings",       href: "/dashboard/settings",         icon: GearIcon },

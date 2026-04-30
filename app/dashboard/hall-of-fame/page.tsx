@@ -42,27 +42,39 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-/* ── Core gate ───────────────────────────────────────────────────────────── */
-function CoreGate() {
+const FREE_NOMINATION_LIMIT = 5;
+
+/* ── Free limit gate (shown after 5 nominations) ─────────────────────────── */
+function FreeLimitGate({ used }: { used: number }) {
   return (
-    <div style={{ ...card, padding: "28px 24px", textAlign: "center" }}>
-      <div style={{
-        width: 52, height: 52, borderRadius: 14, margin: "0 auto 14px",
-        background: "linear-gradient(135deg,#ffd700,#ff8c00)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 24,
-      }}>🏆</div>
-      <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)", marginBottom: 8 }}>
-        Hall of Fame is a Core feature
+    <div style={{ textAlign: "center", padding: "4px 0 8px" }}>
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--ink-muted)", marginBottom: 6 }}>
+          <span>{used} / {FREE_NOMINATION_LIMIT} free nominations used</span>
+          <span style={{ color: "#dc2626", fontWeight: 700 }}>Limit reached</span>
+        </div>
+        <div style={{ height: 5, borderRadius: 99, background: "var(--border)", overflow: "hidden" }}>
+          <div style={{ height: "100%", borderRadius: 99, background: "#dc2626", width: "100%" }} />
+        </div>
       </div>
-      <p style={{ fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.6, margin: "0 0 20px" }}>
-        Upgrade to <b style={{ color: "var(--ink)" }}>Core</b> to nominate your product for permanent Hall of Fame placement — homepage visibility, HoF badge on your listing, forever.
+      <div style={{
+        width: 44, height: 44, borderRadius: 12, margin: "0 auto 12px",
+        background: "linear-gradient(135deg,#ffd700,#ff8c00)",
+        display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20,
+      }}>🏆</div>
+      <div style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)", marginBottom: 6 }}>
+        Free nomination limit reached
+      </div>
+      <p style={{ fontSize: 12.5, color: "var(--ink-muted)", lineHeight: 1.6, margin: "0 0 18px" }}>
+        You&apos;ve used all {FREE_NOMINATION_LIMIT} free nominations. Upgrade to{" "}
+        <b style={{ color: "var(--ink)" }}>Core</b> for unlimited nominations, plus Hall of Fame badge, homepage placement, and press release.
       </p>
       <Link href="/dashboard/plan" style={{
-        display: "inline-block", padding: "10px 24px",
+        display: "inline-block", padding: "10px 22px",
         background: "linear-gradient(90deg,#ff6a3d,#ff3d88)",
         borderRadius: 10, fontSize: 13, fontWeight: 700,
         color: "#fff", textDecoration: "none",
+        boxShadow: "0 4px 14px rgba(255,61,136,0.3)",
       }}>
         Upgrade to Core →
       </Link>
@@ -290,12 +302,25 @@ export default function HallOfFamePage() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isCore = plan === "core";
+  const freeAtLimit = !isCore && nominations.length >= FREE_NOMINATION_LIMIT;
+  const nominationsLeft = isCore ? null : Math.max(0, FREE_NOMINATION_LIMIT - nominations.length);
 
   return (
     <main style={{ flex: 1, overflow: "auto", padding: "28px 32px" }}>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>Core Feature</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "var(--ink-muted)" }}>
+            Hall of Fame
+          </div>
+          {!isCore && (
+            <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "2px 8px", borderRadius: 20, background: freeAtLimit ? "rgba(220,38,38,0.08)" : "rgba(255,215,0,0.1)", border: `1px solid ${freeAtLimit ? "rgba(220,38,38,0.2)" : "rgba(255,215,0,0.3)"}` }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: freeAtLimit ? "#dc2626" : "#9a6a00" }}>
+                {freeAtLimit ? "Limit reached" : `${nominationsLeft} nomination${nominationsLeft !== 1 ? "s" : ""} left`}
+              </span>
+            </div>
+          )}
+        </div>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.02em", margin: "0 0 4px" }}>
           🏆 Hall of Fame
         </h1>
@@ -318,8 +343,8 @@ export default function HallOfFamePage() {
 
             {loading ? (
               <div style={{ height: 80, background: "var(--surface-alt)", borderRadius: 8 }} />
-            ) : !isCore ? (
-              <CoreGate />
+            ) : freeAtLimit ? (
+              <FreeLimitGate used={nominations.length} />
             ) : userId ? (
               <SubmitForm tools={tools} userId={userId} nominations={nominations} />
             ) : null}
@@ -330,29 +355,25 @@ export default function HallOfFamePage() {
 
         {/* ── Right: Nominations history ───────────────────────────────── */}
         <div style={{ ...card, padding: 0, overflow: "hidden" }}>
-          <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-faint)" }}>
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-faint)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <h2 style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Your nominations</h2>
+            {!isCore && nominations.length > 0 && (
+              <span style={{ fontSize: 11, color: freeAtLimit ? "#dc2626" : "var(--ink-muted)", fontWeight: 600 }}>
+                {nominations.length} / {FREE_NOMINATION_LIMIT} used
+              </span>
+            )}
           </div>
 
           {loading ? (
             <div style={{ padding: "40px 24px", textAlign: "center", color: "var(--ink-faint)", fontSize: 13 }}>Loading…</div>
-          ) : !isCore ? (
-            <div style={{ padding: "48px 24px", textAlign: "center" }}>
-              <div style={{ fontSize: 36, marginBottom: 10 }}>🔒</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", marginBottom: 6 }}>Core plan only</div>
-              <p style={{ fontSize: 13, color: "var(--ink-muted)", margin: "0 0 16px" }}>Upgrade to nominate your product.</p>
-              <Link href="/dashboard/plan" style={{
-                padding: "8px 20px", borderRadius: 9,
-                background: "linear-gradient(90deg,#ff6a3d,#ff3d88)",
-                fontSize: 12.5, fontWeight: 700, color: "#fff", textDecoration: "none",
-              }}>View plans →</Link>
-            </div>
           ) : nominations.length === 0 ? (
             <div style={{ padding: "48px 24px", textAlign: "center" }}>
               <div style={{ fontSize: 36, marginBottom: 10 }}>🏆</div>
               <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", marginBottom: 6 }}>No nominations yet</div>
               <p style={{ fontSize: 13, color: "var(--ink-muted)", margin: 0 }}>
-                Submit a nomination on the left to get your product into the Hall of Fame.
+                {freeAtLimit
+                  ? "Upgrade to Core to submit more nominations."
+                  : "Submit a nomination on the left to get your product into the Hall of Fame."}
               </p>
             </div>
           ) : (
