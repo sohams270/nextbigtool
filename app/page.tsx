@@ -473,16 +473,21 @@ export default async function HomePage({
 
           <div style={{ position: "relative", zIndex: 1, padding: "22px 24px 20px" }}>
             {/* Header */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20 }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, paddingTop: 6 }}>
                   <div className="pulse" style={{ width: 7, height: 7, borderRadius: "50%", background: "#00B87A", flexShrink: 0 }} />
                   <span style={{ fontSize: 9, fontWeight: 700, color: "#00B87A", textTransform: "uppercase", letterSpacing: "0.1em" }}>Live</span>
                 </div>
-                <div style={{ width: 1, height: 14, background: "rgba(255,255,255,0.12)" }} />
-                <span style={{ fontSize: 26, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
-                  Build in Public Wall
-                </span>
+                <div style={{ width: 1, height: 14, background: "rgba(255,255,255,0.12)", marginTop: 6 }} />
+                <div>
+                  <span style={{ fontSize: 26, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
+                    Build in Public Wall
+                  </span>
+                  <p style={{ fontSize: 12, color: "rgba(255,255,255,0.42)", margin: "3px 0 0", lineHeight: 1.5, fontWeight: 400, maxWidth: 480 }}>
+                    Your front-row seat to how products are actually built. Milestones, updates, and funding news from the founders themselves.
+                  </p>
+                </div>
                 <div style={{ display: "flex", gap: 6 }}>
                   {["Milestones", "Updates", "Funding", "Launches"].map((tag) => (
                     <span key={tag} style={{
