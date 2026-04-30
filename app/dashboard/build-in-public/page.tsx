@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PostCard, { type PostRow } from "@/app/components/PostCard";
+import UpgradeModal from "@/app/components/UpgradeModal";
 
 const ADMIN_EMAIL = "sohams270@gmail.com";
 
@@ -308,9 +309,10 @@ export default function BuildInPublicPage() {
   const [hasDraft, setHasDraft]       = useState(false);
   const [postError, setPostError]     = useState<string | null>(null);
 
-  const [activeTab, setActiveTab]   = useState<"mine" | "wall">("mine");
-  const [perfRange, setPerfRange]   = useState<"7d" | "30d" | "1y">("30d");
-  const [tagFilter, setTagFilter]   = useState<string>("all");
+  const [activeTab, setActiveTab]     = useState<"mine" | "wall">("mine");
+  const [perfRange, setPerfRange]     = useState<"7d" | "30d" | "1y">("30d");
+  const [tagFilter, setTagFilter]     = useState<string>("all");
+  const [showBipUpgrade, setShowBipUpgrade] = useState(false);
 
   /* ── Load data ──────────────────────────────────────────────────── */
   useEffect(() => {
@@ -510,8 +512,14 @@ export default function BuildInPublicPage() {
 
     const newPost = data as unknown as MyPost;
 
-    // Add to my posts feed instantly
-    setMyPosts(prev => [newPost, ...prev]);
+    // Add to my posts feed instantly; check limit after update
+    setMyPosts(prev => {
+      const updated = [newPost, ...prev];
+      if (plan !== "core" && updated.length >= planLimit) {
+        setShowBipUpgrade(true);
+      }
+      return updated;
+    });
 
     // Add to wall posts feed (construct PostRow from profile)
     const wallPost: PostRow = {
@@ -569,6 +577,11 @@ export default function BuildInPublicPage() {
   /* ── Render ─────────────────────────────────────────────────────── */
   return (
     <main style={{ flex: 1, overflow: "auto", padding: "28px 32px" }}>
+      {/* Upgrade modal — shown when free limit is hit */}
+      {showBipUpgrade && (
+        <UpgradeModal feature="bip" onClose={() => setShowBipUpgrade(false)} />
+      )}
+
       {/* Confirm modal */}
       {showConfirm && (
         <ConfirmPostModal
@@ -756,16 +769,18 @@ export default function BuildInPublicPage() {
                   Save draft
                 </button>
                 <button
-                  onClick={() => { if (text.trim() && canPost) setShowConfirm(true); }}
-                  disabled={!text.trim() || !canPost}
+                  onClick={() => {
+                    if (!canPost) { setShowBipUpgrade(true); return; }
+                    if (text.trim()) setShowConfirm(true);
+                  }}
                   style={{
                     background: "linear-gradient(90deg,#ff6a3d,#ff3d88)", border: "none",
                     borderRadius: 8, padding: "6px 16px", fontSize: 12, fontWeight: 700, color: "#fff",
-                    cursor: (!text.trim() || !canPost) ? "not-allowed" : "pointer",
-                    opacity: (!text.trim() || !canPost) ? 0.6 : 1,
+                    cursor: !text.trim() && canPost ? "not-allowed" : "pointer",
+                    opacity: !text.trim() && canPost ? 0.6 : 1,
                   }}
                 >
-                  Post update
+                  {!canPost ? "Upgrade to post →" : "Post update"}
                 </button>
               </div>
             </div>

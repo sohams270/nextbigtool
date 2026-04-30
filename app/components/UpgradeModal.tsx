@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-export type GatedFeature = "crm" | "blog" | "hof";
+export type GatedFeature = "crm" | "blog" | "hof" | "bip";
 
 const FEATURES: Record<GatedFeature, {
   emoji: string;
@@ -10,6 +10,17 @@ const FEATURES: Record<GatedFeature, {
   tagline: string;
   benefits: string[];
 }> = {
+  bip: {
+    emoji: "📢",
+    title: "Build in Public",
+    tagline: "You've used all 5 free posts. Keep the momentum going.",
+    benefits: [
+      "Unlimited Build in Public posts on Core",
+      "Posts surface in the global Activity Feed on the homepage",
+      "Milestone, launch, funding & update post types",
+      "Post performance stats — likes, comments, top tags",
+    ],
+  },
   crm: {
     emoji: "👥",
     title: "Founder's CRM",
