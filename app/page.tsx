@@ -480,7 +480,7 @@ export default async function HomePage({
                   <span style={{ fontSize: 9, fontWeight: 700, color: "#00B87A", textTransform: "uppercase", letterSpacing: "0.1em" }}>Live</span>
                 </div>
                 <div style={{ width: 1, height: 14, background: "rgba(255,255,255,0.12)" }} />
-                <span style={{ fontSize: 15, fontWeight: 800, color: "#fff", letterSpacing: "-0.01em" }}>
+                <span style={{ fontSize: 26, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
                   Build in Public Wall
                 </span>
                 <div style={{ display: "flex", gap: 6 }}>

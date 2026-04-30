@@ -123,7 +123,7 @@ export default function BuildInPublicWall({ userId }: { userId: string | null })
       ) : (
         <>
           {/* Post list — vertical, single column */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingBottom: 4 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 0, paddingBottom: 4 }}>
             {posts.map((p) => (
               <PostCard
                 key={p.id}
