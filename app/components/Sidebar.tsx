@@ -11,10 +11,10 @@ const ADMIN_EMAIL = "sohams270@gmail.com";
 const NAV = [
   { id: "overview",   label: "Overview",       href: "/dashboard",                  icon: GridIcon },
   { id: "products",   label: "Add Your Tool",  href: "/dashboard/products",         icon: BoxIcon },
-  { id: "interested", label: "Founder's CRM",  href: "/dashboard/interested",       icon: UsersIcon,    prime: true,  gate: "crm"  as GatedFeature },
   { id: "bip",        label: "Build In Public",href: "/dashboard/build-in-public",  icon: EditIcon },
-  { id: "blog",       label: "Press Release",  href: "/dashboard/blog",             icon: FileTextIcon, prime: true,  gate: "blog" as GatedFeature },
-  { id: "hof",        label: "Hall of Fame",   href: "/dashboard/hall-of-fame",     icon: TrophyIcon,   locked: true, gate: "hof"  as GatedFeature },
+  { id: "interested", label: "Founder's CRM",  href: "/dashboard/interested",       icon: UsersIcon,    prime: true, gate: "crm"  as GatedFeature },
+  { id: "blog",       label: "Press Release",  href: "/dashboard/blog",             icon: FileTextIcon, prime: true, gate: "blog" as GatedFeature },
+  { id: "hof",        label: "Hall of Fame",   href: "/dashboard/hall-of-fame",     icon: TrophyIcon,   prime: true, gate: "hof"  as GatedFeature },
   { id: "plan",       label: "My Plan",        href: "/dashboard/plan",             icon: StarIcon },
   { id: "profile",    label: "My Profile",     href: "/dashboard/profile",          icon: PersonIcon },
   { id: "settings",   label: "Settings",       href: "/dashboard/settings",         icon: GearIcon },
@@ -63,25 +63,33 @@ export default function Sidebar() {
       top: 0,
     }}>
       <style>{`
-        @keyframes crmPulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(255,106,61,0), 0 0 8px 2px rgba(255,61,136,0.25); }
-          50%       { box-shadow: 0 0 0 3px rgba(255,106,61,0.12), 0 0 16px 4px rgba(255,61,136,0.45); }
-        }
-        @keyframes crmShimmer {
+        @keyframes gateShimmer {
           0%   { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
-        .crm-nav-item {
-          border-radius: 8px;
-          padding: 8px 10px;
-          background: linear-gradient(90deg,rgba(255,106,61,0.18),rgba(255,61,136,0.18),rgba(168,85,247,0.18),rgba(255,106,61,0.18));
-          background-size: 300% 100%;
-          animation: crmShimmer 3s linear infinite, crmPulse 2.5s ease-in-out infinite;
-          cursor: pointer;
-          display: flex; align-items: center; gap: 10;
-          transition: opacity 0.15s;
+        @keyframes gatePulseRed {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0),   0 0 8px 2px rgba(239,68,68,0.15); }
+          50%       { box-shadow: 0 0 0 3px rgba(220,38,38,0.15), 0 0 16px 4px rgba(239,68,68,0.35); }
         }
-        .crm-nav-item:hover { opacity: 0.85; }
+        @keyframes gatePulseGreen {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(0,184,122,0),   0 0 8px 2px rgba(16,185,129,0.15); }
+          50%       { box-shadow: 0 0 0 3px rgba(0,184,122,0.15), 0 0 16px 4px rgba(16,185,129,0.35); }
+        }
+        .gate-item-free {
+          border-radius: 8px; padding: 8px 10px;
+          background: linear-gradient(90deg,rgba(220,38,38,0.22),rgba(239,68,68,0.18),rgba(185,28,28,0.22),rgba(220,38,38,0.22));
+          background-size: 300% 100%;
+          animation: gateShimmer 3s linear infinite, gatePulseRed 2.5s ease-in-out infinite;
+          cursor: pointer; display: flex; align-items: center; gap: 10; transition: opacity 0.15s;
+        }
+        .gate-item-core {
+          border-radius: 8px; padding: 8px 10px;
+          background: linear-gradient(90deg,rgba(0,184,122,0.22),rgba(16,185,129,0.18),rgba(5,150,105,0.22),rgba(0,184,122,0.22));
+          background-size: 300% 100%;
+          animation: gateShimmer 3s linear infinite, gatePulseGreen 2.5s ease-in-out infinite;
+          cursor: pointer; display: flex; align-items: center; gap: 10; transition: opacity 0.15s;
+        }
+        .gate-item-free:hover, .gate-item-core:hover { opacity: 0.85; }
       `}</style>
 
       {/* Logo */}
