@@ -4,24 +4,26 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import NBTWordmark from "./NBTWordmark";
+import UpgradeModal, { type GatedFeature } from "./UpgradeModal";
 
 const ADMIN_EMAIL = "sohams270@gmail.com";
 
 const NAV = [
-  { id: "overview",        label: "Overview",          href: "/dashboard",                   icon: GridIcon },
-  { id: "products",        label: "Add Your Tool",      href: "/dashboard/products",          icon: BoxIcon,     badge: null },
-  { id: "interested",      label: "Founder's CRM",      href: "/dashboard/interested",        icon: UsersIcon,   prime: true },
-  { id: "bip",             label: "Build In Public",    href: "/dashboard/build-in-public",   icon: EditIcon },
-  { id: "blog",            label: "Press Release",       href: "/dashboard/blog",              icon: FileTextIcon, prime: true },
-  { id: "hof",             label: "Hall of Fame",        href: "/dashboard/hall-of-fame",      icon: TrophyIcon,  locked: true },
-  { id: "plan",            label: "My Plan",             href: "/dashboard/plan",              icon: StarIcon },
-  { id: "profile",         label: "My Profile",          href: "/dashboard/profile",           icon: PersonIcon },
-  { id: "settings",        label: "Settings",            href: "/dashboard/settings",          icon: GearIcon },
+  { id: "overview",   label: "Overview",       href: "/dashboard",                  icon: GridIcon },
+  { id: "products",   label: "Add Your Tool",  href: "/dashboard/products",         icon: BoxIcon },
+  { id: "interested", label: "Founder's CRM",  href: "/dashboard/interested",       icon: UsersIcon,    prime: true,  gate: "crm"  as GatedFeature },
+  { id: "bip",        label: "Build In Public",href: "/dashboard/build-in-public",  icon: EditIcon },
+  { id: "blog",       label: "Press Release",  href: "/dashboard/blog",             icon: FileTextIcon, prime: true,  gate: "blog" as GatedFeature },
+  { id: "hof",        label: "Hall of Fame",   href: "/dashboard/hall-of-fame",     icon: TrophyIcon,   locked: true, gate: "hof"  as GatedFeature },
+  { id: "plan",       label: "My Plan",        href: "/dashboard/plan",             icon: StarIcon },
+  { id: "profile",    label: "My Profile",     href: "/dashboard/profile",          icon: PersonIcon },
+  { id: "settings",   label: "Settings",       href: "/dashboard/settings",         icon: GearIcon },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [userPlan, setUserPlan] = useState<string>("free");
+  const [upgradeFeature, setUpgradeFeature] = useState<GatedFeature | null>(null);
 
   useEffect(() => {
     const client = createClient();
@@ -32,6 +34,15 @@ export default function Sidebar() {
         .then(({ data }) => { if (data?.plan) setUserPlan(data.plan); });
     });
   }, []);
+
+  const isCore = userPlan === "core";
+
+  function handleGatedClick(e: React.MouseEvent, gate: GatedFeature) {
+    if (!isCore) {
+      e.preventDefault();
+      setUpgradeFeature(gate);
+    }
+  }
 
   const planLabel = userPlan.charAt(0).toUpperCase() + userPlan.slice(1);
   const planColor = userPlan === "core" ? "#ff6a3d" : userPlan === "basic" ? "#3b7fff" : "rgba(255,255,255,0.45)";
@@ -78,28 +89,50 @@ export default function Sidebar() {
         <NBTWordmark height={52} dark priority />
       </Link>
 
+      {/* Upgrade modal */}
+      {upgradeFeature && (
+        <UpgradeModal feature={upgradeFeature} onClose={() => setUpgradeFeature(null)} />
+      )}
+
       {/* Nav */}
       <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {NAV.map((item) => {
           const active = pathname === item.href;
           const Icon = item.icon;
-          if ((item as { prime?: boolean }).prime) {
+          const gate = (item as { gate?: GatedFeature }).gate;
+          const isPrime = !!(item as { prime?: boolean }).prime;
+          const isLocked = !!(item as { locked?: boolean }).locked;
+          const needsGate = (isPrime || isLocked) && !!gate;
+
+          if (isPrime) {
             return (
-              <Link key={item.id} href={item.href} style={{ textDecoration: "none" }}>
+              <Link
+                key={item.id}
+                href={item.href}
+                style={{ textDecoration: "none" }}
+                onClick={needsGate ? (e) => handleGatedClick(e, gate!) : undefined}
+              >
                 <div className="crm-nav-item" style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <Icon size={15} color={active ? "#ff6a3d" : "#ff9f7a"} />
                   <span style={{ flex: 1, fontSize: 12.5, fontWeight: 700, color: "#fff", letterSpacing: "-0.01em" }}>
                     {item.label}
                   </span>
-                  <span style={{ fontSize: 9, fontWeight: 800, color: "#ff6a3d", background: "rgba(255,106,61,0.2)", border: "1px solid rgba(255,106,61,0.4)", borderRadius: 4, padding: "1px 5px", letterSpacing: "0.04em" }}>
-                    CORE
-                  </span>
+                  {!isCore && (
+                    <span style={{ fontSize: 9, fontWeight: 800, color: "#ff6a3d", background: "rgba(255,106,61,0.2)", border: "1px solid rgba(255,106,61,0.4)", borderRadius: 4, padding: "1px 5px", letterSpacing: "0.04em" }}>
+                      CORE
+                    </span>
+                  )}
                 </div>
               </Link>
             );
           }
           return (
-            <Link key={item.id} href={item.href} style={{ textDecoration: "none" }}>
+            <Link
+              key={item.id}
+              href={item.href}
+              style={{ textDecoration: "none" }}
+              onClick={needsGate ? (e) => handleGatedClick(e, gate!) : undefined}
+            >
               <div style={{
                 display: "flex", alignItems: "center", gap: 10,
                 padding: "8px 10px", borderRadius: 8,
@@ -119,7 +152,7 @@ export default function Sidebar() {
                 }}>
                   {item.label}
                 </span>
-                {(item as { locked?: boolean }).locked && (
+                {isLocked && !isCore && (
                   <LockIcon size={12} color="rgba(255,255,255,0.3)" />
                 )}
               </div>

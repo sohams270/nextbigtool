@@ -32,8 +32,8 @@ type Profile = {
 type Draft = { text: string; tags: string[]; toolId: string };
 
 /* ── constants ───────────────────────────────────────────────────────── */
-const PLAN_LIMITS: Record<string, number> = { free: 1, basic: 5, core: Infinity };
-const PLAN_LABELS: Record<string, string> = { free: "Free", basic: "Basic", core: "Core" };
+const PLAN_LIMITS: Record<string, number> = { free: 5, core: Infinity };
+const PLAN_LABELS: Record<string, string> = { free: "Free", core: "Core" };
 
 const TAG_TO_TYPE: Record<string, string> = {
   "#Milestone": "milestone",
@@ -158,7 +158,6 @@ function MyPostCard({
 /* ── PlanSidebar ─────────────────────────────────────────────────────── */
 function PlanSidebar({ plan, postsUsed, postsLimit }: { plan: string; postsUsed: number; postsLimit: number }) {
   const isCore  = plan === "core";
-  const isBasic = plan === "basic";
   const remaining = postsLimit === Infinity ? Infinity : Math.max(0, postsLimit - postsUsed);
   const pct = postsLimit === Infinity ? 100 : Math.min(100, (postsUsed / postsLimit) * 100);
 
@@ -202,13 +201,9 @@ function PlanSidebar({ plan, postsUsed, postsLimit }: { plan: string; postsUsed:
             </div>
           </div>
           <p style={{ fontSize: 12.5, color: "#8a8a90", margin: "0 0 14px", lineHeight: 1.5 }}>
-            {isBasic
-              ? remaining > 0
-                ? <><b style={{ color: "#c0c0cc" }}>{remaining} post{remaining !== 1 ? "s" : ""} remaining</b> on Basic. Upgrade to Core for unlimited posts plus upvoter tracking.</>
-                : <>You&apos;ve used all <b style={{ color: "#c0c0cc" }}>5 Basic posts</b>. Upgrade to Core to keep building in public.</>
-              : remaining > 0
-                ? <>Your Free plan includes <b style={{ color: "#c0c0cc" }}>1 post total</b>. Upgrade to Core for unlimited posts and upvoter tracking.</>
-                : <>You&apos;ve used your free post. <b style={{ color: "#c0c0cc" }}>Upgrade to Core</b> to keep sharing your journey.</>
+            {remaining > 0
+              ? <>Your Free plan includes <b style={{ color: "#c0c0cc" }}>5 posts total</b>. Upgrade to Core for unlimited posts and upvoter tracking.</>
+              : <>You&apos;ve used all 5 free posts. <b style={{ color: "#c0c0cc" }}>Upgrade to Core</b> to keep sharing your journey.</>
             }
           </p>
           <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px", display: "flex", flexDirection: "column", gap: 8 }}>

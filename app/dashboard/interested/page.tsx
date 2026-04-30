@@ -12,8 +12,14 @@ export default async function FounderCRMPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/");
 
-  // Admin gets Core access automatically
-  const isUnlocked = user.email === ADMIN_EMAIL;
+  // Admin bypasses plan check; everyone else must be on Core
+  const isAdmin = user.email === ADMIN_EMAIL;
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("plan")
+    .eq("id", user.id)
+    .single();
+  const isUnlocked = isAdmin || profile?.plan === "core";
 
   // Fetch user's approved tools
   const { data: toolsRaw } = await supabase
