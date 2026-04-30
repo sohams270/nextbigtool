@@ -213,6 +213,26 @@ export default function BlogGrid() {
   const shown = rest.slice(0, visible);
   const hasMore = visible < rest.length;
 
+  /* Empty state */
+  if (BLOG_POSTS.length === 0) {
+    return (
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "80px 28px 120px", textAlign: "center" }}>
+        <div style={{
+          width: 64, height: 64, borderRadius: 18,
+          background: "rgba(255,107,53,0.10)", border: "1px solid rgba(255,107,53,0.22)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 28, margin: "0 auto 18px",
+        }}>✍️</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)", marginBottom: 8 }}>
+          First post coming soon
+        </div>
+        <div style={{ fontSize: 13, color: "var(--ink-muted)", maxWidth: 360, margin: "0 auto", lineHeight: 1.6 }}>
+          We're working on something worth your time. Check back soon for launch strategies, growth playbooks, and founder lessons.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 28px 80px", width: "100%" }}>
       {/* Featured */}
