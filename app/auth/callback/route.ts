@@ -31,7 +31,7 @@ export async function GET(request: Request) {
         .upsert({ id: user.id }, { onConflict: "id", ignoreDuplicates: true });
 
       // Fire-and-forget email notification for brand-new signups only
-      if (isNewUser && process.env.RESEND_API_KEY && process.env.INTERNAL_API_SECRET) {
+      if (isNewUser && process.env.ZOHO_EMAIL && process.env.INTERNAL_API_SECRET) {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? origin;
         fetch(`${siteUrl}/api/notify-new-user`, {
           method: "POST",

@@ -1,7 +1,18 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Zoho SMTP transporter — credentials come from env vars
+function createTransporter() {
+  return nodemailer.createTransport({
+    host: "smtp.zoho.in",       // use smtp.zoho.com if your account is on .com
+    port: 465,
+    secure: true,               // SSL
+    auth: {
+      user: process.env.ZOHO_EMAIL,    // soham@nextbigtool.com
+      pass: process.env.ZOHO_PASSWORD, // Zoho app-specific password
+    },
+  });
+}
 
 export async function POST(request: Request) {
   // Guard: only allow internal calls with the shared secret
@@ -26,8 +37,9 @@ export async function POST(request: Request) {
   });
 
   try {
-    await resend.emails.send({
-      from: "NBT Alerts <alerts@nextbigtool.com>",
+    const transporter = createTransporter();
+    await transporter.sendMail({
+      from: `"NBT Alerts" <${process.env.ZOHO_EMAIL}>`,
       to: "soham@nextbigtool.com",
       subject: `🎉 New signup: ${email}`,
       html: `
@@ -45,7 +57,7 @@ export async function POST(request: Request) {
             ${formatted} (IST)
           </p>
 
-          <table style="width:100%;border-collapse:collapse;border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.05);">
+          <table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,0.05);border-radius:10px;">
             <tr style="border-bottom:1px solid rgba(255,255,255,0.07);">
               <td style="padding:12px 16px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.05em;width:36%;">Email</td>
               <td style="padding:12px 16px;font-size:13px;color:#fff;font-weight:600;">${email}</td>
@@ -69,7 +81,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("[notify-new-user] Resend error:", err);
+    console.error("[notify-new-user] SMTP error:", err);
     return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
   }
 }
