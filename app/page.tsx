@@ -1,5 +1,11 @@
 import { Suspense } from "react";
 import { cookies } from "next/headers";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "NextBigTool | Where Indie Founders Launch and Buyers Discover",
+  description: "The product discovery platform for indie founders. List your tool, build in public, and connect with people genuinely interested.",
+};
 
 export const dynamic = "force-dynamic";
 import { createClient } from "@/utils/supabase/server";
