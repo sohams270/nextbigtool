@@ -1,3 +1,5 @@
+"use client";
+
 export default function CmsDashboard() {
   const cards = [
     { icon: "✍️", label: "Blog Posts",     href: "/cms/blog",          desc: "Write and publish blog articles", color: "#FF6B35" },

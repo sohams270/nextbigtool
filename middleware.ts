@@ -1,12 +1,24 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/middleware";
-import { createHmac } from "crypto";
 
-function isValidCmsSession(token: string): boolean {
+// Use Web Crypto API (Edge-compatible) instead of Node's crypto module
+async function isValidCmsSession(token: string): Promise<boolean> {
   const username = process.env.CMS_USERNAME;
   const secret   = process.env.CMS_SECRET ?? "fallback-secret";
-  if (!username) return false;
-  const expected = createHmac("sha256", secret).update(username).digest("hex");
+  if (!username || !token) return false;
+
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(secret);
+  const msgData = encoder.encode(username);
+
+  const key = await crypto.subtle.importKey(
+    "raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, msgData);
+  const expected = Array.from(new Uint8Array(sig))
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+
   return token === expected;
 }
 
@@ -15,9 +27,9 @@ export async function middleware(request: NextRequest) {
 
   // ── CMS auth guard ──────────────────────────────────────────────────────
   if (pathname.startsWith("/cms")) {
-    const isLoginPage = pathname === "/cms/login";
+    const isLoginPage   = pathname === "/cms/login";
     const sessionCookie = request.cookies.get("cms_session")?.value ?? "";
-    const authed = isValidCmsSession(sessionCookie);
+    const authed        = await isValidCmsSession(sessionCookie);
 
     if (!isLoginPage && !authed) {
       return NextResponse.redirect(new URL("/cms/login", request.url));
