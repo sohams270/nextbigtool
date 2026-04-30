@@ -498,3 +498,34 @@ body {
   /* HoF 3-col → 1-col on mobile */
   .showcase-hof-grid { grid-template-columns: 1fr !important; }
 }
+
+/* ── TipTap Editor ──────────────────────────────────────────────────────── */
+.tiptap-editor { outline: none; min-height: 400px; font-size: 15px; line-height: 1.8; color: var(--ink); }
+.tiptap-editor p { margin: 0 0 1em; }
+.tiptap-editor h1 { font-size: 2em; font-weight: 800; margin: 1.2em 0 0.5em; }
+.tiptap-editor h2 { font-size: 1.5em; font-weight: 700; margin: 1.2em 0 0.5em; }
+.tiptap-editor h3 { font-size: 1.2em; font-weight: 700; margin: 1.2em 0 0.5em; }
+.tiptap-editor blockquote { border-left: 3px solid #FF6B35; padding-left: 1em; color: var(--ink-2); margin: 1em 0; }
+.tiptap-editor code { background: var(--surface-alt); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+.tiptap-editor pre { background: var(--surface-alt); padding: 1em; border-radius: 8px; overflow-x: auto; }
+.tiptap-editor ul, .tiptap-editor ol { padding-left: 1.5em; margin: 0.5em 0; }
+.tiptap-editor li { margin: 0.25em 0; }
+.tiptap-editor a { color: #FF6B35; text-decoration: underline; }
+.tiptap-editor p.is-editor-empty:first-child::before { content: attr(data-placeholder); color: var(--ink-faint); pointer-events: none; height: 0; float: left; }
+.tiptap-editor hr { border: none; border-top: 1px solid var(--border); margin: 1.5em 0; }
+
+/* Public blog post content (same as editor but for rendered pages) */
+.blog-post-content { outline: none; font-size: 16px; line-height: 1.8; color: var(--ink); }
+.blog-post-content p { margin: 0 0 1em; }
+.blog-post-content h1 { font-size: 2em; font-weight: 800; margin: 1.2em 0 0.5em; letter-spacing: -0.02em; }
+.blog-post-content h2 { font-size: 1.5em; font-weight: 700; margin: 1.2em 0 0.5em; letter-spacing: -0.01em; }
+.blog-post-content h3 { font-size: 1.2em; font-weight: 700; margin: 1.2em 0 0.5em; }
+.blog-post-content blockquote { border-left: 3px solid #FF6B35; padding-left: 1.2em; color: var(--ink-2); margin: 1.5em 0; font-style: italic; }
+.blog-post-content code { background: var(--surface-alt); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; font-family: var(--font-mono); }
+.blog-post-content pre { background: var(--surface-alt); padding: 1em; border-radius: 8px; overflow-x: auto; margin: 1em 0; }
+.blog-post-content pre code { background: none; padding: 0; }
+.blog-post-content ul, .blog-post-content ol { padding-left: 1.5em; margin: 0.5em 0 1em; }
+.blog-post-content li { margin: 0.3em 0; }
+.blog-post-content a { color: #FF6B35; text-decoration: underline; }
+.blog-post-content img { max-width: 100%; border-radius: 8px; margin: 1em 0; }
+.blog-post-content hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }

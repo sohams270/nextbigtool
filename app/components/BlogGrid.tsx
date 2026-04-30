@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { BLOG_POSTS, type BlogPost } from "../lib/blog-posts";
+import type { BlogPost } from "../lib/blog-posts";
 
 const PAGE_SIZE = 6;
 
@@ -22,6 +22,17 @@ function catMeta(category: string) { return CAT_META[category] ?? DEFAULT_META; 
 /* ── Cover image placeholder ────────────────────────────────────────────── */
 function CoverArt({ post, height = 200 }: { post: BlogPost; height?: number }) {
   const meta = catMeta(post.category);
+  if (post.featured_image_url) {
+    return (
+      <div style={{ height, flexShrink: 0, overflow: "hidden", borderRadius: 0 }}>
+        <img
+          src={post.featured_image_url}
+          alt={post.title}
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        />
+      </div>
+    );
+  }
   return (
     <div style={{
       height,
@@ -206,15 +217,15 @@ function PostCard({ post }: { post: BlogPost }) {
 }
 
 /* ── Main export ────────────────────────────────────────────────────────── */
-export default function BlogGrid() {
-  const featured = BLOG_POSTS.find((p) => p.featured) ?? BLOG_POSTS[0];
-  const rest = BLOG_POSTS.filter((p) => !p.featured);
+export default function BlogGrid({ posts = [] }: { posts?: BlogPost[] }) {
+  const featured = posts.find((p) => p.featured) ?? posts[0];
+  const rest = posts.filter((p) => !p.featured);
   const [visible, setVisible] = useState(PAGE_SIZE);
   const shown = rest.slice(0, visible);
   const hasMore = visible < rest.length;
 
   /* Empty state */
-  if (BLOG_POSTS.length === 0) {
+  if (posts.length === 0) {
     return (
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "80px 28px 120px", textAlign: "center" }}>
         <div style={{

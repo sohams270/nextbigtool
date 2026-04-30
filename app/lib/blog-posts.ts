@@ -8,7 +8,8 @@ export type BlogPost = {
   readTime: string;
   featured: boolean;
   coverEmoji: string;
+  featured_image_url?: string | null;
 };
 
-// Add real posts here when ready to publish
+// Static fallback array (kept for backwards compatibility; public page now reads from DB)
 export const BLOG_POSTS: BlogPost[] = [];

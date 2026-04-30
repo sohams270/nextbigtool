@@ -88,7 +88,13 @@ export default function CmsLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <main style={{ flex: 1, overflowY: "auto", padding: "32px 36px" }}>
+      <main style={{
+        flex: 1,
+        overflowY: pathname.startsWith("/cms/blog/new") || pathname.startsWith("/cms/blog/edit") ? "hidden" : "auto",
+        padding: pathname.startsWith("/cms/blog/new") || pathname.startsWith("/cms/blog/edit") ? 0 : "32px 36px",
+        display: "flex",
+        flexDirection: "column",
+      }}>
         {children}
       </main>
     </div>
