@@ -460,7 +460,7 @@ export default function TopNav({ dark: darkProp }: { dark?: boolean }) {
             flexShrink: 0,
           }}>
             <RailDropBtn label="Discover"   items={DISCOVER_ITEMS}  hero={DISCOVER_HERO} />
-            <RailDropBtn label="Press Release" featured href="/newsletter" />
+            <RailDropBtn label="Press Release" featured href="/press-release" />
             <RailDropBtn label="Resources"  items={RESOURCES_ITEMS} hero={RESOURCES_HERO} />
             <RailDropBtn label="Pricing"    href="/pricing" />
           </div>
@@ -755,7 +755,7 @@ export default function TopNav({ dark: darkProp }: { dark?: boolean }) {
           {/* Nav links */}
           {[
             { label: "Discover", href: "/discover" },
-            { label: "Press Release", href: "/newsletter" },
+            { label: "Press Release", href: "/press-release" },
             { label: "Blog", href: "/blog" },
             { label: "FAQs", href: "/faq" },
             { label: "Pricing", href: "/pricing" },
