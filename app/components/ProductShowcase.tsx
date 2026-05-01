@@ -13,6 +13,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import UpvoteButton from "./UpvoteButton";
 
 /* ─── types ──────────────────────────────────────────────────────────── */
@@ -503,19 +504,24 @@ function RankedRow({
   tool: ShowcaseTool; rank: number; userId: string | null; isUpvoted: boolean; compact?: boolean;
 }) {
   const t = tags(tool);
+  const router = useRouter();
 
   if (compact) {
     return (
-      <li className="showcase-ranked-row-compact" style={{
-        display: "grid",
-        gridTemplateColumns: "40px 36px 1fr auto",
-        gap: 12,
-        alignItems: "center",
-        padding: "9px 16px",
-        borderBottom: "1px solid var(--border)",
-        transition: "background .15s",
-        cursor: "pointer",
-      }}>
+      <li
+        className="showcase-ranked-row-compact"
+        onClick={() => router.push(`/tools/${tool.slug}`)}
+        style={{
+          display: "grid",
+          gridTemplateColumns: "40px 36px 1fr auto",
+          gap: 12,
+          alignItems: "center",
+          padding: "9px 16px",
+          borderBottom: "1px solid var(--border)",
+          transition: "background .15s",
+          cursor: "pointer",
+        }}
+      >
         {/* Rank + trend */}
         <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <span style={{
@@ -545,13 +551,15 @@ function RankedRow({
 
         {/* Stats */}
         <div className="showcase-stats" style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <UpvoteButton
-            toolId={tool.id}
-            userId={userId}
-            initialCount={tool.upvote_count}
-            initialActive={isUpvoted}
-            size="sm"
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <UpvoteButton
+              toolId={tool.id}
+              userId={userId}
+              initialCount={tool.upvote_count}
+              initialActive={isUpvoted}
+              size="sm"
+            />
+          </div>
           <span className="showcase-redirect-btn"><RedirectBtn subtle href={`/tools/${tool.slug}`} /></span>
         </div>
       </li>
@@ -559,16 +567,20 @@ function RankedRow({
   }
 
   return (
-    <li className="showcase-ranked-row" style={{
-      display: "grid",
-      gridTemplateColumns: "56px 52px 1fr auto",
-      gap: 18,
-      alignItems: "center",
-      padding: "18px 22px",
-      borderBottom: "1px solid var(--border)",
-      transition: "background .15s",
-      cursor: "pointer",
-    }}>
+    <li
+      className="showcase-ranked-row"
+      onClick={() => router.push(`/tools/${tool.slug}`)}
+      style={{
+        display: "grid",
+        gridTemplateColumns: "56px 52px 1fr auto",
+        gap: 18,
+        alignItems: "center",
+        padding: "18px 22px",
+        borderBottom: "1px solid var(--border)",
+        transition: "background .15s",
+        cursor: "pointer",
+      }}
+    >
       {/* Rank + trend */}
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <span style={{
@@ -604,13 +616,15 @@ function RankedRow({
       {/* Stats */}
       <div className="showcase-stats" style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span className="showcase-comment-btn"><CommentBtn count={0} /></span>
-        <UpvoteButton
-          toolId={tool.id}
-          userId={userId}
-          initialCount={tool.upvote_count}
-          initialActive={isUpvoted}
-          size="sm"
-        />
+        <div onClick={(e) => e.stopPropagation()}>
+          <UpvoteButton
+            toolId={tool.id}
+            userId={userId}
+            initialCount={tool.upvote_count}
+            initialActive={isUpvoted}
+            size="sm"
+          />
+        </div>
         <span className="showcase-redirect-btn"><RedirectBtn subtle href={`/tools/${tool.slug}`} /></span>
       </div>
     </li>
