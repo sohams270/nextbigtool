@@ -359,10 +359,10 @@ export default async function HomePage({
 
             <div style={{ background: "#0A0B1A", borderRadius: 10, padding: 16 }}>
               <span style={{ fontSize: 12, fontWeight: 800, color: "#fff", display: "block", marginBottom: 4 }}>
-                Weekly Digest
+                The Founder's Weekly
               </span>
               <span style={{ fontSize: 10, color: "rgba(255,255,255,0.65)", display: "block", marginBottom: 10 }}>
-                The 5 tools worth checking this week. No spam.
+                Hand-picked indie tools worth your attention — no spam, unsubscribe anytime.
               </span>
               <div
                 style={{
@@ -375,7 +375,7 @@ export default async function HomePage({
                   marginBottom: 8,
                 }}
               >
-                you@founder.co
+                name@company.com
               </div>
               <Btn variant="primary" size="sm" full>Subscribe</Btn>
             </div>

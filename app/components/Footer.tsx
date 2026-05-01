@@ -236,15 +236,15 @@ export default function Footer() {
                   marginBottom: 14,
                 }}
               >
-                Weekly Digest
+                The Founder's Weekly
               </span>
               <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", lineHeight: 1.6, marginBottom: 12, marginTop: 0 }}>
-                5 tools worth checking this week. No spam.
+                Hand-picked indie tools worth your attention — no spam, unsubscribe anytime.
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <input
                   type="email"
-                  placeholder="you@founder.co"
+                  placeholder="name@company.com"
                   style={{
                     background: "rgba(255,255,255,0.06)",
                     border: "1px solid rgba(255,255,255,0.15)",

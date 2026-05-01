@@ -33,7 +33,7 @@ export default function NewsletterPage() {
             ✦ 14,200+ subscribers
           </div>
           <h1 style={{ fontSize: 36, fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1.1, margin: "0 0 14px", maxWidth: 600, marginLeft: "auto", marginRight: "auto" }}>
-            The Weekly Digest for Builders
+            The Founder's Weekly
           </h1>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", margin: "0 auto 32px", maxWidth: 480 }}>
             5 hand-picked tools every Monday. Founder spotlights. Trend reports. No fluff, no spam — just signal.
@@ -43,7 +43,7 @@ export default function NewsletterPage() {
           <div style={{ maxWidth: 460, margin: "0 auto", display: "flex", background: "#fff", borderRadius: 10, padding: 4, gap: 4 }}>
             <input
               type="email"
-              placeholder="you@founder.co"
+              placeholder="name@company.com"
               style={{
                 flex: 1, border: "none", outline: "none", padding: "0 14px",
                 fontSize: 12, fontFamily: "inherit", background: "transparent",
