@@ -6,10 +6,10 @@ import NBTWordmark from "./NBTWordmark";
 import AuthModal from "./AuthModal";
 
 const DISCOVER_LINKS = [
-  { label: "Categories",   href: "/discover?tab=categories" },
-  { label: "Use Cases",    href: "/discover?tab=use-cases" },
-  { label: "Free Tools",   href: "/discover?tab=free" },
-  { label: "Hall of Fame", href: "/discover?tab=hall-of-fame" },
+  { label: "Categories",   href: "/discover/categories" },
+  { label: "Use Cases",    href: "/discover/use-cases" },
+  { label: "Free Tools",   href: "/discover/free-tools" },
+  { label: "Hall of Fame", href: "/discover/hall-of-fame" },
 ];
 
 const COMPANY_LINKS = [
