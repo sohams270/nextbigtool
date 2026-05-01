@@ -82,7 +82,7 @@ export default async function DiscoverSidebar() {
             href="/discover/categories"
             style={{ fontSize: 10, color: "#FF6B35", fontWeight: 600, display: "block", marginTop: 10, textDecoration: "none" }}
           >
-            View all {liveCategories.length} categories →
+            View All →
           </Link>
         )}
       </div>
