@@ -23,6 +23,32 @@ function Toolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
   const [headingOpen, setHeadingOpen] = useState(false);
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
+  const [imgOpen, setImgOpen] = useState(false);
+  const [imgUrl, setImgUrl] = useState("");
+  const [imgAlt, setImgAlt] = useState("");
+  const [imgUploading, setImgUploading] = useState(false);
+  const imgFileRef = useRef<HTMLInputElement>(null);
+
+  async function handleImgUpload(file: File) {
+    setImgUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/cms/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.url) setImgUrl(data.url);
+    } finally {
+      setImgUploading(false);
+    }
+  }
+
+  function insertImage() {
+    if (!imgUrl.trim()) return;
+    editor?.chain().focus().setImage({ src: imgUrl.trim(), alt: imgAlt.trim() }).run();
+    setImgOpen(false);
+    setImgUrl("");
+    setImgAlt("");
+  }
 
   if (!editor) return null;
 
@@ -286,6 +312,155 @@ function Toolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
       {btn("❝", () => editor.chain().focus().toggleBlockquote().run(), editor.isActive("blockquote"), "Blockquote")}
       {btn("</>", () => editor.chain().focus().toggleCodeBlock().run(), editor.isActive("codeBlock"), "Code block")}
       {btn("—", () => editor.chain().focus().setHorizontalRule().run(), false, "Horizontal rule")}
+
+      {sep}
+
+      {/* Image insert */}
+      <div style={{ position: "relative" }}>
+        <input
+          ref={imgFileRef}
+          type="file"
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleImgUpload(file);
+            e.target.value = "";
+          }}
+        />
+        <button
+          type="button"
+          title="Insert image"
+          onClick={() => setImgOpen((o) => !o)}
+          style={{
+            padding: "4px 8px",
+            borderRadius: 5,
+            border: "none",
+            background: imgOpen ? "rgba(255,107,53,0.18)" : "transparent",
+            color: imgOpen ? "#FF6B35" : "rgba(255,255,255,0.7)",
+            fontSize: 14,
+            cursor: "pointer",
+            fontFamily: "inherit",
+          }}
+        >
+          🖼
+        </button>
+        {imgOpen && (
+          <div style={{
+            position: "absolute",
+            top: "calc(100% + 6px)",
+            left: 0,
+            background: "#1A1B2E",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: 10,
+            padding: 14,
+            zIndex: 100,
+            boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+            minWidth: 300,
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+          }}>
+            <button
+              type="button"
+              onClick={() => imgFileRef.current?.click()}
+              style={{
+                padding: "7px 12px",
+                borderRadius: 7,
+                border: "1px dashed rgba(255,255,255,0.2)",
+                background: "rgba(255,255,255,0.04)",
+                color: "rgba(255,255,255,0.6)",
+                fontSize: 12,
+                cursor: "pointer",
+                fontFamily: "inherit",
+                textAlign: "center",
+              }}
+            >
+              {imgUploading ? "Uploading…" : "⬆ Upload image"}
+            </button>
+
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", textAlign: "center" }}>— or paste URL —</div>
+            <input
+              value={imgUrl}
+              onChange={(e) => setImgUrl(e.target.value)}
+              placeholder="https://..."
+              style={{
+                background: "rgba(255,255,255,0.07)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: 6,
+                padding: "6px 8px",
+                color: "#fff",
+                fontSize: 12,
+                fontFamily: "inherit",
+                outline: "none",
+              }}
+            />
+
+            <input
+              value={imgAlt}
+              onChange={(e) => setImgAlt(e.target.value)}
+              placeholder="Alt text (for accessibility & SEO)"
+              style={{
+                background: "rgba(255,255,255,0.07)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: 6,
+                padding: "6px 8px",
+                color: "#fff",
+                fontSize: 12,
+                fontFamily: "inherit",
+                outline: "none",
+              }}
+            />
+
+            {imgUrl && (
+              <img
+                src={imgUrl}
+                alt={imgAlt}
+                style={{ width: "100%", maxHeight: 120, objectFit: "cover", borderRadius: 6, border: "1px solid rgba(255,255,255,0.1)" }}
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+              />
+            )}
+
+            <div style={{ display: "flex", gap: 6 }}>
+              <button
+                type="button"
+                onClick={insertImage}
+                disabled={!imgUrl.trim()}
+                style={{
+                  flex: 1,
+                  padding: "7px 12px",
+                  borderRadius: 7,
+                  background: imgUrl.trim() ? "#FF6B35" : "rgba(255,255,255,0.1)",
+                  border: "none",
+                  color: "#fff",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: imgUrl.trim() ? "pointer" : "not-allowed",
+                  fontFamily: "inherit",
+                }}
+              >
+                Insert Image
+              </button>
+              <button
+                type="button"
+                onClick={() => { setImgOpen(false); setImgUrl(""); setImgAlt(""); }}
+                style={{
+                  padding: "7px 12px",
+                  borderRadius: 7,
+                  background: "rgba(255,255,255,0.07)",
+                  border: "none",
+                  color: "rgba(255,255,255,0.6)",
+                  fontSize: 12,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
