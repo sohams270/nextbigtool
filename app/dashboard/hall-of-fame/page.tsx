@@ -17,6 +17,9 @@ type Nomination = {
   tools: { name: string; logo_url: string | null; tagline: string } | null;
 };
 type Tool = { id: string; name: string; tagline: string; logo_url: string | null };
+type InductedTool = {
+  id: string; name: string; tagline: string; logo_url: string | null; slug: string; inducted_at: string | null;
+};
 
 const card: React.CSSProperties = {
   background: "var(--surface)",
@@ -275,11 +278,12 @@ export default function HallOfFamePage() {
   const router = useRouter();
   const supabase = createClient();
 
-  const [userId,      setUserId]      = useState<string | null>(null);
-  const [plan,        setPlan]        = useState<string>("free");
-  const [tools,       setTools]       = useState<Tool[]>([]);
-  const [nominations, setNominations] = useState<Nomination[]>([]);
-  const [loading,     setLoading]     = useState(true);
+  const [userId,        setUserId]        = useState<string | null>(null);
+  const [plan,          setPlan]          = useState<string>("free");
+  const [tools,         setTools]         = useState<Tool[]>([]);
+  const [nominations,   setNominations]   = useState<Nomination[]>([]);
+  const [inducted,      setInducted]      = useState<InductedTool[]>([]);
+  const [loading,       setLoading]       = useState(true);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -291,10 +295,16 @@ export default function HallOfFamePage() {
         supabase.from("profiles").select("plan").eq("id", user.id).single(),
         supabase.from("tools").select("id, name, tagline, logo_url").eq("submitter_id", user.id).eq("status", "approved"),
         supabase.from("hall_of_fame").select("id, tool_id, pitch, status, inducted_at, created_at, tools(name, logo_url, tagline)").eq("user_id", user.id).order("created_at", { ascending: false }),
-      ]).then(([profileRes, toolsRes, nomRes]) => {
+        supabase.from("hall_of_fame").select("inducted_at, tools(id, name, tagline, logo_url, slug)").eq("status", "approved").order("inducted_at", { ascending: false }),
+      ]).then(([profileRes, toolsRes, nomRes, inductedRes]) => {
         setPlan(isAdmin ? "core" : (profileRes.data?.plan ?? "free"));
         setTools((toolsRes.data ?? []) as Tool[]);
         setNominations((nomRes.data ?? []) as unknown as Nomination[]);
+        const inductedTools = ((inductedRes.data ?? []) as any[]).map(r => ({
+          ...(r.tools as InductedTool),
+          inducted_at: r.inducted_at,
+        })).filter(t => t?.id);
+        setInducted(inductedTools);
         setLoading(false);
       });
     });
@@ -420,6 +430,101 @@ export default function HallOfFamePage() {
           )}
         </div>
       </div>
+
+      {/* ── Recently Inducted ─────────────────────────────────────────────── */}
+      {inducted.length > 0 && (
+        <div style={{ marginTop: 32 }}>
+          {/* Section header */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{
+                width: 30, height: 30, borderRadius: 8,
+                background: "linear-gradient(135deg,#ffd700,#ff8c00)",
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15,
+              }}>🏆</div>
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.01em" }}>
+                  Hall of Fame
+                </div>
+                <div style={{ fontSize: 11, color: "var(--ink-muted)" }}>
+                  {inducted.length} tool{inducted.length !== 1 ? "s" : ""} permanently inducted
+                </div>
+              </div>
+            </div>
+            <Link href="/discover?tab=hall-of-fame" style={{
+              fontSize: 12, fontWeight: 600, color: "#ff6a3d",
+              textDecoration: "none",
+            }}>
+              View public page →
+            </Link>
+          </div>
+
+          {/* Cards grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 14 }}>
+            {inducted.map(tool => (
+              <Link key={tool.id} href={`/tools/${tool.slug}`} style={{ textDecoration: "none" }}>
+                <div style={{
+                  background: "var(--surface)",
+                  border: "1.5px solid rgba(255,215,0,0.3)",
+                  borderRadius: 12,
+                  padding: "16px 14px 14px",
+                  position: "relative",
+                  overflow: "hidden",
+                  cursor: "pointer",
+                  transition: "box-shadow 0.15s, transform 0.1s",
+                }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 20px rgba(255,215,0,0.12)";
+                    (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                    (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
+                  }}
+                >
+                  {/* Gold top bar */}
+                  <div style={{
+                    position: "absolute", top: 0, left: 0, right: 0, height: 2,
+                    background: "linear-gradient(90deg,#ffd700,#ff8c00,#ffd700)",
+                  }} />
+
+                  {/* Logo */}
+                  <div style={{
+                    width: 42, height: 42, borderRadius: 10, marginBottom: 10,
+                    border: "1.5px solid rgba(255,215,0,0.25)",
+                    overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center",
+                    background: tool.logo_url ? "transparent" : `hsl(${tool.name.charCodeAt(0) * 7 % 360},55%,45%)`,
+                    fontSize: 18, fontWeight: 800, color: "#fff",
+                  }}>
+                    {tool.logo_url
+                      ? <img src={tool.logo_url} alt={tool.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      : tool.name[0]}
+                  </div>
+
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", marginBottom: 3, letterSpacing: "-0.01em" }}>
+                    {tool.name}
+                  </div>
+                  <div style={{
+                    fontSize: 11, color: "var(--ink-muted)", lineHeight: 1.45, marginBottom: 12,
+                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden",
+                  }}>
+                    {tool.tagline}
+                  </div>
+
+                  <div style={{
+                    display: "inline-flex", alignItems: "center", gap: 4,
+                    padding: "2px 8px", borderRadius: 20,
+                    background: "rgba(255,215,0,0.1)", border: "1px solid rgba(255,215,0,0.3)",
+                    fontSize: 10, fontWeight: 700, color: "#9a6a00",
+                  }}>
+                    🏆 {tool.inducted_at ? fmtMonth(tool.inducted_at) : "Inducted"}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
