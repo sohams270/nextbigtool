@@ -195,7 +195,7 @@ export default function HeroSection() {
             </div>
           </div>
 
-          <a href="#how-it-works" style={{ textDecoration: "none" }}>
+          <a href="https://www.nextbigtool.com/rules" style={{ textDecoration: "none" }}>
             <div
               style={{ height: 40, padding: "0 20px", border: "1px solid rgba(255,255,255,0.22)", borderRadius: 8, display: "flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.85)", cursor: "pointer", whiteSpace: "nowrap", transition: "border-color 0.2s, color 0.2s" }}
               onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.5)"; (e.currentTarget as HTMLDivElement).style.color = "#fff"; }}
