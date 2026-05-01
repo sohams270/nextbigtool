@@ -216,11 +216,11 @@ export default function PricingPage() {
                 </div>
               ))}
             </div>
-            <Link href="/auth/login" style={{ textDecoration: "none" }}>
+            <a href={`/api/checkout?interval=${yearly ? "yearly" : "monthly"}`} style={{ textDecoration: "none" }}>
               <button style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", background: "#fff", fontSize: 14, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
                 Upgrade to Core →
               </button>
-            </Link>
+            </a>
           </div>
         </div>
 

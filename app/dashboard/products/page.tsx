@@ -867,9 +867,11 @@ export default function AddYourToolPage() {
                     </div>
                   ))}
                 </div>
-                <button style={{ width: "100%", padding: "10px 0", borderRadius: 9, border: "none", background: "#fff", fontSize: 13, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
-                  Upgrade to Core →
-                </button>
+                <a href="/api/checkout?interval=monthly" style={{ textDecoration: "none" }}>
+                  <button style={{ width: "100%", padding: "10px 0", borderRadius: 9, border: "none", background: "#fff", fontSize: 13, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
+                    Upgrade to Core →
+                  </button>
+                </a>
               </div>
             </div>
 

@@ -162,8 +162,8 @@ export default function UpgradeModal({
 
           {/* CTAs */}
           <div style={{ display: "flex", gap: 10 }}>
-            <Link
-              href="/dashboard/plan"
+            <a
+              href="/api/checkout?interval=monthly"
               style={{
                 flex: 1, textAlign: "center",
                 padding: "11px 0", borderRadius: 11,
@@ -174,7 +174,7 @@ export default function UpgradeModal({
               }}
             >
               Upgrade to Core →
-            </Link>
+            </a>
             <Link
               href="/pricing"
               onClick={onClose}

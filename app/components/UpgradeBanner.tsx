@@ -37,7 +37,9 @@ export default function UpgradeBanner() {
           86 people are following Replai. Each one can get a single follow-up from you.
         </div>
       </div>
-      <Btn variant="primary" size="md">Upgrade to Core →</Btn>
+      <a href="/api/checkout?interval=monthly" style={{ textDecoration: "none", flexShrink: 0 }}>
+        <Btn variant="primary" size="md">Upgrade to Core →</Btn>
+      </a>
     </div>
   );
 }
