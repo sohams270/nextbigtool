@@ -182,7 +182,7 @@ export default async function AdminPage() {
   // All members
   const { data: allMembers } = await adminDb
     .from("profiles")
-    .select("id, full_name, email, plan, created_at")
+    .select("id, full_name, email, plan, company, role, created_at")
     .order("created_at", { ascending: false });
 
   // Tool count per user
@@ -198,7 +198,7 @@ export default async function AdminPage() {
 
   const members = (allMembers ?? []) as Array<{
     id: string; full_name: string | null; email: string | null;
-    plan: string | null; created_at: string;
+    plan: string | null; company: string | null; role: string | null; created_at: string;
   }>;
 
   // Stats
@@ -682,9 +682,11 @@ export default async function AdminPage() {
         {/* Table */}
         <div style={{ ...card, overflow: "hidden", padding: 0 }}>
           {/* Header row */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 90px 90px 90px", padding: "10px 16px", borderBottom: "1px solid var(--border)", fontSize: 10, fontWeight: 700, color: "var(--ink-muted)", letterSpacing: "0.07em", textTransform: "uppercase" }}>
-            <div>Name / Email</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 120px 120px 90px 90px 90px", padding: "10px 16px", borderBottom: "1px solid var(--border)", fontSize: 10, fontWeight: 700, color: "var(--ink-muted)", letterSpacing: "0.07em", textTransform: "uppercase" }}>
+            <div>Name</div>
             <div>Email</div>
+            <div>Company</div>
+            <div>Role</div>
             <div>Plan</div>
             <div>Tools</div>
             <div>Joined</div>
@@ -700,7 +702,7 @@ export default async function AdminPage() {
               return (
                 <div key={m.id} style={{
                   display: "grid",
-                  gridTemplateColumns: "1fr 1fr 90px 90px 90px",
+                  gridTemplateColumns: "1fr 1fr 120px 120px 90px 90px 90px",
                   padding: "11px 16px",
                   borderBottom: idx < members.length - 1 ? "1px solid var(--border-faint)" : "none",
                   alignItems: "center",
@@ -720,6 +722,14 @@ export default async function AdminPage() {
                   {/* Email */}
                   <div style={{ fontSize: 12, color: "var(--ink-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {m.email ?? "—"}
+                  </div>
+                  {/* Company */}
+                  <div style={{ fontSize: 12, color: "var(--ink-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {m.company ?? "—"}
+                  </div>
+                  {/* Role */}
+                  <div style={{ fontSize: 12, color: "var(--ink-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {m.role ?? "—"}
                   </div>
                   {/* Plan */}
                   <div>
