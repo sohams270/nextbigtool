@@ -1,64 +1,62 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useState, useRef, useEffect, useTransition } from "react";
+import { useTransition } from "react";
 
 const SORT_TABS = [
-  { key: "trending",  label: "Trending"     },
-  { key: "new",       label: "New Today"    },
-  { key: "top",       label: "Top All Time" },
-  { key: "activity",  label: "Activity"     },
+  { key: "trending",  label: "Trending"      },
+  { key: "new",       label: "New Today"     },
+  { key: "top",       label: "Top All Time"  },
+  { key: "activity",  label: "Activity"      },
 ];
 
 const PRICE_TABS = [
-  { key: "all",       label: "All"      },
-  { key: "free",      label: "Free"     },
-  { key: "freemium",  label: "Freemium" },
-  { key: "paid",      label: "Paid"     },
+  { key: "free",      label: "Free"      },
+  { key: "freemium",  label: "Freemium"  },
+  { key: "paid",      label: "Paid"      },
 ];
 
-export default function FilterBar({ categories }: { categories: string[] }) {
+export default function FilterBar() {
   const router       = useRouter();
   const pathname     = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const [catOpen, setCatOpen] = useState(false);
-  const catRef = useRef<HTMLDivElement>(null);
 
-  const sort     = searchParams.get("sort")     ?? "trending";
-  const price    = searchParams.get("price")    ?? "all";
-  const category = searchParams.get("category") ?? "";
+  const sort  = searchParams.get("sort")  ?? "trending";
+  const price = searchParams.get("price") ?? "all";
 
   function update(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
-    const isDefault = (key === "sort" && value === "trending") ||
-                      (key === "price" && value === "all") ||
-                      value === "";
-    if (isDefault) params.delete(key);
-    else params.set(key, value);
+
+    if (key === "price") {
+      // Toggle: clicking active price deselects it (back to "all")
+      if (price === value) {
+        params.delete("price");
+      } else {
+        params.set("price", value);
+      }
+    } else {
+      // Sort: trending is the default, remove param when selecting it
+      const isDefault = key === "sort" && value === "trending";
+      if (isDefault) params.delete(key);
+      else params.set(key, value);
+    }
+
     const qs = params.toString();
     startTransition(() => router.push(qs ? `${pathname}?${qs}` : pathname));
   }
 
-  useEffect(() => {
-    function onDown(e: MouseEvent) {
-      if (catRef.current && !catRef.current.contains(e.target as Node)) {
-        setCatOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, []);
-
   return (
-    <div className="filter-bar-inner" style={{
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "8px 40px", borderBottom: "1px solid var(--border)",
-      background: "var(--surface)", position: "sticky", top: 0, zIndex: 100,
-      opacity: isPending ? 0.65 : 1, transition: "opacity 0.15s",
-      overflowX: "auto",
-    }}>
-
+    <div
+      className="filter-bar-inner"
+      style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "8px 40px", borderBottom: "1px solid var(--border)",
+        background: "var(--surface)", position: "sticky", top: 0, zIndex: 100,
+        opacity: isPending ? 0.65 : 1, transition: "opacity 0.15s",
+        overflowX: "auto",
+      }}
+    >
       {/* ── Left: sort tabs ── */}
       <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
         {SORT_TABS.map(({ key, label }) => {
@@ -105,7 +103,7 @@ export default function FilterBar({ categories }: { categories: string[] }) {
         </button>
       </div>
 
-      {/* ── Right: price + category ── */}
+      {/* ── Right: pricing filters only ── */}
       <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
         {PRICE_TABS.map(({ key, label }) => {
           const active = price === key;
@@ -123,69 +121,6 @@ export default function FilterBar({ categories }: { categories: string[] }) {
             </button>
           );
         })}
-
-        <div style={{ width: 1, background: "var(--border)", height: 16, margin: "0 4px" }} />
-
-        {/* Category dropdown */}
-        <div ref={catRef} style={{ position: "relative" }}>
-          <button onClick={() => setCatOpen(v => !v)} style={{
-            padding: "5px 13px", borderRadius: 20,
-            fontSize: 12, fontWeight: category ? 700 : 500,
-            border: category ? "1.5px solid #FF6B35" : "1px solid var(--border)",
-            background: category ? "var(--orange-soft)" : "transparent",
-            color: category ? "#FF6B35" : "var(--ink)",
-            cursor: "pointer", fontFamily: "inherit",
-            display: "flex", alignItems: "center", gap: 6,
-            transition: "all 0.12s", whiteSpace: "nowrap",
-          }}>
-            {category || "Category"}
-            <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-              style={{ transform: catOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
-              <path d="M6 9l6 6 6-6"/>
-            </svg>
-          </button>
-
-          {catOpen && (
-            <div style={{
-              position: "absolute", top: "calc(100% + 8px)", right: 0,
-              background: "var(--surface)", border: "1px solid var(--border)",
-              borderRadius: 12, padding: "6px",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.14)",
-              zIndex: 300, minWidth: 220,
-              maxHeight: 340, overflowY: "auto",
-            }}>
-              {category && (
-                <button onClick={() => { update("category", ""); setCatOpen(false); }} style={{
-                  display: "block", width: "100%", textAlign: "left",
-                  padding: "7px 10px", borderRadius: 8, border: "none",
-                  background: "transparent", fontSize: 11.5, fontWeight: 600,
-                  color: "#FF6B35", cursor: "pointer", fontFamily: "inherit",
-                  marginBottom: 4,
-                }}>
-                  ✕ Clear filter
-                </button>
-              )}
-              {categories.map((cat) => (
-                <button key={cat} onClick={() => { update("category", cat); setCatOpen(false); }} style={{
-                  display: "block", width: "100%", textAlign: "left",
-                  padding: "7px 10px", borderRadius: 8, border: "none",
-                  background: category === cat ? "var(--orange-soft)" : "transparent",
-                  color: category === cat ? "#FF6B35" : "var(--ink)",
-                  fontSize: 12, fontWeight: category === cat ? 700 : 500,
-                  cursor: "pointer", fontFamily: "inherit",
-                  transition: "background 0.1s",
-                }}>
-                  {cat}
-                </button>
-              ))}
-              {categories.length === 0 && (
-                <div style={{ padding: "10px 12px", fontSize: 12, color: "var(--ink-muted)" }}>
-                  No categories yet
-                </div>
-              )}
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );

@@ -35,105 +35,192 @@ type ToolRow = {
   tool_tags: { tags: { name: string } | null }[];
 };
 
-type SearchParams = Promise<{ sort?: string; price?: string; category?: string }>;
+type ActivityItem = {
+  id: string;
+  type: "tool_added" | "hof_inducted" | "bip_post";
+  timestamp: string;
+  title: string;
+  description: string;
+  href: string;
+  emoji: string;
+  badge: string;
+};
+
+type SearchParams = Promise<{ sort?: string; price?: string }>;
 
 export default async function HomePage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  const { sort = "trending", price = "all", category = "" } = await searchParams;
+  const { sort = "trending", price = "all" } = await searchParams;
 
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // ── Fetch tags for the category dropdown ──────────────────────────────
-  const { data: tagsData } = await supabase
-    .from("tags")
-    .select("name")
-    .order("name");
-  const categories = (tagsData ?? []).map((t: { name: string }) => t.name);
+  // ── Hall of Fame sidebar (always static, 3 entries) ───────────────────
+  const { data: hofRows } = await supabase
+    .from("hall_of_fame")
+    .select("inducted_at, tools(id, slug, name, tagline, logo_url, website_url, pricing, upvote_count, featured, tool_tags(tags(name)))")
+    .eq("status", "approved")
+    .order("inducted_at", { ascending: false })
+    .limit(3);
 
-  // ── Build tools query ─────────────────────────────────────────────────
-  let toolQuery = supabase
-    .from("tools")
-    .select(`
-      id, slug, name, tagline, logo_url, website_url, pricing, upvote_count, featured,
-      tool_tags ( tags ( name ) )
-    `)
-    .eq("status", "approved");
+  const hofEntries: HofEntry[] = (hofRows ?? [])
+    .filter((r: any) => r.tools)
+    .map((r: any) => ({ inducted_at: r.inducted_at, tool: r.tools as any }));
 
-  // Price filter
-  if (price && price !== "all") {
-    toolQuery = toolQuery.eq("pricing", price);
-  }
+  // ── Activity feed (only when sort === "activity") ─────────────────────
+  let activities: ActivityItem[] = [];
+  if (sort === "activity") {
+    const [
+      { data: recentTools },
+      { data: recentHof },
+      { data: recentPosts },
+    ] = await Promise.all([
+      supabase
+        .from("tools")
+        .select("id, name, slug, tagline, logo_url, created_at")
+        .eq("status", "approved")
+        .order("created_at", { ascending: false })
+        .limit(12),
+      supabase
+        .from("hall_of_fame")
+        .select("id, inducted_at, tools(name, slug, logo_url)")
+        .eq("status", "approved")
+        .order("inducted_at", { ascending: false })
+        .limit(6),
+      supabase
+        .from("posts")
+        .select("id, content, created_at, tool_id")
+        .order("created_at", { ascending: false })
+        .limit(10),
+    ]);
 
-  // Category filter: look up tag → get matching tool IDs
-  if (category) {
-    const { data: tagRow } = await supabase
-      .from("tags")
-      .select("id")
-      .eq("name", category)
-      .maybeSingle();
+    // Enrich posts with tool names
+    const postToolIds = [...new Set((recentPosts ?? []).map((p: any) => p.tool_id).filter(Boolean))];
+    const { data: postToolRows } = postToolIds.length > 0
+      ? await supabase.from("tools").select("id, name, slug").in("id", postToolIds)
+      : { data: [] as { id: string; name: string; slug: string }[] };
+    const toolMap = Object.fromEntries((postToolRows ?? []).map((t: any) => [t.id, t]));
 
-    if (tagRow) {
-      const { data: toolTagRows } = await supabase
-        .from("tool_tags")
-        .select("tool_id")
-        .eq("tag_id", tagRow.id);
-      const ids = (toolTagRows ?? []).map((r: { tool_id: string }) => r.tool_id);
-      if (ids.length > 0) {
-        toolQuery = toolQuery.in("id", ids);
-      } else {
-        // No tools in this category — force empty result
-        toolQuery = toolQuery.in("id", ["00000000-0000-0000-0000-000000000000"]);
-      }
+    const items: ActivityItem[] = [];
+
+    for (const t of recentTools ?? []) {
+      items.push({
+        id: `tool-${t.id}`,
+        type: "tool_added",
+        timestamp: t.created_at,
+        title: `New tool launched: ${t.name}`,
+        description: t.tagline ?? "",
+        href: `/tools/${t.slug}`,
+        emoji: "🚀",
+        badge: "New Launch",
+      });
     }
+    for (const h of recentHof ?? []) {
+      const tool = (h as any).tools;
+      if (!tool) continue;
+      items.push({
+        id: `hof-${h.id}`,
+        type: "hof_inducted",
+        timestamp: h.inducted_at,
+        title: `${tool.name} inducted into Hall of Fame`,
+        description: "Recognised as one of the best indie tools",
+        href: `/tools/${tool.slug}`,
+        emoji: "🏆",
+        badge: "Hall of Fame",
+      });
+    }
+    for (const p of recentPosts ?? []) {
+      const tool = toolMap[(p as any).tool_id];
+      items.push({
+        id: `post-${p.id}`,
+        type: "bip_post",
+        timestamp: p.created_at,
+        title: tool ? `${tool.name} posted an update` : "A founder posted an update",
+        description: typeof p.content === "string" ? p.content.slice(0, 120) : "",
+        href: tool ? `/tools/${tool.slug}` : "/",
+        emoji: "📝",
+        badge: "Build in Public",
+      });
+    }
+
+    activities = items.sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
   }
 
-  // Sort order
-  switch (sort) {
-    case "new":
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      toolQuery = toolQuery
-        .gte("created_at", today.toISOString())
-        .order("created_at", { ascending: false });
-      break;
-    case "activity":
-      toolQuery = toolQuery.order("created_at", { ascending: false });
-      break;
-    case "top":
-    case "hof":
-    case "trending":
-    default:
-      toolQuery = toolQuery.order("upvote_count", { ascending: false });
-      break;
+  // ── Hall of Fame sort: fetch all inducted tools (no pagination) ────────
+  let allHofEntries: HofEntry[] = [];
+  if (sort === "hof") {
+    const { data: allHofRows } = await supabase
+      .from("hall_of_fame")
+      .select("inducted_at, tools(id, slug, name, tagline, logo_url, website_url, pricing, upvote_count, featured, tool_tags(tags(name)))")
+      .eq("status", "approved")
+      .order("inducted_at", { ascending: false });
+
+    allHofEntries = (allHofRows ?? [])
+      .filter((r: any) => r.tools)
+      .map((r: any) => ({ inducted_at: r.inducted_at, tool: r.tools as any }));
   }
 
-  const { data: allTools } = await toolQuery.limit(15);
-  const tools = (allTools ?? []) as unknown as ToolRow[];
-
-  // For non-hof sorts, put featured tools first
-  const sortedTools = sort === "hof"
-    ? tools
-    : [
-        ...tools.filter((t) => t.featured),
-        ...tools.filter((t) => !t.featured),
-      ];
-
-  const displayedIds = tools.map((t) => t.id);
-
+  // ── Build tools query (for all non-activity, non-hof sorts) ──────────
+  let tools: ToolRow[] = [];
+  let sortedTools: ToolRow[] = [];
   let userUpvotedIds: string[] = [];
-  if (user && displayedIds.length > 0) {
-    const { data: votes } = await supabase
-      .from("upvotes")
-      .select("tool_id")
-      .eq("user_id", user.id)
-      .in("tool_id", displayedIds);
-    userUpvotedIds = (votes ?? []).map((v: { tool_id: string }) => v.tool_id);
+
+  if (sort !== "activity" && sort !== "hof") {
+    let toolQuery = supabase
+      .from("tools")
+      .select(`
+        id, slug, name, tagline, logo_url, website_url, pricing, upvote_count, featured,
+        tool_tags ( tags ( name ) )
+      `)
+      .eq("status", "approved");
+
+    // Price filter
+    if (price && price !== "all") {
+      toolQuery = toolQuery.eq("pricing", price);
+    }
+
+    // Sort order
+    switch (sort) {
+      case "new":
+        // All tools sorted by created_at desc
+        toolQuery = toolQuery.order("created_at", { ascending: false });
+        break;
+      case "top":
+        toolQuery = toolQuery.order("upvote_count", { ascending: false });
+        break;
+      case "trending":
+      default:
+        toolQuery = toolQuery.order("upvote_count", { ascending: false });
+        break;
+    }
+
+    const { data: allTools } = await toolQuery.limit(20);
+    tools = (allTools ?? []) as unknown as ToolRow[];
+
+    // Put featured tools first (except for "new" sort which is chronological)
+    sortedTools = sort === "new"
+      ? tools
+      : [
+          ...tools.filter((t) => t.featured),
+          ...tools.filter((t) => !t.featured),
+        ];
+
+    const displayedIds = tools.map((t) => t.id);
+    if (user && displayedIds.length > 0) {
+      const { data: votes } = await supabase
+        .from("upvotes")
+        .select("tool_id")
+        .eq("user_id", user.id)
+        .in("tool_id", displayedIds);
+      userUpvotedIds = (votes ?? []).map((v: { tool_id: string }) => v.tool_id);
+    }
   }
 
   // ── User's own submissions (for nudge banner) ─────────────────────────
@@ -148,7 +235,6 @@ export default async function HomePage({
       .limit(3);
 
     if (myTools && myTools.length > 0) {
-      // Fetch today's upvote counts for the user's tools
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
       const myToolIds = myTools.map((t: { id: string }) => t.id);
@@ -171,25 +257,12 @@ export default async function HomePage({
     }
   }
 
-  // ── Hall of Fame inducted tools ───────────────────────────────────────
-  const { data: hofRows } = await supabase
-    .from("hall_of_fame")
-    .select("inducted_at, tools(id, slug, name, tagline, logo_url, website_url, pricing, upvote_count, featured, tool_tags(tags(name)))")
-    .eq("status", "approved")
-    .order("inducted_at", { ascending: false })
-    .limit(3);
-
-  const hofEntries: HofEntry[] = (hofRows ?? [])
-    .filter((r: any) => r.tools)
-    .map((r: any) => ({ inducted_at: r.inducted_at, tool: r.tools as any }));
-
-  // ── Categories with live tool counts ─────────────────────────────────
+  // ── Categories with live tool counts (sidebar) ─────────────────────────
   const { data: catRows } = await supabase
     .from("categories")
     .select("id, name")
     .order("name");
 
-  // Count approved tools per category
   const { data: toolCatCounts } = await supabase
     .from("tools")
     .select("category_id")
@@ -205,8 +278,6 @@ export default async function HomePage({
     .map((c: { id: string; name: string }) => ({ id: c.id, name: c.name, count: countByCategory[c.id] ?? 0 }))
     .sort((a, b) => b.count - a.count);
 
-  // Posts are now fetched client-side by <BuildInPublicWall />
-
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
       <TopNav />
@@ -215,7 +286,7 @@ export default async function HomePage({
 
       {/* Filter bar — client component, needs Suspense for useSearchParams */}
       <Suspense fallback={<FilterBarSkeleton />}>
-        <FilterBar categories={categories} />
+        <FilterBar />
       </Suspense>
 
       {/* Main content */}
@@ -232,65 +303,131 @@ export default async function HomePage({
         >
           {/* Feed */}
           <div>
-            {/* Hall of Fame heading */}
+            {/* ── Activity feed ── */}
+            {sort === "activity" && (
+              <ActivityFeedSection activities={activities} />
+            )}
+
+            {/* ── Hall of Fame full list ── */}
             {sort === "hof" && (
-              <div style={{
-                display: "flex", alignItems: "center", gap: 10,
-                marginBottom: 16, padding: "12px 16px",
-                background: "linear-gradient(135deg,#0D0E22,#1A0D2E)",
-                borderRadius: 12, border: "1px solid rgba(255,215,0,0.2)",
-              }}>
-                <span style={{ fontSize: 22 }}>🏆</span>
-                <div>
-                  <div style={{
-                    fontSize: 15, fontWeight: 800,
-                    background: "linear-gradient(90deg,#FFD700,#FFA500)",
-                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                  }}>Hall of Fame</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>
-                    All-time top products by community upvotes
+              <>
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  marginBottom: 20, padding: "12px 16px",
+                  background: "linear-gradient(135deg,#0D0E22,#1A0D2E)",
+                  borderRadius: 12, border: "1px solid rgba(255,215,0,0.2)",
+                }}>
+                  <span style={{ fontSize: 22 }}>🏆</span>
+                  <div>
+                    <div style={{
+                      fontSize: 15, fontWeight: 800,
+                      background: "linear-gradient(90deg,#FFD700,#FFA500)",
+                      WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                    }}>Hall of Fame</div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>
+                      All inducted tools — ranked by induction date
+                    </div>
                   </div>
                 </div>
-              </div>
+                {allHofEntries.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "60px 0", color: "var(--ink-muted)", fontSize: 14 }}>
+                    No tools inducted yet.
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    {allHofEntries.map((entry, i) => {
+                      const t = entry.tool as any;
+                      const medals = ["🥇", "🥈", "🥉"];
+                      let logoSrc: string | null = t.logo_url;
+                      if (!logoSrc && t.website_url) {
+                        try {
+                          const d = new URL(t.website_url).hostname.replace(/^www\./, "");
+                          logoSrc = `https://logo.clearbit.com/${d}`;
+                        } catch { /* no-op */ }
+                      }
+                      return (
+                        <a
+                          key={t.id}
+                          href={`/tools/${t.slug}`}
+                          style={{ textDecoration: "none" }}
+                        >
+                          <div style={{
+                            display: "flex", alignItems: "center", gap: 14,
+                            padding: "14px 16px", borderRadius: 12,
+                            background: "linear-gradient(135deg,#0D0E22,#15102A)",
+                            border: "1px solid rgba(255,215,0,0.18)",
+                            transition: "border-color 0.15s, background 0.15s",
+                          }}>
+                            <span style={{ fontSize: 20, flexShrink: 0, width: 24, textAlign: "center" }}>
+                              {medals[i] ?? "🏅"}
+                            </span>
+                            <div style={{
+                              width: 40, height: 40, borderRadius: 9, overflow: "hidden", flexShrink: 0,
+                              background: "rgba(255,215,0,0.1)", border: "1px solid rgba(255,215,0,0.25)",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              fontSize: 16, fontWeight: 800, color: "#FFD700",
+                            }}>
+                              {logoSrc
+                                ? <img src={logoSrc} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                                : t.name?.[0]}
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{
+                                fontSize: 13, fontWeight: 700, color: "#fff",
+                                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                              }}>{t.name}</div>
+                              <div style={{
+                                fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 2,
+                                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                              }}>{t.tagline}</div>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+                              <div style={{ fontSize: 11, color: "rgba(255,215,0,0.7)", fontWeight: 600 }}>
+                                ▲ {t.upvote_count ?? 0}
+                              </div>
+                              {entry.inducted_at && (
+                                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>
+                                  {new Date(entry.inducted_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
             )}
 
-            {/* Active filters summary */}
-            {(category || price !== "all") && (
-              <div style={{
-                display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap",
-              }}>
-                {category && (
-                  <span style={{
-                    display: "inline-flex", alignItems: "center", gap: 5,
-                    padding: "3px 10px", borderRadius: 20,
-                    background: "var(--orange-soft)", border: "1px solid rgba(255,107,53,0.3)",
-                    fontSize: 11, fontWeight: 700, color: "#FF6B35",
-                  }}>
-                    Category: {category}
-                  </span>
-                )}
+            {/* ── Regular tool feed ── */}
+            {sort !== "activity" && sort !== "hof" && (
+              <>
+                {/* Active price filter */}
                 {price !== "all" && (
-                  <span style={{
-                    display: "inline-flex", alignItems: "center", gap: 5,
-                    padding: "3px 10px", borderRadius: 20,
-                    background: "var(--surface-alt)", border: "1px solid var(--border)",
-                    fontSize: 11, fontWeight: 700, color: "var(--ink-2)",
-                  }}>
-                    Pricing: {price.charAt(0).toUpperCase() + price.slice(1)}
-                  </span>
+                  <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+                    <span style={{
+                      display: "inline-flex", alignItems: "center", gap: 5,
+                      padding: "3px 10px", borderRadius: 20,
+                      background: "var(--surface-alt)", border: "1px solid var(--border)",
+                      fontSize: 11, fontWeight: 700, color: "var(--ink-2)",
+                    }}>
+                      Pricing: {price.charAt(0).toUpperCase() + price.slice(1)}
+                    </span>
+                  </div>
                 )}
-              </div>
+
+                {/* Founder nudge */}
+                <SubmissionNudge submissions={userSubmissions} />
+
+                <ProductShowcase
+                  tools={sortedTools}
+                  userId={user?.id ?? null}
+                  userUpvotedIds={userUpvotedIds}
+                  hofEntries={hofEntries}
+                />
+              </>
             )}
-
-            {/* Founder nudge — only shown to signed-in users with submissions */}
-            <SubmissionNudge submissions={userSubmissions} />
-
-            <ProductShowcase
-              tools={sortedTools}
-              userId={user?.id ?? null}
-              userUpvotedIds={userUpvotedIds}
-              hofEntries={hofEntries}
-            />
           </div>
 
           {/* Sidebar */}
@@ -321,7 +458,7 @@ export default async function HomePage({
               )}
             </div>
 
-            {/* Hall of Fame sidebar — live from DB */}
+            {/* Hall of Fame sidebar — ALWAYS static, regardless of active sort */}
             {hofEntries.length > 0 && (
               <div style={{ borderRadius: 10, border: "1px solid rgba(255,215,0,0.3)", background: "linear-gradient(145deg,#0D0E22,#1A0D2E)" }}>
                 <div style={{ padding: 14 }}>
@@ -350,7 +487,7 @@ export default async function HomePage({
                       </a>
                     );
                   })}
-                  <a href="/discover?tab=hall-of-fame" style={{ fontSize: 10, color: "rgba(255,215,0,0.7)", fontWeight: 600, display: "block", marginTop: 10, textDecoration: "none" }}>
+                  <a href="/?sort=hof" style={{ fontSize: 10, color: "rgba(255,215,0,0.7)", fontWeight: 600, display: "block", marginTop: 10, textDecoration: "none" }}>
                     View all →
                   </a>
                 </div>
@@ -478,7 +615,6 @@ export default async function HomePage({
           }} />
 
           <div style={{ position: "relative", zIndex: 1, padding: "22px 24px 20px" }}>
-            {/* Header */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20 }}>
               <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, paddingTop: 6 }}>
@@ -509,7 +645,6 @@ export default async function HomePage({
               </span>
             </div>
 
-            {/* Client component — handles fetching, pagination, and rendering */}
             <BuildInPublicWall userId={user?.id ?? null} />
           </div>
 
@@ -540,6 +675,107 @@ export default async function HomePage({
   );
 }
 
+// ── Activity Feed Section ─────────────────────────────────────────────────────
+
+function ActivityFeedSection({ activities }: { activities: ActivityItem[] }) {
+  if (activities.length === 0) {
+    return (
+      <div style={{ textAlign: "center", padding: "60px 0", color: "var(--ink-muted)", fontSize: 14 }}>
+        No recent activity yet.
+      </div>
+    );
+  }
+
+  const badgeColors: Record<string, { bg: string; color: string }> = {
+    "New Launch":    { bg: "rgba(59,130,246,0.12)", color: "#60a5fa" },
+    "Hall of Fame":  { bg: "rgba(255,215,0,0.12)",  color: "#FFD700" },
+    "Build in Public": { bg: "rgba(0,184,122,0.12)", color: "#00B87A" },
+  };
+
+  return (
+    <div>
+      <div style={{
+        display: "flex", alignItems: "center", gap: 10, marginBottom: 20,
+        padding: "12px 16px", borderRadius: 12,
+        background: "var(--surface)", border: "1px solid var(--border)",
+      }}>
+        <div className="pulse" style={{ width: 7, height: 7, borderRadius: "50%", background: "#00B87A", flexShrink: 0 }} />
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)" }}>Activity Feed</div>
+          <div style={{ fontSize: 11, color: "var(--ink-muted)", marginTop: 1 }}>
+            Latest launches, inductions, and founder updates
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {activities.map((item) => {
+          const colors = badgeColors[item.badge] ?? { bg: "rgba(255,255,255,0.08)", color: "var(--ink-2)" };
+          const timeAgo = formatTimeAgo(item.timestamp);
+          return (
+            <a key={item.id} href={item.href} style={{ textDecoration: "none" }}>
+              <div style={{
+                display: "flex", alignItems: "flex-start", gap: 14,
+                padding: "14px 16px", borderRadius: 12,
+                background: "var(--surface)", border: "1px solid var(--border)",
+                transition: "border-color 0.15s",
+              }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 9, flexShrink: 0,
+                  background: colors.bg, border: `1px solid ${colors.color}33`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 17,
+                }}>
+                  {item.emoji}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {item.title}
+                    </span>
+                    <span style={{
+                      flexShrink: 0,
+                      fontSize: 9, fontWeight: 700,
+                      padding: "2px 7px", borderRadius: 99,
+                      background: colors.bg, color: colors.color,
+                      border: `1px solid ${colors.color}33`,
+                    }}>
+                      {item.badge}
+                    </span>
+                  </div>
+                  {item.description && (
+                    <div style={{
+                      fontSize: 11, color: "var(--ink-muted)", lineHeight: 1.4,
+                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                    }}>
+                      {item.description}
+                    </div>
+                  )}
+                </div>
+                <div style={{ fontSize: 10, color: "var(--ink-muted)", flexShrink: 0, marginTop: 2 }}>
+                  {timeAgo}
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function formatTimeAgo(timestamp: string): string {
+  const now = Date.now();
+  const then = new Date(timestamp).getTime();
+  const diff = Math.floor((now - then) / 1000);
+  if (diff < 60)   return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
+
+// ── Filter bar skeleton ───────────────────────────────────────────────────────
+
 function FilterBarSkeleton() {
   return (
     <div style={{
@@ -553,7 +789,7 @@ function FilterBarSkeleton() {
         ))}
       </div>
       <div style={{ display: "flex", gap: 4 }}>
-        {[40, 50, 72, 44, 88].map((w, i) => (
+        {[50, 72, 44].map((w, i) => (
           <div key={i} style={{ width: w, height: 28, borderRadius: 20, background: "var(--surface-alt)" }} />
         ))}
       </div>
