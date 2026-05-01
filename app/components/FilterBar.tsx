@@ -112,12 +112,19 @@ export default function FilterBar() {
               padding: "5px 13px", borderRadius: 20,
               fontSize: 12, fontWeight: active ? 700 : 500,
               border: active ? "none" : "1px solid var(--border)",
-              background: active ? "var(--ink)" : "transparent",
-              color: active ? "var(--bg)" : "var(--ink)",
+              background: active
+                ? "linear-gradient(90deg,#FF6B35,#FF3B6B)"
+                : "transparent",
+              color: active ? "#fff" : "var(--ink)",
               cursor: "pointer", fontFamily: "inherit",
-              transition: "all 0.12s",
+              transition: "all 0.12s", whiteSpace: "nowrap",
+              display: "flex", alignItems: "center", gap: 5,
+              boxShadow: active ? "0 2px 8px rgba(255,107,53,0.3)" : "none",
             }}>
               {label}
+              {active && (
+                <span style={{ fontSize: 10, opacity: 0.85, lineHeight: 1 }}>✕</span>
+              )}
             </button>
           );
         })}
