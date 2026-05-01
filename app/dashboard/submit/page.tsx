@@ -6,7 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 import DashTopbar from "../../components/DashTopbar";
 import Btn from "../../components/Btn";
 import Pill from "../../components/Pill";
-import { notifyAdmin } from "@/app/lib/notifyAdmin";
+import { sendAdminNotification } from "@/app/admin/actions";
 
 /* ─── helpers ──────────────────────────────────────────────────────────────── */
 function toSlug(name: string) {
@@ -288,15 +288,15 @@ export default function SubmitPage() {
         }
       }
 
-      // Notify admin of new tool submission
-      notifyAdmin({
+      // Notify admin — server action, awaited, runs server-side via nodemailer
+      await sendAdminNotification({
         type:         "tool_submission",
         toolName:     form.name,
         tagline:      form.tagline,
         plan:         form.plan,
         website:      form.website_url,
         contactEmail: form.contact_email,
-        founderName:  form.name,
+        founderName:  form.contact_email || form.name,
       });
 
       setDone(true);

@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { createAdminClient } from "@/utils/supabase/admin";
 import ReviewButtons from "./ReviewButtons";
+
+export const dynamic = "force-dynamic"; // never serve a cached admin page
 import SubmissionButtons from "./SubmissionButtons";
 import BlogRequestButtons from "./BlogRequestButtons";
 import HofNominationButtons from "./HofNominationButtons";

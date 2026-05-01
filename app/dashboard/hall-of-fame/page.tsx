@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { notifyAdmin } from "@/app/lib/notifyAdmin";
+import { sendAdminNotification } from "@/app/admin/actions";
 
 /* ── types ───────────────────────────────────────────────────────────────── */
 type Nomination = {
@@ -107,13 +107,16 @@ function SubmitForm({ tools, userId, nominations }: {
     setSubmitting(false);
     if (err) { setError(err.message); return; }
 
-    // Notify admin of HoF nomination
+    // Fetch founder name from profile for a readable notification
+    const { data: profile } = await supabase.from("profiles").select("full_name, email").eq("id", userId).single();
     const selectedTool = availableTools.find((t) => t.id === toolId);
-    notifyAdmin({
+
+    // Notify admin — server action, awaited, runs server-side via nodemailer
+    await sendAdminNotification({
       type:        "hof_nomination",
       toolName:    selectedTool?.name ?? toolId,
       pitch:       pitch.trim(),
-      founderName: userId,
+      founderName: profile?.full_name || profile?.email || userId,
     });
 
     setSuccess(true);
