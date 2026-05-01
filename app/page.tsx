@@ -20,6 +20,7 @@ import Btn from "./components/Btn";
 import Footer from "./components/Footer";
 import FilterBar from "./components/FilterBar";
 import SubmissionNudge, { type NudgeSubmission } from "./components/SubmissionNudge";
+import HofUpgradeBtn from "./components/HofUpgradeBtn";
 
 
 type ToolRow = {
@@ -563,21 +564,7 @@ export default async function HomePage({
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", marginBottom: 14, lineHeight: 1.5 }}>
                 Make your product stand out from the crowd — at all times.
               </div>
-              <a href="/contact" style={{ textDecoration: "none", display: "block" }}>
-                <button style={{
-                  width: "100%",
-                  background: "linear-gradient(135deg, rgba(255,215,80,0.15), rgba(255,140,0,0.1))",
-                  border: "1px solid rgba(255,215,80,0.45)",
-                  borderRadius: 8, padding: "8px 0",
-                  fontSize: 11, fontWeight: 700,
-                  color: "#FFD700", cursor: "pointer",
-                  fontFamily: "inherit", letterSpacing: "0.02em",
-                }}
-                className="hof-talk-btn"
-                >
-                  ✦ Talk To Us
-                </button>
-              </a>
+              <HofUpgradeBtn />
             </div>
           </div>
         </div>
