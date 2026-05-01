@@ -144,6 +144,7 @@ export async function PUT(
     slug,
     content,
     excerpt: body.excerpt ?? "",
+    tldr_points: Array.isArray(body.tldr_points) ? body.tldr_points : [],
     featured_image_url: body.featured_image_url ?? null,
     author: body.author ?? "The NBT Team",
     author_id: body.author_id ?? null,

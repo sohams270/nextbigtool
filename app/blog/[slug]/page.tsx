@@ -7,6 +7,7 @@ import Footer from "../../components/Footer";
 import ShareButton from "../../components/blog/ShareButton";
 import TableOfContents from "../../components/blog/TableOfContents";
 import LaunchCTABox from "../../components/blog/LaunchCTABox";
+import TldrBox from "../../components/blog/TldrBox";
 
 export const revalidate = 60;
 
@@ -420,6 +421,9 @@ export default async function BlogPostPage({ params }: Props) {
 
           {/* CENTER: Article */}
           <article>
+            {/* TL;DR box — shown only when the writer has added points */}
+            <TldrBox points={Array.isArray(post.tldr_points) ? post.tldr_points as string[] : []} />
+
             <div
               className="tiptap-editor blog-post-content"
               dangerouslySetInnerHTML={{ __html: processedContent }}

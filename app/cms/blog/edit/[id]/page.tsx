@@ -588,6 +588,7 @@ export default function EditBlogPostPage() {
   const [authorAvatarUrl, setAuthorAvatarUrl] = useState("");
   const [authorLinkedinUrl, setAuthorLinkedinUrl] = useState("");
   const [excerpt, setExcerpt] = useState("");
+  const [tldrPoints, setTldrPoints] = useState<string[]>([""]);
   const [featured, setFeatured] = useState(false);
   const [allowComments, setAllowComments] = useState(true);
 
@@ -653,6 +654,7 @@ export default function EditBlogPostPage() {
         setAuthorAvatarUrl(post.author_avatar_url ?? "");
         setAuthorLinkedinUrl(post.author_linkedin_url ?? "");
         setExcerpt(post.excerpt ?? "");
+        setTldrPoints(Array.isArray(post.tldr_points) && post.tldr_points.length > 0 ? post.tldr_points : [""]);
         setFeatured(post.featured ?? false);
         setAllowComments(post.allow_comments ?? true);
         setCategoryId(post.category_id ?? null);
@@ -758,6 +760,7 @@ export default function EditBlogPostPage() {
           slug: seoSlug.trim(),
           content,
           excerpt,
+          tldr_points: tldrPoints.map(p => p.trim()).filter(Boolean),
           featured_image_url: featuredImageUrl,
           author_id: authorId,
           author: authors.find((x) => x.id === authorId)?.name ?? "The NBT Team",
@@ -1152,6 +1155,50 @@ export default function EditBlogPostPage() {
                     style={textareaStyle}
                     placeholder="Brief summary of this post…"
                   />
+                </div>
+
+                {/* TL;DR Points */}
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <FieldLabel label="TL;DR Points" />
+                    <button
+                      onClick={() => setTldrPoints(p => [...p, ""])}
+                      style={{
+                        fontSize: 11, fontWeight: 700, color: "#FF6B35",
+                        background: "rgba(255,107,53,0.1)", border: "1px solid rgba(255,107,53,0.25)",
+                        borderRadius: 6, padding: "3px 9px", cursor: "pointer", fontFamily: "inherit",
+                      }}
+                    >+ Add point</button>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {tldrPoints.map((pt, i) => (
+                      <div key={i} style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                        <span style={{ fontSize: 12, color: "#FF6B35", flexShrink: 0 }}>•</span>
+                        <input
+                          value={pt}
+                          onChange={e => setTldrPoints(p => p.map((x, j) => j === i ? e.target.value : x))}
+                          placeholder={`Point ${i + 1}…`}
+                          style={{
+                            flex: 1, padding: "6px 10px", borderRadius: 7,
+                            background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)",
+                            color: "#fff", fontSize: 12, fontFamily: "inherit", outline: "none",
+                          }}
+                        />
+                        {tldrPoints.length > 1 && (
+                          <button
+                            onClick={() => setTldrPoints(p => p.filter((_, j) => j !== i))}
+                            style={{
+                              background: "none", border: "none", color: "rgba(255,255,255,0.3)",
+                              cursor: "pointer", fontSize: 14, padding: "0 4px", lineHeight: 1,
+                            }}
+                          >✕</button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", marginTop: 6 }}>
+                    Shown as a highlighted box at the top of the article.
+                  </div>
                 </div>
 
                 {/* Toggles */}
