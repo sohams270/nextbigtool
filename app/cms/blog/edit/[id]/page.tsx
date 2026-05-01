@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -369,10 +369,31 @@ const textareaStyle: React.CSSProperties = {
   minHeight: 72,
 };
 
+/* ─── Loading skeleton ───────────────────────────────────────────────────── */
+function Skeleton() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "#0D0E1F" }}>
+      <div style={{ height: 52, background: "#0A0B1A", borderBottom: "1px solid rgba(255,255,255,0.07)" }} />
+      <div style={{ flex: 1, display: "flex" }}>
+        <div style={{ flex: 1, padding: "32px 32px 80px", maxWidth: 760, margin: "0 auto", width: "100%" }}>
+          <div style={{ height: 48, background: "rgba(255,255,255,0.05)", borderRadius: 8, marginBottom: 20 }} />
+          <div style={{ height: 300, background: "rgba(255,255,255,0.03)", borderRadius: 8 }} />
+        </div>
+        <div style={{ width: 340, background: "#0A0B1A", borderLeft: "1px solid rgba(255,255,255,0.07)" }} />
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main page ─────────────────────────────────────────────────────────── */
-export default function NewBlogPostPage() {
+export default function EditBlogPostPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [postLoaded, setPostLoaded] = useState(false);
 
   // Post fields
   const [title, setTitle] = useState("");
@@ -408,6 +429,9 @@ export default function NewBlogPostPage() {
   const [seoSlug, setSeoSlug] = useState("");
   const [seoIndex, setSeoIndex] = useState(true);
 
+  // Loaded post content (for TipTap seeding)
+  const [initialContent, setInitialContent] = useState<string | null>(null);
+
   // TipTap editor
   const editor = useEditor({
     extensions: [
@@ -429,24 +453,67 @@ export default function NewBlogPostPage() {
     },
   });
 
+  // Seed TipTap once both editor and post are ready
+  useEffect(() => {
+    if (editor && initialContent !== null) {
+      editor.commands.setContent(initialContent);
+    }
+  }, [editor, initialContent]);
+
+  // Fetch post on mount
+  useEffect(() => {
+    async function loadPost() {
+      try {
+        const res = await fetch(`/api/cms/blog/${id}`);
+        if (!res.ok) { setError("Failed to load post"); return; }
+        const data = await res.json();
+        const post = data.post;
+
+        setTitle(post.title ?? "");
+        setStatus(post.status ?? "draft");
+        setAuthor(post.author ?? "The NBT Team");
+        setAuthorBio(post.author_bio ?? "");
+        setAuthorAvatarUrl(post.author_avatar_url ?? "");
+        setAuthorLinkedinUrl(post.author_linkedin_url ?? "");
+        setExcerpt(post.excerpt ?? "");
+        setFeatured(post.featured ?? false);
+        setAllowComments(post.allow_comments ?? true);
+        setCategoryId(post.category_id ?? null);
+        setTags(post.tags ?? []);
+        setSeoTitle(post.seo_title ?? "");
+        setSeoDescription(post.seo_description ?? "");
+        setSeoSlug(post.slug ?? "");
+        setSeoIndex(post.seo_index ?? true);
+
+        if (post.featured_image_url) {
+          setFeaturedImage(post.featured_image_url);
+          setFeaturedImageUrl(post.featured_image_url);
+        }
+
+        if (post.publish_date) {
+          const d = new Date(post.publish_date);
+          const pad = (n: number) => String(n).padStart(2, "0");
+          const local = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+          setPublishDate(local);
+        }
+
+        setInitialContent(post.content ?? "");
+        setPostLoaded(true);
+      } catch {
+        setError("Network error loading post");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadPost();
+  }, [id]);
+
   // Fetch categories
   useEffect(() => {
     fetch("/api/cms/blog/categories")
       .then((r) => r.json())
       .then((d) => setCategories(d.categories ?? []));
   }, []);
-
-  // Auto-generate slug from title
-  useEffect(() => {
-    const slug = title
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .slice(0, 80);
-    setSeoSlug(slug);
-  }, [title]);
 
   // Image upload handler
   const handleImageFile = useCallback(async (file: File) => {
@@ -461,7 +528,6 @@ export default function NewBlogPostPage() {
         setFeaturedImage(data.url);
       }
     } catch {
-      // fallback: base64 preview
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
@@ -493,7 +559,7 @@ export default function NewBlogPostPage() {
     setTagInput("");
   }
 
-  // Save / publish
+  // Save
   async function save(targetStatus: "draft" | "published") {
     setError(null);
     const content = editor?.getHTML() ?? "";
@@ -504,8 +570,8 @@ export default function NewBlogPostPage() {
 
     setSaving(true);
     try {
-      const res = await fetch("/api/cms/blog", {
-        method: "POST",
+      const res = await fetch(`/api/cms/blog/${id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: title.trim(),
@@ -531,12 +597,14 @@ export default function NewBlogPostPage() {
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Failed to save"); return; }
       router.push("/cms/blog");
-    } catch (e) {
+    } catch {
       setError("Network error");
     } finally {
       setSaving(false);
     }
   }
+
+  if (loading) return <Skeleton />;
 
   const googlePreviewTitle = seoTitle || title || "Post Title";
   const googlePreviewDesc = seoDescription || excerpt || "Post description will appear here…";

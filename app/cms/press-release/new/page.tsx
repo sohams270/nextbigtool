@@ -14,8 +14,7 @@ import Highlight from "@tiptap/extension-highlight";
 import CharacterCount from "@tiptap/extension-character-count";
 import Image from "@tiptap/extension-image";
 
-/* ─── Types ─────────────────────────────────────────────────────────────── */
-type Category = { id: string; name: string; slug: string };
+type PRStatus = "draft" | "pending_review" | "published";
 
 /* ─── Toolbar ────────────────────────────────────────────────────────────── */
 function Toolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
@@ -75,11 +74,7 @@ function Toolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
 
   function applyLink() {
     if (linkUrl.trim()) {
-      editor
-        ?.chain()
-        .focus()
-        .setLink({ href: linkUrl.trim() })
-        .run();
+      editor?.chain().focus().setLink({ href: linkUrl.trim() }).run();
     }
     setLinkOpen(false);
     setLinkUrl("");
@@ -106,7 +101,6 @@ function Toolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
       {btn("U", () => editor.chain().focus().toggleUnderline().run(), editor.isActive("underline"), "Underline")}
       {sep}
 
-      {/* Heading dropdown */}
       <div style={{ position: "relative" }}>
         <button
           type="button"
@@ -176,7 +170,6 @@ function Toolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
 
       {sep}
 
-      {/* Link */}
       <div style={{ position: "relative" }}>
         <button
           type="button"
@@ -369,14 +362,20 @@ const textareaStyle: React.CSSProperties = {
   minHeight: 72,
 };
 
+/* ─── Status badge config ────────────────────────────────────────────────── */
+function statusBadgeProps(status: PRStatus) {
+  if (status === "published") return { bg: "rgba(0,184,117,0.15)", color: "#00B875", border: "rgba(0,184,117,0.3)", label: "Published" };
+  if (status === "pending_review") return { bg: "rgba(245,158,11,0.15)", color: "#F59E0B", border: "rgba(245,158,11,0.3)", label: "Pending Review" };
+  return { bg: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.45)", border: "rgba(255,255,255,0.12)", label: "Draft" };
+}
+
 /* ─── Main page ─────────────────────────────────────────────────────────── */
-export default function NewBlogPostPage() {
+export default function NewPressReleasePage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Post fields
   const [title, setTitle] = useState("");
-  const [status, setStatus] = useState<"draft" | "published">("draft");
+  const [status, setStatus] = useState<PRStatus>("draft");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -386,21 +385,19 @@ export default function NewBlogPostPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [publishDate, setPublishDate] = useState("");
   const [author, setAuthor] = useState("The NBT Team");
-  const [authorBio, setAuthorBio] = useState("");
-  const [authorAvatarUrl, setAuthorAvatarUrl] = useState("");
-  const [authorLinkedinUrl, setAuthorLinkedinUrl] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [featured, setFeatured] = useState(false);
-  const [allowComments, setAllowComments] = useState(true);
 
-  // Sidebar - Categories
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"general" | "categories" | "tags">("general");
+  // Sidebar - Company
+  const [companyName, setCompanyName] = useState("");
+  const [companyUrl, setCompanyUrl] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
 
   // Sidebar - Tags
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<"general" | "company" | "tags">("general");
 
   // SEO
   const [seoTitle, setSeoTitle] = useState("");
@@ -408,11 +405,10 @@ export default function NewBlogPostPage() {
   const [seoSlug, setSeoSlug] = useState("");
   const [seoIndex, setSeoIndex] = useState(true);
 
-  // TipTap editor
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Placeholder.configure({ placeholder: "Start writing your post…" }),
+      Placeholder.configure({ placeholder: "Start writing your press release…" }),
       Link.configure({ openOnClick: false }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Underline,
@@ -423,18 +419,9 @@ export default function NewBlogPostPage() {
       Image,
     ],
     editorProps: {
-      attributes: {
-        class: "tiptap-editor",
-      },
+      attributes: { class: "tiptap-editor" },
     },
   });
-
-  // Fetch categories
-  useEffect(() => {
-    fetch("/api/cms/blog/categories")
-      .then((r) => r.json())
-      .then((d) => setCategories(d.categories ?? []));
-  }, []);
 
   // Auto-generate slug from title
   useEffect(() => {
@@ -461,7 +448,6 @@ export default function NewBlogPostPage() {
         setFeaturedImage(data.url);
       }
     } catch {
-      // fallback: base64 preview
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
@@ -483,7 +469,6 @@ export default function NewBlogPostPage() {
     [handleImageFile]
   );
 
-  // Add tag
   function addTag(raw: string) {
     const cleaned = raw
       .split(",")
@@ -493,8 +478,7 @@ export default function NewBlogPostPage() {
     setTagInput("");
   }
 
-  // Save / publish
-  async function save(targetStatus: "draft" | "published") {
+  async function save(targetStatus: PRStatus) {
     setError(null);
     const content = editor?.getHTML() ?? "";
     if (!title.trim()) { setError("Title is required"); return; }
@@ -504,7 +488,7 @@ export default function NewBlogPostPage() {
 
     setSaving(true);
     try {
-      const res = await fetch("/api/cms/blog", {
+      const res = await fetch("/api/cms/press-releases", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -512,16 +496,15 @@ export default function NewBlogPostPage() {
           slug: seoSlug.trim(),
           content,
           excerpt,
+          company_name: companyName,
+          company_url: companyUrl,
+          contact_name: contactName,
+          contact_email: contactEmail,
           featured_image_url: featuredImageUrl,
           author,
-          author_bio: authorBio,
-          author_avatar_url: authorAvatarUrl,
-          author_linkedin_url: authorLinkedinUrl,
-          category_id: categoryId,
           tags,
           status: targetStatus,
           featured,
-          allow_comments: allowComments,
           publish_date: publishDate ? new Date(publishDate).toISOString() : null,
           seo_title: seoTitle,
           seo_description: seoDescription,
@@ -530,17 +513,18 @@ export default function NewBlogPostPage() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error ?? "Failed to save"); return; }
-      router.push("/cms/blog");
-    } catch (e) {
+      router.push("/cms/press-release");
+    } catch {
       setError("Network error");
     } finally {
       setSaving(false);
     }
   }
 
-  const googlePreviewTitle = seoTitle || title || "Post Title";
-  const googlePreviewDesc = seoDescription || excerpt || "Post description will appear here…";
-  const googlePreviewUrl = `https://www.nextbigtool.com/blog/${seoSlug || "post-slug"}`;
+  const badge = statusBadgeProps(status);
+  const googlePreviewTitle = seoTitle || title || "Press Release Title";
+  const googlePreviewDesc = seoDescription || excerpt || "Press release description will appear here…";
+  const googlePreviewUrl = `https://www.nextbigtool.com/press-release/${seoSlug || "release-slug"}`;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "#0D0E1F", color: "#fff", fontFamily: "inherit" }}>
@@ -558,9 +542,8 @@ export default function NewBlogPostPage() {
         top: 0,
         zIndex: 20,
       }}>
-        {/* Left */}
         <a
-          href="/cms/blog"
+          href="/cms/press-release"
           style={{
             display: "flex",
             alignItems: "center",
@@ -571,21 +554,21 @@ export default function NewBlogPostPage() {
             fontWeight: 600,
           }}
         >
-          ← Blog Posts
+          ← Press Releases
         </a>
 
-        {/* Center status */}
+        {/* Center status badge */}
         <div style={{
           fontSize: 11,
           fontWeight: 700,
           padding: "3px 10px",
           borderRadius: 99,
-          background: status === "published" ? "rgba(0,184,117,0.15)" : "rgba(255,255,255,0.08)",
-          color: status === "published" ? "#00B875" : "rgba(255,255,255,0.45)",
-          border: `1px solid ${status === "published" ? "rgba(0,184,117,0.3)" : "rgba(255,255,255,0.12)"}`,
+          background: badge.bg,
+          color: badge.color,
+          border: `1px solid ${badge.border}`,
           letterSpacing: "0.05em",
         }}>
-          {status === "published" ? "Published" : "Draft"}
+          {badge.label}
         </div>
 
         {/* Right buttons */}
@@ -611,6 +594,25 @@ export default function NewBlogPostPage() {
             }}
           >
             {saving ? "Saving…" : "Save Draft"}
+          </button>
+          <button
+            type="button"
+            onClick={() => save("pending_review")}
+            disabled={saving}
+            style={{
+              padding: "7px 16px",
+              borderRadius: 7,
+              background: "rgba(245,158,11,0.15)",
+              border: "1px solid rgba(245,158,11,0.3)",
+              color: "#F59E0B",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: saving ? "not-allowed" : "pointer",
+              fontFamily: "inherit",
+              opacity: saving ? 0.6 : 1,
+            }}
+          >
+            Submit for Review
           </button>
           <button
             type="button"
@@ -644,7 +646,7 @@ export default function NewBlogPostPage() {
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value.slice(0, 200))}
-                placeholder="Add Title"
+                placeholder="Press Release Title"
                 maxLength={200}
                 style={{
                   width: "100%",
@@ -660,21 +662,13 @@ export default function NewBlogPostPage() {
                   letterSpacing: "-0.02em",
                 }}
               />
-              <div style={{
-                position: "absolute",
-                top: 12,
-                right: 0,
-                fontSize: 10,
-                color: "rgba(255,255,255,0.25)",
-              }}>
+              <div style={{ position: "absolute", top: 12, right: 0, fontSize: 10, color: "rgba(255,255,255,0.25)" }}>
                 {title.length}/200
               </div>
             </div>
 
-            {/* Toolbar */}
             <Toolbar editor={editor} />
 
-            {/* Editor */}
             <div style={{
               background: "#13142A",
               border: "1px solid rgba(255,255,255,0.07)",
@@ -704,14 +698,13 @@ export default function NewBlogPostPage() {
           display: "flex",
           flexDirection: "column",
         }}>
-          {/* Post Settings */}
           <div style={{ padding: "16px 16px 0" }}>
-            <SectionHeading label="Post Settings" />
+            <SectionHeading label="Release Settings" />
 
             {/* Tabs */}
             <div style={{ display: "flex", gap: 2, marginBottom: 16, background: "rgba(255,255,255,0.04)", borderRadius: 8, padding: 3 }}>
-              {(["general", "categories", "tags"] as const).map((tab) => {
-                const count = tab === "categories" ? (categoryId ? 1 : 0) : tab === "tags" ? tags.length : null;
+              {(["general", "company", "tags"] as const).map((tab) => {
+                const count = tab === "tags" ? tags.length : null;
                 return (
                   <button
                     key={tab}
@@ -819,7 +812,6 @@ export default function NewBlogPostPage() {
                         cursor: "pointer",
                         color: "rgba(255,255,255,0.3)",
                         fontSize: 12,
-                        transition: "border-color .15s",
                       }}
                     >
                       {uploadingImage ? (
@@ -843,11 +835,6 @@ export default function NewBlogPostPage() {
                     onChange={(e) => setPublishDate(e.target.value)}
                     style={{ ...inputStyle, colorScheme: "dark" }}
                   />
-                  {!publishDate && (
-                    <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginTop: 4 }}>
-                      Defaults to now when published
-                    </div>
-                  )}
                 </div>
 
                 {/* Author */}
@@ -861,42 +848,6 @@ export default function NewBlogPostPage() {
                   />
                 </div>
 
-                {/* Author Bio */}
-                <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-                    <FieldLabel label="Author Bio" />
-                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}>{authorBio.length}/300</span>
-                  </div>
-                  <textarea
-                    value={authorBio}
-                    onChange={(e) => setAuthorBio(e.target.value.slice(0, 300))}
-                    style={textareaStyle}
-                    placeholder="A short bio about the author…"
-                  />
-                </div>
-
-                {/* Author Avatar URL */}
-                <div>
-                  <FieldLabel label="Author Avatar URL" />
-                  <input
-                    value={authorAvatarUrl}
-                    onChange={(e) => setAuthorAvatarUrl(e.target.value)}
-                    style={inputStyle}
-                    placeholder="https://... (or leave blank for initials)"
-                  />
-                </div>
-
-                {/* Author LinkedIn URL */}
-                <div>
-                  <FieldLabel label="Author LinkedIn URL" />
-                  <input
-                    value={authorLinkedinUrl}
-                    onChange={(e) => setAuthorLinkedinUrl(e.target.value)}
-                    style={inputStyle}
-                    placeholder="https://linkedin.com/in/..."
-                  />
-                </div>
-
                 {/* Excerpt */}
                 <div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
@@ -907,52 +858,95 @@ export default function NewBlogPostPage() {
                     value={excerpt}
                     onChange={(e) => setExcerpt(e.target.value.slice(0, 500))}
                     style={textareaStyle}
-                    placeholder="Brief summary of this post…"
+                    placeholder="Brief summary of this release…"
                   />
                 </div>
 
                 {/* Toggles */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 4 }}>
-                  <Toggle checked={featured} onChange={setFeatured} label="Feature this post" />
-                  <Toggle checked={allowComments} onChange={setAllowComments} label="Allow commenting" />
+                  <Toggle checked={featured} onChange={setFeatured} label="Feature this release" />
+                </div>
+
+                {/* Status selector */}
+                <div>
+                  <FieldLabel label="Status" />
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {(["draft", "pending_review", "published"] as PRStatus[]).map((s) => {
+                      const cfg = statusBadgeProps(s);
+                      return (
+                        <label
+                          key={s}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            cursor: "pointer",
+                            padding: "6px 8px",
+                            borderRadius: 6,
+                            background: status === s ? "rgba(255,107,53,0.06)" : "transparent",
+                            border: `1px solid ${status === s ? "rgba(255,107,53,0.18)" : "transparent"}`,
+                          }}
+                        >
+                          <input
+                            type="radio"
+                            name="status"
+                            value={s}
+                            checked={status === s}
+                            onChange={() => setStatus(s)}
+                            style={{ accentColor: "#FF6B35" }}
+                          />
+                          <span style={{ fontSize: 12, color: cfg.color, fontWeight: 600 }}>
+                            {cfg.label}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Categories tab */}
-            {activeTab === "categories" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {categories.length === 0 ? (
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", padding: "8px 0" }}>
-                    Loading categories…
-                  </div>
-                ) : (
-                  categories.map((cat) => (
-                    <label
-                      key={cat.id}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        cursor: "pointer",
-                        padding: "6px 8px",
-                        borderRadius: 6,
-                        background: categoryId === cat.id ? "rgba(255,107,53,0.08)" : "transparent",
-                        border: `1px solid ${categoryId === cat.id ? "rgba(255,107,53,0.2)" : "transparent"}`,
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={categoryId === cat.id}
-                        onChange={() => setCategoryId(categoryId === cat.id ? null : cat.id)}
-                        style={{ accentColor: "#FF6B35" }}
-                      />
-                      <span style={{ fontSize: 12, color: categoryId === cat.id ? "#FF6B35" : "rgba(255,255,255,0.65)", fontWeight: 500 }}>
-                        {cat.name}
-                      </span>
-                    </label>
-                  ))
-                )}
+            {/* Company tab */}
+            {activeTab === "company" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div>
+                  <FieldLabel label="Company Name" />
+                  <input
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    style={inputStyle}
+                    placeholder="Acme Corp"
+                  />
+                </div>
+                <div>
+                  <FieldLabel label="Company Website URL" />
+                  <input
+                    value={companyUrl}
+                    onChange={(e) => setCompanyUrl(e.target.value)}
+                    style={inputStyle}
+                    placeholder="https://..."
+                    type="url"
+                  />
+                </div>
+                <div>
+                  <FieldLabel label="Contact Person Name" />
+                  <input
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    style={inputStyle}
+                    placeholder="Jane Smith"
+                  />
+                </div>
+                <div>
+                  <FieldLabel label="Contact Email" />
+                  <input
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    style={inputStyle}
+                    placeholder="press@company.com"
+                    type="email"
+                  />
+                </div>
               </div>
             )}
 
@@ -1069,7 +1063,7 @@ export default function NewBlogPostPage() {
                 <FieldLabel label="URL Slug" />
                 <div style={{ display: "flex", alignItems: "center", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 7 }}>
                   <span style={{ padding: "7px 8px", color: "rgba(255,255,255,0.3)", fontSize: 11, whiteSpace: "nowrap", flexShrink: 0 }}>
-                    /blog/
+                    /press-release/
                   </span>
                   <input
                     value={seoSlug}
@@ -1088,7 +1082,7 @@ export default function NewBlogPostPage() {
                 </div>
               </div>
 
-              <Toggle checked={seoIndex} onChange={setSeoIndex} label="Index this post in search engines" />
+              <Toggle checked={seoIndex} onChange={setSeoIndex} label="Index this release in search engines" />
 
               {/* Google preview */}
               <div>

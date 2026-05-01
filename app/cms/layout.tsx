@@ -90,8 +90,8 @@ export default function CmsLayout({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <main style={{
         flex: 1,
-        overflowY: pathname.startsWith("/cms/blog/new") || pathname.startsWith("/cms/blog/edit") ? "hidden" : "auto",
-        padding: pathname.startsWith("/cms/blog/new") || pathname.startsWith("/cms/blog/edit") ? 0 : "32px 36px",
+        overflowY: pathname.startsWith("/cms/blog/new") || pathname.startsWith("/cms/blog/edit") || pathname.startsWith("/cms/press-release/new") || pathname.startsWith("/cms/press-release/edit") ? "hidden" : "auto",
+        padding: pathname.startsWith("/cms/blog/new") || pathname.startsWith("/cms/blog/edit") || pathname.startsWith("/cms/press-release/new") || pathname.startsWith("/cms/press-release/edit") ? 0 : "32px 36px",
         display: "flex",
         flexDirection: "column",
       }}>

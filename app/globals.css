@@ -529,3 +529,23 @@ body {
 .blog-post-content a { color: #FF6B35; text-decoration: underline; }
 .blog-post-content img { max-width: 100%; border-radius: 8px; margin: 1em 0; }
 .blog-post-content hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
+
+/* ── Blog post 3-column layout ──────────────────────────────────────────── */
+.blog-post-layout { display: grid; grid-template-columns: 220px 1fr 280px; gap: 32px; align-items: start; }
+.blog-post-layout-left { position: sticky; top: 90px; }
+.blog-post-layout-right { position: sticky; top: 90px; }
+@media (max-width: 1024px) {
+  .blog-post-layout { grid-template-columns: 1fr 260px; }
+  .blog-post-layout-left { display: none; }
+}
+@media (max-width: 700px) {
+  .blog-post-layout { grid-template-columns: 1fr; }
+  .blog-post-layout-right { display: none; }
+}
+
+/* ── Blog post hero ──────────────────────────────────────────────────────── */
+.blog-post-hero { display: grid; grid-template-columns: 1fr 380px; gap: 40px; align-items: center; }
+@media (max-width: 900px) {
+  .blog-post-hero { grid-template-columns: 1fr; }
+  .blog-post-hero-image { display: none; }
+}
