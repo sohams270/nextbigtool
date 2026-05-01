@@ -231,8 +231,28 @@ export default function SubmitPage() {
         }
       }
 
-      // 2. insert tool
-      const slug = toSlug(form.name) + "-" + Date.now().toString(36);
+      // 2. Build a clean slug — just the tool name, with conflict handling
+      async function buildSlug(base: string): Promise<string> {
+        const { data: existing } = await supabase
+          .from("tools")
+          .select("slug")
+          .eq("slug", base)
+          .maybeSingle();
+        if (!existing) return base;
+        // Slug taken — try base-2, base-3, …
+        let n = 2;
+        while (true) {
+          const candidate = `${base}-${n}`;
+          const { data: taken } = await supabase
+            .from("tools")
+            .select("slug")
+            .eq("slug", candidate)
+            .maybeSingle();
+          if (!taken) return candidate;
+          n++;
+        }
+      }
+      const slug = await buildSlug(toSlug(form.name));
       const { data: tool, error: toolErr } = await supabase
         .from("tools")
         .insert({
