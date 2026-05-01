@@ -150,21 +150,15 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
 
   function navigate(path: string) { setOpen(false); router.push(path); }
 
-  function handleSubmit(e?: React.FormEvent) {
-    e?.preventDefault();
-    if (!query.trim()) return;
-    if (active >= 0 && results[active]) {
-      navigate(`/tools/${results[active].slug}`);
-    } else {
-      navigate(`/discover?q=${encodeURIComponent(query.trim())}`);
-    }
-  }
-
   function handleKey(e: React.KeyboardEvent) {
     if (!open) return;
     if (e.key === "ArrowDown")  { e.preventDefault(); setActive((a) => Math.min(a + 1, results.length - 1)); }
     else if (e.key === "ArrowUp")   { e.preventDefault(); setActive((a) => Math.max(a - 1, -1)); }
     else if (e.key === "Escape")    { setOpen(false); }
+    else if (e.key === "Enter" && active >= 0 && results[active]) {
+      e.preventDefault();
+      navigate(`/tools/${results[active].slug}`);
+    }
   }
 
   const showDropdown = open && query.trim().length >= 2;
@@ -172,7 +166,7 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
 
   return (
     <div ref={wrapRef} style={{ position: "relative", width: "100%" }}>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={(e) => e.preventDefault()}>
         {/* Rainbow border wrapper */}
         <div className={`smart-search-wrap${showDropdown ? " ss-open" : ""}`}>
           <div className="smart-search-inner">
@@ -228,24 +222,29 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
               </button>
             )}
 
-            {/* Smart Search button — dark fill, like launch-btn-inner */}
-            <button type="submit" style={{
+            {/* Smart Search button — decorative, non-submitting */}
+            <button type="button" style={{
               background: "var(--sidebar-bg)",
-              color: "#fff", border: "none",
+              border: "none",
               padding: compact ? "0 16px" : "0 22px",
               fontSize: compact ? 11.5 : 12.5,
               fontWeight: 700,
-              cursor: "pointer", fontFamily: "inherit",
+              cursor: "default", fontFamily: "inherit",
               display: "flex", alignItems: "center", gap: 7,
               flexShrink: 0, letterSpacing: "0.03em",
-              transition: "background 0.15s",
               whiteSpace: "nowrap",
-            }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#12132a"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--sidebar-bg)"; }}
-            >
-              <SparkleIcon size={12} color="#fff" />
-              Smart Search
+            }}>
+              <SparkleIcon size={12} color="#FF6B35" />
+              <span style={{
+                background: "linear-gradient(90deg,#FF6B35,#fff,#FF6B35,#fff,#FF6B35)",
+                backgroundSize: "300% auto",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                animation: "ss-gradient-move 3s linear infinite",
+              }}>
+                Smart Search
+              </span>
             </button>
           </div>
         </div>
@@ -270,7 +269,6 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
           backgroundOrigin: "border-box",
           backgroundClip: "padding-box, border-box",
           boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
-          overflow: "hidden",
         }}>
 
           {/* Loading skeleton */}
@@ -401,6 +399,10 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
         @keyframes shimmer {
           0%   { background-position: 200% 0; }
           100% { background-position: -200% 0; }
+        }
+        @keyframes ss-gradient-move {
+          0%   { background-position: 0% center; }
+          100% { background-position: 300% center; }
         }
       `}</style>
     </div>
