@@ -6,6 +6,7 @@ import TopNav from "../../components/TopNav";
 import Footer from "../../components/Footer";
 import DiscoverSidebar from "../../components/DiscoverSidebar";
 import HofUpgradeBtn from "../../components/HofUpgradeBtn";
+import DiscoverHero from "../../components/DiscoverHero";
 
 export const metadata: Metadata = {
   title: "Hall of Fame — Next Big Tool",
@@ -43,32 +44,13 @@ export default async function HallOfFamePage() {
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
       <TopNav />
 
-      {/* ── Premium dark/gold header ──────────────────────────────────── */}
-      <div style={{ background: "linear-gradient(135deg,#0D0E22 0%,#1A0D2E 50%,#0D0E22 100%)", padding: "44px 28px 40px", position: "relative", overflow: "hidden" }}>
-        {[
-          { top: "15%", left: "5%",  s: 2 }, { top: "8%",  left: "30%", s: 1.5 },
-          { top: "25%", left: "60%", s: 1 }, { top: "12%", left: "80%", s: 2 },
-          { top: "60%", left: "90%", s: 1.5 }, { top: "70%", left: "15%", s: 1 },
-          { top: "80%", left: "45%", s: 2 }, { top: "50%", left: "70%", s: 1 },
-        ].map((star, i) => (
-          <div key={i} style={{ position: "absolute", top: star.top, left: star.left, width: star.s, height: star.s, borderRadius: "50%", background: "rgba(255,215,80,0.5)", pointerEvents: "none" }} />
-        ))}
-        <div style={{ position: "absolute", top: -80, right: -80, width: 360, height: 360, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,180,0,0.15) 0%, transparent 65%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -60, left: -60, width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 65%)", pointerEvents: "none" }} />
-
-        <div style={{ maxWidth: 1160, margin: "0 auto", position: "relative", textAlign: "center" }}>
-          <div style={{ width: 64, height: 64, borderRadius: 18, background: "linear-gradient(135deg,rgba(255,215,80,0.2),rgba(255,140,0,0.15))", border: "1px solid rgba(255,215,80,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, margin: "0 auto 16px" }}>🏆</div>
-          <h1 style={{ fontSize: 32, fontWeight: 800, letterSpacing: "-0.03em", margin: "0 0 10px", background: "linear-gradient(90deg,#FFD700,#FFA500,#FFD700)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundSize: "200%" }}>
-            Hall of Fame
-          </h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", margin: "0 0 4px", maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
-            Permanently inducted · Curated by NextBigTool editors
-          </p>
-          <p style={{ fontSize: 12, color: "rgba(255,215,80,0.6)", margin: 0 }}>
-            {hofEntries.length} product{hofEntries.length !== 1 ? "s" : ""} in the Hall of Fame
-          </p>
-        </div>
-      </div>
+      <DiscoverHero
+        badge="🏆 Hall of Fame"
+        title="Hall of"
+        titleAccent="Fame"
+        subtitle={`${hofEntries.length} product${hofEntries.length !== 1 ? "s" : ""} · Permanently inducted · Curated by NextBigTool editors`}
+        accent="gold"
+      />
 
       {/* ── Main Content ─────────────────────────────────────────────── */}
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "32px 28px 80px", width: "100%", boxSizing: "border-box" }}>

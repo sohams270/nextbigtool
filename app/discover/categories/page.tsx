@@ -5,6 +5,7 @@ import Link from "next/link";
 import TopNav from "../../components/TopNav";
 import Footer from "../../components/Footer";
 import DiscoverSidebar from "../../components/DiscoverSidebar";
+import DiscoverHero from "../../components/DiscoverHero";
 
 export const metadata: Metadata = {
   title: "Browse by Category — Next Big Tool",
@@ -96,39 +97,20 @@ export default async function CategoriesPage({
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
       <TopNav />
 
-      {/* ── Page Header ───────────────────────────────────────────────── */}
-      <div style={{
-        background: "linear-gradient(135deg,#3B7FFF 0%,#7C3AED 100%)",
-        padding: "36px 28px 32px",
-        position: "relative", overflow: "hidden",
-      }}>
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.12) 0%, transparent 60%)",
-          pointerEvents: "none",
-        }} />
-        <div style={{ maxWidth: 1160, margin: "0 auto", position: "relative" }}>
-          {cat && (
-            <Link
-              href="/discover/categories"
-              style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "rgba(255,255,255,0.7)", textDecoration: "none", marginBottom: 12, fontWeight: 500 }}
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M11 6l-6 6 6 6"/>
-              </svg>
-              All Categories
-            </Link>
-          )}
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", margin: "0 0 8px" }}>
-            {cat ? (selectedCat?.name ?? cat) : "Browse by Category"}
-          </h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", margin: 0 }}>
-            {cat
-              ? `${filteredTools.length} tool${filteredTools.length !== 1 ? "s" : ""} in this category`
-              : `${categories.length} categories · Find exactly what you need`}
-          </p>
-        </div>
-      </div>
+      <DiscoverHero
+        badge="🗂️ Browse Categories"
+        title={cat ? (selectedCat?.name ?? cat) : "Browse by"}
+        titleAccent={cat ? undefined : "Category"}
+        subtitle={cat
+          ? `${filteredTools.length} tool${filteredTools.length !== 1 ? "s" : ""} in this category`
+          : `${categories.length} categories · Find exactly what you need`}
+        breadcrumb={cat ? (
+          <Link href="/discover/categories" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "rgba(255,255,255,0.55)", textDecoration: "none", fontWeight: 500 }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+            All Categories
+          </Link>
+        ) : undefined}
+      />
 
       {/* ── Main Content ─────────────────────────────────────────────── */}
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "32px 28px 80px", width: "100%", boxSizing: "border-box" }}>

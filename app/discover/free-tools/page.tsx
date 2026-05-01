@@ -5,6 +5,7 @@ import Link from "next/link";
 import TopNav from "../../components/TopNav";
 import Footer from "../../components/Footer";
 import DiscoverSidebar from "../../components/DiscoverSidebar";
+import DiscoverHero from "../../components/DiscoverHero";
 
 export const metadata: Metadata = {
   title: "Free Tools — Next Big Tool",
@@ -42,21 +43,12 @@ export default async function FreeToolsPage() {
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
       <TopNav />
 
-      {/* ── Page Header ───────────────────────────────────────────────── */}
-      <div style={{ background: "linear-gradient(135deg,#FF6B35 0%,#FF4500 100%)", padding: "36px 28px 32px", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.15) 0%, transparent 60%)", pointerEvents: "none" }} />
-        <div style={{ maxWidth: 1160, margin: "0 auto", position: "relative" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 20, background: "rgba(255,255,255,0.18)", marginBottom: 12, fontSize: 11, fontWeight: 700, color: "#fff", letterSpacing: "0.04em", textTransform: "uppercase" }}>
-            🎁 Free Forever
-          </div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", margin: "0 0 8px" }}>
-            Free Tools
-          </h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", margin: 0 }}>
-            {tools.length} free tool{tools.length !== 1 ? "s" : ""} · No credit card required
-          </p>
-        </div>
-      </div>
+      <DiscoverHero
+        badge="🎁 Free Forever"
+        title="Free"
+        titleAccent="Tools"
+        subtitle={`${tools.length} free tool${tools.length !== 1 ? "s" : ""} · No credit card, no trial, just free`}
+      />
 
       {/* ── Main Content ─────────────────────────────────────────────── */}
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "32px 28px 80px", width: "100%", boxSizing: "border-box" }}>

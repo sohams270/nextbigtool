@@ -5,6 +5,7 @@ import Link from "next/link";
 import TopNav from "../../components/TopNav";
 import Footer from "../../components/Footer";
 import DiscoverSidebar from "../../components/DiscoverSidebar";
+import DiscoverHero from "../../components/DiscoverHero";
 
 export const metadata: Metadata = {
   title: "Browse by Use Case — Next Big Tool",
@@ -101,26 +102,20 @@ export default async function UseCasesPage({
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
       <TopNav />
 
-      {/* ── Page Header ───────────────────────────────────────────────── */}
-      <div style={{ background: "linear-gradient(135deg,#10B981 0%,#0891B2 100%)", padding: "36px 28px 32px", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.12) 0%, transparent 60%)", pointerEvents: "none" }} />
-        <div style={{ maxWidth: 1160, margin: "0 auto", position: "relative" }}>
-          {uc && (
-            <Link href="/discover/use-cases" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "rgba(255,255,255,0.75)", textDecoration: "none", marginBottom: 12, fontWeight: 500 }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-              All Use Cases
-            </Link>
-          )}
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", margin: "0 0 8px" }}>
-            {uc ? (selectedUC ? `${selectedUC.emoji} ${selectedUC.name}` : uc) : "Browse by Use Case"}
-          </h1>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", margin: 0 }}>
-            {uc
-              ? `${filteredTools.length} tool${filteredTools.length !== 1 ? "s" : ""} matched this use case`
-              : `${USE_CASES.length} use cases · Find the right tool for any job`}
-          </p>
-        </div>
-      </div>
+      <DiscoverHero
+        badge="✅ Use Cases"
+        title={uc ? (selectedUC ? `${selectedUC.emoji} ${selectedUC.name}` : uc) : "Browse by"}
+        titleAccent={uc ? undefined : "Use Case"}
+        subtitle={uc
+          ? `${filteredTools.length} tool${filteredTools.length !== 1 ? "s" : ""} matched this use case`
+          : `${USE_CASES.length} use cases · Find the right tool for any job`}
+        breadcrumb={uc ? (
+          <Link href="/discover/use-cases" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "rgba(255,255,255,0.55)", textDecoration: "none", fontWeight: 500 }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+            All Use Cases
+          </Link>
+        ) : undefined}
+      />
 
       {/* ── Main Content ─────────────────────────────────────────────── */}
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "32px 28px 80px", width: "100%", boxSizing: "border-box" }}>
