@@ -82,10 +82,10 @@ const IconRocket = () => (
 
 /* ─── menu data ──────────────────────────────────────────────────────── */
 const DISCOVER_ITEMS: DDItem[] = [
-  { label: "Categories",   sub: "Browse by topic",          href: "/discover?tab=categories",   icon: <IconCategories />, iconBg: "#f1f2ff", iconColor: "#5b6bff" },
-  { label: "Use Cases",    sub: "Find tools by use case",   href: "/discover?tab=use-cases",    icon: <IconUseCases />,   iconBg: "#ecfaf0", iconColor: "#15a35a" },
-  { label: "Free Tools",   sub: "Developer utilities",      href: "/discover?tab=free",         icon: <IconFreeTools />,  iconBg: "#f0f6ff", iconColor: "#3d7aff" },
-  { label: "Hall of Fame", sub: "Top rated products",       href: "/discover?tab=hall-of-fame", icon: <IconHoF />,        iconBg: "linear-gradient(135deg,#ff6a3d,#ff3d88)", iconColor: "#fff", highlight: true },
+  { label: "Categories",   sub: "Browse by topic",          href: "/discover/categories",   icon: <IconCategories />, iconBg: "#f1f2ff", iconColor: "#5b6bff" },
+  { label: "Use Cases",    sub: "Find tools by use case",   href: "/discover/use-cases",    icon: <IconUseCases />,   iconBg: "#ecfaf0", iconColor: "#15a35a" },
+  { label: "Free Tools",   sub: "Developer utilities",      href: "/discover/free-tools",   icon: <IconFreeTools />,  iconBg: "#f0f6ff", iconColor: "#3d7aff" },
+  { label: "Hall of Fame", sub: "Top rated products",       href: "/discover/hall-of-fame", icon: <IconHoF />,        iconBg: "linear-gradient(135deg,#ff6a3d,#ff3d88)", iconColor: "#fff", highlight: true },
 ];
 
 const DISCOVER_HERO: HeroPanel = {
@@ -93,7 +93,7 @@ const DISCOVER_HERO: HeroPanel = {
   heading:  "The best tools, ranked by the community",
   sub:      "Only the highest-rated products make it here.",
   ctaLabel: "View Hall of Fame",
-  ctaHref:  "/discover?tab=hall-of-fame",
+  ctaHref:  "/discover/hall-of-fame",
 };
 
 const RESOURCES_ITEMS: DDItem[] = [
@@ -759,7 +759,7 @@ export default function TopNav({ dark: darkProp }: { dark?: boolean }) {
             { label: "Blog", href: "/blog" },
             { label: "FAQs", href: "/faq" },
             { label: "Pricing", href: "/pricing" },
-            { label: "Hall of Fame", href: "/discover?tab=hall-of-fame" },
+            { label: "Hall of Fame", href: "/discover/hall-of-fame" },
           ].map(item => (
             <Link key={item.href} href={item.href}
               onClick={() => setMobileMenuOpen(false)}

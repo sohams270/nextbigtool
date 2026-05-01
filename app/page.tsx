@@ -445,7 +445,7 @@ export default async function HomePage({
                 liveCategories.slice(0, 7).map(({ id, name, count }) => (
                   <a
                     key={id}
-                    href={`/?category=${encodeURIComponent(name)}`}
+                    href={`/discover/categories?cat=${encodeURIComponent(name)}`}
                     style={{ textDecoration: "none", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderBottom: "1px solid var(--border-faint)" }}
                   >
                     <span style={{ fontSize: 11, fontWeight: 500, color: "var(--ink)" }}>{name}</span>
@@ -454,7 +454,7 @@ export default async function HomePage({
                 ))
               )}
               {liveCategories.length > 7 && (
-                <a href="/discover" style={{ fontSize: 10, color: "#FF6B35", fontWeight: 600, display: "block", marginTop: 10, textDecoration: "none" }}>
+                <a href="/discover/categories" style={{ fontSize: 10, color: "#FF6B35", fontWeight: 600, display: "block", marginTop: 10, textDecoration: "none" }}>
                   View all {liveCategories.length} categories →
                 </a>
               )}
@@ -489,7 +489,7 @@ export default async function HomePage({
                       </a>
                     );
                   })}
-                  <a href="/?sort=hof" style={{ fontSize: 10, color: "rgba(255,215,0,0.7)", fontWeight: 600, display: "block", marginTop: 10, textDecoration: "none" }}>
+                  <a href="/discover/hall-of-fame" style={{ fontSize: 10, color: "rgba(255,215,0,0.7)", fontWeight: 600, display: "block", marginTop: 10, textDecoration: "none" }}>
                     View all →
                   </a>
                 </div>
