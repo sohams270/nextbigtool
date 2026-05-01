@@ -143,7 +143,7 @@ export default async function UseCasesPage({
         titleAccent={uc ? undefined : "Use Case"}
         subtitle={uc
           ? `${filteredTools.length} tool${filteredTools.length !== 1 ? "s" : ""} matched this use case`
-          : `${ALL_USE_CASES.length} use cases · Find the right tool for any job`}
+          : `Find tools by what you need to get done, not what they call themselves`}
         breadcrumb={uc ? (
           <Link href="/discover/use-cases" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "rgba(255,255,255,0.55)", textDecoration: "none", fontWeight: 500 }}>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>

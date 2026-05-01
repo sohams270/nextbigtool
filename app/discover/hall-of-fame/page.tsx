@@ -48,7 +48,7 @@ export default async function HallOfFamePage() {
         badge="🏆 Hall of Fame"
         title="Hall of"
         titleAccent="Fame"
-        subtitle={`${hofEntries.length} product${hofEntries.length !== 1 ? "s" : ""} · Permanently inducted · Curated by NextBigTool editors`}
+        subtitle={`The gold standard of indie tools — permanently recognised, community approved`}
         accent="gold"
       />
 

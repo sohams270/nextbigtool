@@ -106,7 +106,7 @@ export default async function CategoriesPage({
         titleAccent={cat ? undefined : "Category"}
         subtitle={cat
           ? `${filteredTools.length} tool${filteredTools.length !== 1 ? "s" : ""} in this category`
-          : `${ALL_CATEGORIES.length} categories · ${totalTools} tools listed`}
+          : `Every type of tool, neatly organised — browse by what you actually build`}
         breadcrumb={cat ? (
           <Link href="/discover/categories" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "rgba(255,255,255,0.55)", textDecoration: "none", fontWeight: 500 }}>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>

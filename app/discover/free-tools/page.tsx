@@ -47,7 +47,7 @@ export default async function FreeToolsPage() {
         badge="🎁 Free Forever"
         title="Free"
         titleAccent="Tools"
-        subtitle={`${tools.length} free tool${tools.length !== 1 ? "s" : ""} · No credit card, no trial, just free`}
+        subtitle={`The best free indie tools, hand-picked and ready to use today`}
       />
 
       {/* ── Main Content ─────────────────────────────────────────────── */}
