@@ -802,7 +802,7 @@ export default function ProductShowcase({
 
       {/* ── Footer ───────────────────────────────────────────────── */}
       <div style={{ display: "flex", justifyContent: "center", padding: "4px 0 8px" }}>
-        <Link href="/discover" style={{
+        <Link href="/discover/categories" style={{
           display: "inline-flex", alignItems: "center", gap: 8,
           padding: "11px 24px", borderRadius: 999,
           background: "var(--ink)", color: "var(--bg)",
