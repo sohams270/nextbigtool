@@ -125,7 +125,7 @@ export default async function AdminPage() {
     profiles: profileMap[s.user_id] ?? null,
   }));
 
-  // Hall of Fame nominations
+  // Hall of Fame nominations — pending
   const { data: pendingHofRaw } = await supabase
     .from("hall_of_fame")
     .select("id, pitch, status, created_at, user_id, tools(name, logo_url, tagline)")
@@ -142,6 +142,15 @@ export default async function AdminPage() {
     ...r,
     profiles: hofProfileMap[r.user_id] ?? null,
   }));
+
+  // Hall of Fame — inducted (approved)
+  const { data: inductedHofRaw } = await supabase
+    .from("hall_of_fame")
+    .select("id, inducted_at, created_at, user_id, tools(name, logo_url, tagline, slug)")
+    .eq("status", "approved")
+    .order("inducted_at", { ascending: false });
+
+  const inductedHof = (inductedHofRaw ?? []) as any[];
 
   // Blog post requests
   const { data: pendingBlogRaw } = await supabase
@@ -358,6 +367,65 @@ export default async function AdminPage() {
               </div>
 
               <HofNominationButtons nominationId={n.id} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Inducted Tools ── */}
+      <div style={{ marginBottom: 8, fontSize: 14, fontWeight: 700, color: "var(--ink)", display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#ffd700", display: "inline-block" }} />
+        Inducted ({inductedHof.length})
+      </div>
+
+      {inductedHof.length === 0 ? (
+        <div style={{ ...card, textAlign: "center", padding: "24px 20px", color: "var(--ink-muted)", marginBottom: 36 }}>
+          <div style={{ fontSize: 13 }}>No tools inducted yet. Approve a nomination above to induct the first one.</div>
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12, marginBottom: 36 }}>
+          {inductedHof.map((n: any) => (
+            <div key={n.id} style={{
+              ...card,
+              padding: "14px",
+              position: "relative",
+              overflow: "hidden",
+              border: "1.5px solid rgba(255,215,0,0.3)",
+            }}>
+              {/* Gold top bar */}
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg,#ffd700,#ff8c00,#ffd700)" }} />
+
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                {/* Logo */}
+                <div style={{
+                  width: 36, height: 36, borderRadius: 9, flexShrink: 0,
+                  border: "1.5px solid rgba(255,215,0,0.3)",
+                  background: n.tools?.logo_url ? "transparent" : `hsl(${(n.tools?.name?.charCodeAt(0) ?? 0) * 7 % 360},60%,50%)`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 16, fontWeight: 800, color: "#fff", overflow: "hidden",
+                }}>
+                  {n.tools?.logo_url
+                    ? <img src={n.tools.logo_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : (n.tools?.name?.[0] ?? "?")}
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {n.tools?.name ?? "—"}
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--ink-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {n.tools?.tagline ?? ""}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 4,
+                padding: "2px 8px", borderRadius: 20,
+                background: "rgba(255,215,0,0.1)", border: "1px solid rgba(255,215,0,0.3)",
+                fontSize: 10, fontWeight: 700, color: "#9a6a00",
+              }}>
+                🏆 {n.inducted_at ? new Date(n.inducted_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "Inducted"}
+              </div>
             </div>
           ))}
         </div>
