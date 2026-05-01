@@ -107,43 +107,44 @@ export default function HeroSection() {
         color: "#fff",
         padding: "54px 40px 36px",
         textAlign: "center",
-        overflow: "hidden",
+        overflow: "visible",
         cursor: "default",
       }}
     >
-      {/* Moving grid */}
-      <div
-        ref={gridRef}
-        style={{
-          position: "absolute",
-          inset: "-40px",
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.032) 1px, transparent 1px)," +
-            "linear-gradient(90deg, rgba(255,255,255,0.032) 1px, transparent 1px)",
-          backgroundSize: "46px 46px",
-          backgroundPosition: "0px 0px",
-          pointerEvents: "none",
-        }}
-      />
+      {/* Background decorations — clipped to hero bounds without clipping the dropdown */}
+      <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
+        {/* Moving grid */}
+        <div
+          ref={gridRef}
+          style={{
+            position: "absolute",
+            inset: "-40px",
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.032) 1px, transparent 1px)," +
+              "linear-gradient(90deg, rgba(255,255,255,0.032) 1px, transparent 1px)",
+            backgroundSize: "46px 46px",
+            backgroundPosition: "0px 0px",
+          }}
+        />
 
-      {/* Cursor-following orange glow */}
-      <div
-        ref={glowRef}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: 560,
-          height: 560,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(255,107,53,0.42) 0%, rgba(255,107,53,0.12) 40%, transparent 70%)",
-          transform: "translate(140px, -280px)",
-          opacity: 0,
-          pointerEvents: "none",
-          willChange: "transform",
-        }}
-      />
+        {/* Cursor-following orange glow */}
+        <div
+          ref={glowRef}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: 560,
+            height: 560,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(255,107,53,0.42) 0%, rgba(255,107,53,0.12) 40%, transparent 70%)",
+            transform: "translate(140px, -280px)",
+            opacity: 0,
+            willChange: "transform",
+          }}
+        />
+      </div>
 
       {/* Content */}
       <div style={{ position: "relative", zIndex: 1 }}>
