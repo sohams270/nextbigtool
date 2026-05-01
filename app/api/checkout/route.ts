@@ -5,7 +5,7 @@ import DodoPayments from "dodopayments";
 
 const dodo = new DodoPayments({
   bearerToken: process.env.DODO_API_KEY!,
-  environment: "live_mode",
+  environment: process.env.DODO_ENV === "live" ? "live_mode" : "test_mode",
 });
 
 const PRODUCTS: Record<string, string> = {
