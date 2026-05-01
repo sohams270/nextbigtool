@@ -5,6 +5,7 @@ import ReviewButtons from "./ReviewButtons";
 import SubmissionButtons from "./SubmissionButtons";
 import BlogRequestButtons from "./BlogRequestButtons";
 import HofNominationButtons from "./HofNominationButtons";
+import HofInductedButtons from "./HofInductedButtons";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "";
 
@@ -146,7 +147,7 @@ export default async function AdminPage() {
   // Hall of Fame — inducted (approved)
   const { data: inductedHofRaw } = await supabase
     .from("hall_of_fame")
-    .select("id, inducted_at, created_at, user_id, tools(name, logo_url, tagline, slug)")
+    .select("id, tool_id, inducted_at, created_at, user_id, tools(name, logo_url, tagline, slug)")
     .eq("status", "approved")
     .order("inducted_at", { ascending: false });
 
@@ -426,6 +427,8 @@ export default async function AdminPage() {
               }}>
                 🏆 {n.inducted_at ? new Date(n.inducted_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "Inducted"}
               </div>
+
+              <HofInductedButtons nominationId={n.id} toolId={n.tool_id} />
             </div>
           ))}
         </div>

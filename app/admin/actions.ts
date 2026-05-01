@@ -55,13 +55,29 @@ export async function rejectBlogRequest(requestId: string) {
 
 export async function inductHofNomination(nominationId: string) {
   const { supabase } = await getAdminUser();
-  const { error } = await supabase.from("hall_of_fame")
+
+  // 1. Mark nomination as approved
+  const { data: hofRow, error } = await supabase
+    .from("hall_of_fame")
     .update({ status: "approved", inducted_at: new Date().toISOString() })
-    .eq("id", nominationId);
+    .eq("id", nominationId)
+    .select("tool_id")
+    .single();
+
   if (error) {
-    console.error("[inductHofNomination] error:", JSON.stringify(error));
+    console.error("[inductHofNomination] hof error:", JSON.stringify(error));
     throw new Error(error.message);
   }
+
+  // 2. Also mark the tool as featured so it surfaces in the featured strip
+  if (hofRow?.tool_id) {
+    const { error: toolError } = await supabase
+      .from("tools")
+      .update({ featured: true })
+      .eq("id", hofRow.tool_id);
+    if (toolError) console.error("[inductHofNomination] tool featured error:", JSON.stringify(toolError));
+  }
+
   revalidatePath("/admin");
   revalidatePath("/");
 }
@@ -76,6 +92,27 @@ export async function rejectHofNomination(nominationId: string) {
     throw new Error(error.message);
   }
   revalidatePath("/admin");
+}
+
+export async function removeFromHof(nominationId: string, toolId: string) {
+  const { supabase } = await getAdminUser();
+
+  // 1. Mark nomination as removed (keeps the record, just hides from HoF)
+  const { error: hofError } = await supabase
+    .from("hall_of_fame")
+    .update({ status: "removed" })
+    .eq("id", nominationId);
+  if (hofError) {
+    console.error("[removeFromHof] hof error:", JSON.stringify(hofError));
+    throw new Error(hofError.message);
+  }
+
+  // 2. Keep tools.featured = true so it stays in the featured strip
+  // (no change needed — just leaving it as-is)
+  console.log(`[removeFromHof] Removed nomination ${nominationId}, tool ${toolId} stays featured`);
+
+  revalidatePath("/admin");
+  revalidatePath("/");
 }
 
 export async function publishBlogRequest(requestId: string, blogUrl: string) {
