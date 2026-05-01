@@ -14,37 +14,45 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
-const USE_CASES: { name: string; emoji: string; searchTags: string[] }[] = [
-  { name: "Content Creation",      emoji: "✍️",  searchTags: ["content", "writing", "blog", "copywriting", "cms"] },
-  { name: "Marketing Automation",  emoji: "📢",  searchTags: ["marketing", "automation", "campaign", "ads"] },
-  { name: "Analytics & Reporting", emoji: "📊",  searchTags: ["analytics", "reporting", "dashboard", "metrics", "data"] },
-  { name: "Team Collaboration",    emoji: "👥",  searchTags: ["collaboration", "team", "workspace", "productivity"] },
-  { name: "Customer Support",      emoji: "💬",  searchTags: ["support", "helpdesk", "customer", "chat", "crm"] },
-  { name: "Project Management",    emoji: "📋",  searchTags: ["project", "management", "tasks", "planning", "kanban"] },
-  { name: "Developer Tools",       emoji: "⚙️",  searchTags: ["developer", "api", "code", "devops", "cli"] },
-  { name: "Design & Creative",     emoji: "🎨",  searchTags: ["design", "creative", "visual", "ui", "figma"] },
-  { name: "SEO & Growth",          emoji: "📈",  searchTags: ["seo", "growth", "traffic", "ranking", "keyword"] },
-  { name: "E-commerce",            emoji: "🛒",  searchTags: ["ecommerce", "shop", "store", "payments", "checkout"] },
-  { name: "Finance & Invoicing",   emoji: "💰",  searchTags: ["finance", "invoice", "billing", "accounting", "payments"] },
-  { name: "Email & Outreach",      emoji: "📧",  searchTags: ["email", "outreach", "newsletter", "cold", "smtp"] },
-  { name: "Video & Media",         emoji: "🎥",  searchTags: ["video", "media", "streaming", "recording", "podcast"] },
-  { name: "AI & Automation",       emoji: "🤖",  searchTags: ["ai", "automation", "ml", "gpt", "llm", "openai"] },
-  { name: "Lead Generation",       emoji: "🎯",  searchTags: ["leads", "generation", "crm", "prospecting", "sales"] },
-  { name: "No-code & Low-code",    emoji: "🔧",  searchTags: ["no-code", "low-code", "builder", "nocode", "workflow"] },
+/* ── Full canonical use-case list (mirrors dashboard/products/page.tsx) ── */
+const ALL_USE_CASES = [
+  "A/B Testing","AI Agents","AI Analytics","AI Automation","AI Code Assistant",
+  "AI Marketing","AI Video Generation","AI Voice Generation","Analytics & Reporting",
+  "API Development","Art Portfolio","Audio Editing","Authentication",
+  "Book Recommendations","Bug Tracking","CI/CD","Code Development","Code Review",
+  "Cold Call","Cold Email","Community Management","Competitor Analysis",
+  "Contact Management","Content Creation","Content Promotion","Customer Support",
+  "Data Analysis","Database Management","Data Enrichment","Data Integration",
+  "Design & Prototyping","Digital Signage","Digital Signature","Documentation",
+  "Email Campaigns","Email Management","Event Management","Fact Verifying",
+  "Feedback Collection","File Conversion","File Sharing","File Storage",
+  "Financial Planning For Startups","Form Building","Gear Organizer","Graphic Design",
+  "Habit Building","Home Automation","Hosted Trivia","Hosting & Deployment",
+  "Image Generation","Insurance Claims","Invoicing & Billing","Job Hunters",
+  "Job Search","Journaling","Keyword Research","Knowledge Base","Landing Pages",
+  "Lead Generation","Live Chat","LLM Security","Macro Tracking",
+  "Meeting Transcription","Monitoring & Alerting","Network Printer Discovery",
+  "Note-Taking","Offramping","Online Art Gallery","Online Shopping",
+  "Payment Processing","Payroll","Photo Sharing","Price Comparison",
+  "Printer Usage Monitoring","Product Launch","Professional Portfolio",
+  "Project Management","Public Relations","Reading Insights","Receive Files via QR",
+  "Reddit Marketing","Referral Programs","Runtime Threat Detection","Sales Quote",
+  "Sales Roleplay","Scheduling & Booking","Screen Resumes","SEO Optimization",
+  "Skill Building","Social Media Management","Software Comparison","Startup Naming",
+  "Steps Tracking","Subscription Management","Task Management","Team Collaboration",
+  "Testing & QA","Trading","Trip Planning","User Onboarding","Video Editing",
+  "Video Hosting","Waitlist Management","Web Scraping","Website Management",
+  "Website Performance","Website Security","Workflow Automation","Workout Tracking",
+  "Writing & Copywriting",
 ];
 
-const PALETTE = [
-  { gradient: "linear-gradient(135deg,#10B981,#059669)", light: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.3)", text: "#10B981" },
-  { gradient: "linear-gradient(135deg,#06B6D4,#0891B2)", light: "rgba(6,182,212,0.1)",  border: "rgba(6,182,212,0.3)",  text: "#06B6D4" },
-  { gradient: "linear-gradient(135deg,#3B7FFF,#7C3AED)", light: "rgba(59,127,255,0.1)", border: "rgba(59,127,255,0.3)", text: "#3B7FFF" },
-  { gradient: "linear-gradient(135deg,#8B5CF6,#6D28D9)", light: "rgba(139,92,246,0.1)", border: "rgba(139,92,246,0.3)", text: "#8B5CF6" },
-  { gradient: "linear-gradient(135deg,#EC4899,#EF4444)", light: "rgba(236,72,153,0.1)", border: "rgba(236,72,153,0.3)", text: "#EC4899" },
-  { gradient: "linear-gradient(135deg,#F59E0B,#D97706)", light: "rgba(245,158,11,0.1)", border: "rgba(245,158,11,0.3)", text: "#F59E0B" },
-  { gradient: "linear-gradient(135deg,#FF6B35,#FF4500)", light: "rgba(255,107,53,0.1)", border: "rgba(255,107,53,0.3)", text: "#FF6B35" },
-  { gradient: "linear-gradient(135deg,#00B875,#065F46)", light: "rgba(0,184,117,0.1)",  border: "rgba(0,184,117,0.3)",  text: "#00B875" },
-];
+/* ── 5-colour accent palette (cycling) ─────────────────────────────── */
+const ACCENTS = ["#FF6B35","#3B7FFF","#00B875","#8B5CF6","#06B6D4"];
+function accent(i: number) { return ACCENTS[i % ACCENTS.length]; }
 
-function palette(i: number) { return PALETTE[i % PALETTE.length]; }
+function toSlug(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
 
 type ToolRow = {
   id: string; slug: string; name: string; tagline: string;
@@ -61,37 +69,64 @@ export default async function UseCasesPage({
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
+  /* ── Fetch DB tags → id + name ─────────────────────────────────────── */
+  const { data: dbTags } = await supabase
+    .from("tags")
+    .select("id, name, slug");
+
+  const nameToTagId: Record<string, string> = {};
+  for (const t of dbTags ?? []) {
+    nameToTagId[(t as { id: string; name: string; slug: string }).name] = (t as { id: string; name: string; slug: string }).id;
+  }
+
+  /* ── Count tools per tag_id ──────────────────────────────────────────── */
+  const { data: toolTagCounts } = await supabase
+    .from("tool_tags")
+    .select("tag_id");
+
+  const countByTagId = (toolTagCounts ?? []).reduce<Record<string, number>>(
+    (acc, r: { tag_id: string }) => {
+      acc[r.tag_id] = (acc[r.tag_id] ?? 0) + 1;
+      return acc;
+    }, {}
+  );
+
+  /* ── Build display list from static canonical list ─────────────────── */
+  const useCases = ALL_USE_CASES.map((name, i) => {
+    const tagId = nameToTagId[name];
+    return { name, tagId, count: tagId ? (countByTagId[tagId] ?? 0) : 0, accentColor: accent(i) };
+  });
+
+  /* ── If a use case is selected, fetch its tools ─────────────────────── */
   let filteredTools: ToolRow[] = [];
-  const selectedUC = uc ? USE_CASES.find((u) => u.name.toLowerCase() === uc.toLowerCase()) : null;
+  const selectedUC = uc ? useCases.find(u => u.name.toLowerCase() === uc.toLowerCase()) : null;
 
-  if (selectedUC) {
-    const tagFilter = selectedUC.searchTags.map((t) => `name.ilike.%${t}%`).join(",");
-    const { data: matchedTags } = await supabase.from("tags").select("id").or(tagFilter).limit(30);
-    const tagIds = (matchedTags ?? []).map((t: { id: string }) => t.id);
+  if (selectedUC?.tagId) {
+    const { data: junctionRows } = await supabase
+      .from("tool_tags")
+      .select("tool_id")
+      .eq("tag_id", selectedUC.tagId);
+    const toolIds = [...new Set((junctionRows ?? []).map((r: { tool_id: string }) => r.tool_id))];
 
-    if (tagIds.length > 0) {
-      const { data: junctionRows } = await supabase.from("tool_tags").select("tool_id").in("tag_id", tagIds).limit(60);
-      const toolIds = [...new Set((junctionRows ?? []).map((r: { tool_id: string }) => r.tool_id))];
-      if (toolIds.length > 0) {
-        const { data: toolRows } = await supabase
-          .from("tools")
-          .select("id, slug, name, tagline, logo_url, website_url, pricing, upvote_count")
-          .eq("status", "approved")
-          .in("id", toolIds)
-          .order("upvote_count", { ascending: false });
-        filteredTools = (toolRows ?? []) as ToolRow[];
-      }
+    if (toolIds.length > 0) {
+      const { data: toolRows } = await supabase
+        .from("tools")
+        .select("id, slug, name, tagline, logo_url, website_url, pricing, upvote_count")
+        .eq("status", "approved")
+        .in("id", toolIds)
+        .order("upvote_count", { ascending: false });
+      filteredTools = (toolRows ?? []) as ToolRow[];
     }
-
-    if (filteredTools.length === 0) {
-      const keywordFilter = selectedUC.searchTags.slice(0, 3)
-        .flatMap((kw) => [`name.ilike.%${kw}%`, `tagline.ilike.%${kw}%`, `description.ilike.%${kw}%`])
-        .join(",");
+  } else if (uc && !selectedUC?.tagId) {
+    /* Fallback: keyword search for unknown or un-tagged use cases */
+    const ucObj = ALL_USE_CASES.find(u => u.toLowerCase() === uc.toLowerCase());
+    if (ucObj) {
+      const kw = ucObj.toLowerCase();
       const { data: fallbackRows } = await supabase
         .from("tools")
         .select("id, slug, name, tagline, logo_url, website_url, pricing, upvote_count")
         .eq("status", "approved")
-        .or(keywordFilter)
+        .or(`name.ilike.%${kw}%,tagline.ilike.%${kw}%,description.ilike.%${kw}%`)
         .order("upvote_count", { ascending: false })
         .limit(20);
       filteredTools = (fallbackRows ?? []) as ToolRow[];
@@ -104,11 +139,11 @@ export default async function UseCasesPage({
 
       <DiscoverHero
         badge="✅ Use Cases"
-        title={uc ? (selectedUC ? `${selectedUC.emoji} ${selectedUC.name}` : uc) : "Browse by"}
+        title={uc ? (selectedUC?.name ?? uc) : "Browse by"}
         titleAccent={uc ? undefined : "Use Case"}
         subtitle={uc
           ? `${filteredTools.length} tool${filteredTools.length !== 1 ? "s" : ""} matched this use case`
-          : `${USE_CASES.length} use cases · Find the right tool for any job`}
+          : `${ALL_USE_CASES.length} use cases · Find the right tool for any job`}
         breadcrumb={uc ? (
           <Link href="/discover/use-cases" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "rgba(255,255,255,0.55)", textDecoration: "none", fontWeight: 500 }}>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
@@ -117,33 +152,53 @@ export default async function UseCasesPage({
         ) : undefined}
       />
 
-      {/* ── Main Content ─────────────────────────────────────────────── */}
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "32px 28px 80px", width: "100%", boxSizing: "border-box" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 28 }}>
+
           <div>
             {!uc ? (
+              /* ── Use case grid ─────────────────────────────────────── */
               <>
                 <div style={{ marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>All Use Cases</span>
                   <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-                  <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>{USE_CASES.length} use cases</span>
+                  <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>{ALL_USE_CASES.length} use cases</span>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 14 }}>
-                  {USE_CASES.map((uc, i) => {
-                    const p = palette(i);
-                    return (
-                      <Link key={uc.name} href={`/discover/use-cases?uc=${encodeURIComponent(uc.name)}`} style={{ textDecoration: "none" }}>
-                        <div className="discover-cat-box" style={{ borderRadius: 12, padding: "18px 16px", background: p.light, border: `1px solid ${p.border}`, cursor: "pointer", position: "relative", overflow: "hidden" }}>
-                          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: p.gradient }} />
-                          <div style={{ fontSize: 22, marginBottom: 8 }}>{uc.emoji}</div>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: p.text, lineHeight: 1.3 }}>{uc.name}</div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 10 }}>
+                  {useCases.map((uc) => (
+                    <Link key={uc.name} href={`/discover/use-cases?uc=${encodeURIComponent(uc.name)}`} style={{ textDecoration: "none" }}>
+                      <div
+                        className="discover-cat-box"
+                        style={{
+                          borderRadius: 9, padding: "13px 14px 13px 17px",
+                          background: "var(--surface)", border: "1px solid var(--border)",
+                          cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
+                          position: "relative", overflow: "hidden",
+                        }}
+                      >
+                        {/* Left accent stripe */}
+                        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: uc.accentColor, borderRadius: "9px 0 0 9px" }} />
+
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", lineHeight: 1.3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {uc.name}
+                          </div>
+                          <div style={{ fontSize: 11, color: "var(--ink-muted)", marginTop: 2 }}>
+                            {uc.count} tool{uc.count !== 1 ? "s" : ""}
+                          </div>
                         </div>
-                      </Link>
-                    );
-                  })}
+
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--ink-faint)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                          <path d="M5 12h14M13 6l6 6-6 6"/>
+                        </svg>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </>
             ) : (
+              /* ── Filtered tool list ────────────────────────────────── */
               filteredTools.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "80px 0" }}>
                   <div style={{ fontSize: 40, marginBottom: 16 }}>📭</div>
@@ -151,12 +206,12 @@ export default async function UseCasesPage({
                   <div style={{ fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: 20 }}>
                     No tools found for this use case yet. Submit yours and be the first!
                   </div>
-                  <Link href="/dashboard/submit" style={{ display: "inline-block", padding: "10px 24px", borderRadius: 8, background: "#10B981", color: "#fff", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
+                  <Link href="/dashboard/products" style={{ display: "inline-block", padding: "10px 24px", borderRadius: 8, background: "#FF6B35", color: "#fff", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
                     Submit Your Tool →
                   </Link>
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {filteredTools.map((tool, i) => {
                     let logoSrc: string | null = tool.logo_url;
                     if (!logoSrc && tool.website_url) {
@@ -164,15 +219,13 @@ export default async function UseCasesPage({
                     }
                     return (
                       <Link key={tool.id} href={`/tools/${tool.slug}`} style={{ textDecoration: "none" }}>
-                        <div className="discover-tool-row" style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderRadius: 12, background: "var(--surface)", border: "1px solid var(--border)" }}>
-                          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-muted)", width: 24, textAlign: "center", flexShrink: 0 }}>#{i + 1}</span>
-                          <div style={{ width: 44, height: 44, borderRadius: 10, overflow: "hidden", flexShrink: 0, background: "var(--surface-alt)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 700, color: "var(--ink-muted)" }}>
-                            {logoSrc
-                              ? <img src={logoSrc} alt={tool.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                              : tool.name[0]}
+                        <div className="discover-tool-row" style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderRadius: 10, background: "var(--surface)", border: "1px solid var(--border)" }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-muted)", width: 22, textAlign: "center", flexShrink: 0 }}>#{i + 1}</span>
+                          <div style={{ width: 40, height: 40, borderRadius: 9, overflow: "hidden", flexShrink: 0, background: "var(--surface-alt)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, color: "var(--ink-muted)" }}>
+                            {logoSrc ? <img src={logoSrc} alt={tool.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : tool.name[0]}
                           </div>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", marginBottom: 3 }}>{tool.name}</div>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", marginBottom: 2 }}>{tool.name}</div>
                             <div style={{ fontSize: 12, color: "var(--ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tool.tagline}</div>
                           </div>
                           <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 10 }}>
