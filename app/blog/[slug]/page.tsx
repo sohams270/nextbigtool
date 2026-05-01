@@ -6,6 +6,7 @@ import TopNav from "../../components/TopNav";
 import Footer from "../../components/Footer";
 import ShareButton from "../../components/blog/ShareButton";
 import TableOfContents from "../../components/blog/TableOfContents";
+import LaunchCTABox from "../../components/blog/LaunchCTABox";
 
 export const revalidate = 60;
 
@@ -548,41 +549,7 @@ export default async function BlogPostPage({ params }: Props) {
           {/* RIGHT: Sidebar */}
           <aside className="blog-post-layout-right">
             {/* CTA Box */}
-            <div style={{
-              background: "var(--surface)",
-              border: "1px solid var(--border)",
-              borderRadius: 16,
-              overflow: "hidden",
-              marginBottom: 20,
-            }}>
-              <div style={{ height: 3, background: "linear-gradient(90deg,#FF6B35,#ff3d88)" }} />
-              <div style={{ padding: "20px 20px 24px" }}>
-                <div style={{ fontSize: 28, marginBottom: 10 }}>🚀</div>
-                <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)", marginBottom: 8, letterSpacing: "-0.01em" }}>
-                  Ready to Ship Your Tool?
-                </div>
-                <div style={{ fontSize: 12, color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: 16 }}>
-                  Join hundreds of founders who&apos;ve launched on Next Big Tool.
-                </div>
-                <a
-                  href="/submit"
-                  style={{
-                    display: "block",
-                    textAlign: "center",
-                    padding: "10px 16px",
-                    borderRadius: 10,
-                    background: "#FF6B35",
-                    color: "#fff",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    textDecoration: "none",
-                    transition: "opacity 0.15s",
-                  }}
-                >
-                  Launch Now →
-                </a>
-              </div>
-            </div>
+            <LaunchCTABox />
 
             {/* You Might Also Like */}
             {relatedPosts.length > 0 && (
