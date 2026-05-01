@@ -625,11 +625,13 @@ export default function ProductShowcase({
   userId,
   userUpvotedIds,
   hofEntries = [],
+  sort = "trending",
 }: {
   tools: ShowcaseTool[];
   userId: string | null;
   userUpvotedIds: string[];
   hofEntries?: HofEntry[];
+  sort?: string;
 }) {
   if (tools.length === 0 && hofEntries.length === 0) {
     return (
@@ -711,10 +713,18 @@ export default function ProductShowcase({
                 fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em",
                 lineHeight: 1.05, color: "var(--ink)", margin: 0,
               }}>
-                Featured Tools
+                {sort === "new"
+                  ? "New Tool Additions"
+                  : sort === "top"
+                  ? "Top Voted Tools"
+                  : "Featured Tools"}
               </h2>
               <p style={{ margin: "6px 0 0", color: "var(--ink-muted)", fontSize: 13 }}>
-                Hand-picked tools, ranked by builders
+                {sort === "new"
+                  ? "The latest indie tools added to the platform"
+                  : sort === "top"
+                  ? "The highest-upvoted tools of all time, ranked by the community"
+                  : "Hand-picked tools, ranked by builders"}
               </p>
             </div>
             <div style={{ display: "inline-flex", padding: 3, background: "var(--surface-alt)", borderRadius: 10, gap: 2 }}>

@@ -425,6 +425,7 @@ export default async function HomePage({
                   userId={user?.id ?? null}
                   userUpvotedIds={userUpvotedIds}
                   hofEntries={hofEntries}
+                  sort={sort}
                 />
               </>
             )}
