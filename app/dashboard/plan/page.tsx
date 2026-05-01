@@ -17,7 +17,12 @@ const PLAN_DESCRIPTIONS: Record<string, string> = {
   core:  "You have full access to all features including Founder CRM, Hall of Fame, Press Release, and unlimited everything.",
 };
 
-export default async function PlanPage() {
+export default async function PlanPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ upgraded?: string; error?: string }>;
+}) {
+  const { upgraded, error: checkoutError } = await searchParams;
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
@@ -42,6 +47,23 @@ export default async function PlanPage() {
 
   return (
     <main style={{ flex: 1, overflow: "auto", padding: "28px 32px" }}>
+
+      {/* Success banner */}
+      {upgraded === "1" && (
+        <div style={{ marginBottom: 20, padding: "14px 18px", borderRadius: 10, background: "rgba(0,184,122,0.12)", border: "1px solid rgba(0,184,122,0.3)", display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 18 }}>🎉</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "#00B87A" }}>Welcome to Core! Your plan has been upgraded. All features are now unlocked.</span>
+        </div>
+      )}
+
+      {/* Error banner */}
+      {checkoutError === "1" && (
+        <div style={{ marginBottom: 20, padding: "14px 18px", borderRadius: 10, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 18 }}>⚠️</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "#ef4444" }}>Something went wrong with checkout. Please try again or contact support.</span>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
         <div>

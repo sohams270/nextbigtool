@@ -202,11 +202,11 @@ export default function PlanToggle({ currentPlan = "free" }: { currentPlan?: "fr
                   {plan.cta}
                 </button>
               ) : plan.isCore ? (
-                <Link href={plan.ctaHref} style={{ textDecoration: "none" }}>
+                <a href={`/api/checkout?interval=${yearly ? "yearly" : "monthly"}`} style={{ textDecoration: "none" }}>
                   <button style={{ width: "100%", padding: "10px 0", borderRadius: 9, border: "none", background: "#fff", fontSize: 13, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
                     {plan.cta}
                   </button>
-                </Link>
+                </a>
               ) : (
                 <Link href={plan.ctaHref} style={{ textDecoration: "none" }}>
                   <button style={{ width: "100%", padding: "10px 0", borderRadius: 9, border: "1.5px solid #FF6B35", background: "transparent", fontSize: 13, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
