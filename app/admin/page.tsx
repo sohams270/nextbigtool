@@ -179,6 +179,36 @@ export default async function AdminPage() {
 
   const tools = (pending ?? []) as Tool[];
 
+  // All members
+  const { data: allMembers } = await adminDb
+    .from("profiles")
+    .select("id, full_name, email, plan, created_at")
+    .order("created_at", { ascending: false });
+
+  // Tool count per user
+  const { data: toolCounts } = await adminDb
+    .from("tools")
+    .select("submitter_id")
+    .neq("status", "rejected");
+
+  const toolCountMap: Record<string, number> = {};
+  (toolCounts ?? []).forEach((t: any) => {
+    toolCountMap[t.submitter_id] = (toolCountMap[t.submitter_id] ?? 0) + 1;
+  });
+
+  const members = (allMembers ?? []) as Array<{
+    id: string; full_name: string | null; email: string | null;
+    plan: string | null; created_at: string;
+  }>;
+
+  // Stats
+  const totalMembers = members.length;
+  const thisWeek = members.filter(m => {
+    const d = new Date(m.created_at);
+    const weekAgo = new Date(Date.now() - 7 * 86400000);
+    return d > weekAgo;
+  }).length;
+
   return (
     <main style={{ maxWidth: 900, margin: "0 auto", padding: "36px 24px" }}>
       {/* Header */}
@@ -626,6 +656,93 @@ export default async function AdminPage() {
           </div>
         </>
       )}
+      {/* ── Members ── */}
+      <div style={{ marginTop: 48 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>
+              Platform
+            </div>
+            <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)", margin: 0, letterSpacing: "-0.02em" }}>
+              All Members
+            </h2>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ textAlign: "center", padding: "8px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10 }}>
+              <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ink)" }}>{totalMembers}</div>
+              <div style={{ fontSize: 10, color: "var(--ink-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Total</div>
+            </div>
+            <div style={{ textAlign: "center", padding: "8px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10 }}>
+              <div style={{ fontSize: 20, fontWeight: 800, color: "#00B875" }}>{thisWeek}</div>
+              <div style={{ fontSize: 10, color: "var(--ink-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>This Week</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div style={{ ...card, overflow: "hidden", padding: 0 }}>
+          {/* Header row */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 90px 90px 90px", padding: "10px 16px", borderBottom: "1px solid var(--border)", fontSize: 10, fontWeight: 700, color: "var(--ink-muted)", letterSpacing: "0.07em", textTransform: "uppercase" }}>
+            <div>Name / Email</div>
+            <div>Email</div>
+            <div>Plan</div>
+            <div>Tools</div>
+            <div>Joined</div>
+          </div>
+
+          {members.length === 0 ? (
+            <div style={{ padding: "40px", textAlign: "center", color: "var(--ink-muted)", fontSize: 13 }}>No members yet.</div>
+          ) : (
+            members.map((m, idx) => {
+              const initial = (m.full_name ?? m.email ?? "?")[0].toUpperCase();
+              const planColor = m.plan === "core" ? "#F59E0B" : m.plan === "pro" ? "#3B7FFF" : "var(--ink-muted)";
+              const joined = new Date(m.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+              return (
+                <div key={m.id} style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr 90px 90px 90px",
+                  padding: "11px 16px",
+                  borderBottom: idx < members.length - 1 ? "1px solid var(--border-faint)" : "none",
+                  alignItems: "center",
+                }}>
+                  {/* Avatar + Name */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                    <div style={{
+                      width: 30, height: 30, borderRadius: "50%", flexShrink: 0,
+                      background: "linear-gradient(135deg,#FF6B35,#FF4500)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 12, fontWeight: 700, color: "#fff",
+                    }}>{initial}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {m.full_name ?? "—"}
+                    </div>
+                  </div>
+                  {/* Email */}
+                  <div style={{ fontSize: 12, color: "var(--ink-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {m.email ?? "—"}
+                  </div>
+                  {/* Plan */}
+                  <div>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99,
+                      background: m.plan === "core" ? "rgba(245,158,11,0.12)" : "rgba(107,114,128,0.1)",
+                      color: planColor, textTransform: "uppercase", letterSpacing: "0.04em",
+                    }}>
+                      {m.plan ?? "free"}
+                    </span>
+                  </div>
+                  {/* Tools */}
+                  <div style={{ fontSize: 13, color: "var(--ink)", fontWeight: 600 }}>
+                    {toolCountMap[m.id] ?? 0}
+                  </div>
+                  {/* Joined */}
+                  <div style={{ fontSize: 11, color: "var(--ink-muted)" }}>{joined}</div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
     </main>
   );
 }
