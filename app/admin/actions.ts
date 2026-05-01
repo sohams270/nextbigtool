@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "sohams270@gmail.com";
 
@@ -11,7 +12,8 @@ async function getAdminUser() {
   const supabase = createClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
   if (!user || user.email !== ADMIN_EMAIL) throw new Error("Unauthorized");
-  return { user, supabase };
+  // Return admin client for writes — bypasses RLS so updates always land
+  return { user, supabase: createAdminClient() };
 }
 
 export async function approveTool(toolId: string) {
