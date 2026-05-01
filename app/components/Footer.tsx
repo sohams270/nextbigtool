@@ -15,7 +15,7 @@ const DISCOVER_LINKS = [
 const COMPANY_LINKS = [
   { label: "About",           href: "/about" },
   { label: "Blog",            href: "/blog" },
-  { label: "Press Release",   href: "/press" },
+  { label: "Press Release",   href: "/press-release" },
   { label: "Pricing",         href: "/pricing" },
   { label: "Contact",         href: "/contact" },
   { label: "Privacy Policy",  href: "/privacy" },
