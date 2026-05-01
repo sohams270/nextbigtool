@@ -103,6 +103,7 @@ export default function HeroSection() {
       className="hero-inner"
       style={{
         position: "relative",
+        zIndex: 10,
         background: "#0A0B1A",
         color: "#fff",
         padding: "54px 40px 36px",
