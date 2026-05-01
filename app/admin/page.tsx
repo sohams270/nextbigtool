@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 import ReviewButtons from "./ReviewButtons";
 import SubmissionButtons from "./SubmissionButtons";
 import BlogRequestButtons from "./BlogRequestButtons";
@@ -88,27 +89,30 @@ export default async function AdminPage() {
   if (!user) redirect("/");
   if (user.email !== ADMIN_EMAIL) redirect("/");
 
-  const { data: pending } = await supabase
+  // Use service-role client for all data reads so RLS doesn't block admin queries
+  const adminDb = createAdminClient();
+
+  const { data: pending } = await adminDb
     .from("tools")
     .select("*, categories(name)")
     .eq("status", "pending")
     .order("created_at", { ascending: false });
 
-  const { data: approved } = await supabase
+  const { data: approved } = await adminDb
     .from("tools")
     .select("id, name, status, created_at")
     .eq("status", "approved")
     .order("created_at", { ascending: false })
     .limit(10);
 
-  const { data: rejected } = await supabase
+  const { data: rejected } = await adminDb
     .from("tools")
     .select("id, name, status, created_at")
     .eq("status", "rejected")
     .order("created_at", { ascending: false })
     .limit(10);
 
-  const { data: pendingNewsletterRaw } = await supabase
+  const { data: pendingNewsletterRaw } = await adminDb
     .from("newsletter_submissions")
     .select("id, headline, story, link, status, created_at, user_id, tools(name)")
     .eq("status", "pending")
@@ -117,7 +121,7 @@ export default async function AdminPage() {
   // enrich with profiles separately
   const submitterIds = [...new Set((pendingNewsletterRaw ?? []).map((s: any) => s.user_id))];
   const { data: submitterProfiles } = submitterIds.length > 0
-    ? await supabase.from("profiles").select("id, full_name, email").in("id", submitterIds)
+    ? await adminDb.from("profiles").select("id, full_name, email").in("id", submitterIds)
     : { data: [] };
   const profileMap = Object.fromEntries((submitterProfiles ?? []).map((p: any) => [p.id, p]));
 
@@ -127,7 +131,7 @@ export default async function AdminPage() {
   }));
 
   // Hall of Fame nominations — pending
-  const { data: pendingHofRaw } = await supabase
+  const { data: pendingHofRaw } = await adminDb
     .from("hall_of_fame")
     .select("id, pitch, status, created_at, user_id, tools(name, logo_url, tagline)")
     .eq("status", "pending")
@@ -135,7 +139,7 @@ export default async function AdminPage() {
 
   const hofSubmitterIds = [...new Set((pendingHofRaw ?? []).map((r: any) => r.user_id))];
   const { data: hofProfiles } = hofSubmitterIds.length > 0
-    ? await supabase.from("profiles").select("id, full_name, email").in("id", hofSubmitterIds)
+    ? await adminDb.from("profiles").select("id, full_name, email").in("id", hofSubmitterIds)
     : { data: [] };
   const hofProfileMap = Object.fromEntries((hofProfiles ?? []).map((p: any) => [p.id, p]));
 
@@ -145,7 +149,7 @@ export default async function AdminPage() {
   }));
 
   // Hall of Fame — inducted (approved)
-  const { data: inductedHofRaw } = await supabase
+  const { data: inductedHofRaw } = await adminDb
     .from("hall_of_fame")
     .select("id, tool_id, inducted_at, created_at, user_id, tools(name, logo_url, tagline, slug)")
     .eq("status", "approved")
@@ -154,7 +158,7 @@ export default async function AdminPage() {
   const inductedHof = (inductedHofRaw ?? []) as any[];
 
   // Blog post requests
-  const { data: pendingBlogRaw } = await supabase
+  const { data: pendingBlogRaw } = await adminDb
     .from("blog_post_requests")
     .select("id, company_name, headline, story, link, status, blog_url, created_at, user_id, tools(name)")
     .in("status", ["pending", "approved"])
@@ -162,7 +166,7 @@ export default async function AdminPage() {
 
   const blogSubmitterIds = [...new Set((pendingBlogRaw ?? []).map((r: any) => r.user_id))];
   const { data: blogProfiles } = blogSubmitterIds.length > 0
-    ? await supabase.from("profiles").select("id, full_name, email").in("id", blogSubmitterIds)
+    ? await adminDb.from("profiles").select("id, full_name, email").in("id", blogSubmitterIds)
     : { data: [] };
   const blogProfileMap = Object.fromEntries((blogProfiles ?? []).map((p: any) => [p.id, p]));
 

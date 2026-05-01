@@ -7,7 +7,7 @@ export function notifyAdmin(payload: Record<string, string>) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-internal-secret": process.env.NEXT_PUBLIC_NOTIFY_KEY ?? "",
+      "x-internal-secret": "nbt-secret-2025",
     },
     body: JSON.stringify(payload),
   }).catch(() => {}); // silent — never block the user flow
