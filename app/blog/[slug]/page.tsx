@@ -272,7 +272,7 @@ export default async function BlogPostPage({ params }: Props) {
         borderBottom: "1px solid var(--border)",
         padding: "40px 0",
       }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ maxWidth: 1320, margin: "0 auto", padding: "0 32px" }}>
           <div className="blog-post-hero">
             {/* Left: meta */}
             <div>
@@ -409,7 +409,7 @@ export default async function BlogPostPage({ params }: Props) {
       </section>
 
       {/* ── 3-COLUMN BODY ── */}
-      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "40px 24px 80px", width: "100%" }}>
+      <div style={{ maxWidth: 1320, margin: "0 auto", padding: "40px 32px 80px", width: "100%" }}>
         <div className="blog-post-layout">
 
           {/* LEFT: Table of contents */}
