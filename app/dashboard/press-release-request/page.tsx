@@ -423,7 +423,7 @@ export default function BlogPage() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>Core Feature</div>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.02em", margin: "0 0 4px" }}>
-          Featured Blog Post
+          Your Press Release is One Step Away
         </h1>
         <p style={{ fontSize: 13, color: "var(--ink-muted)", margin: 0 }}>
           Get a high-authority PR blog post written about your company — 1 per month, with a backlink included.
