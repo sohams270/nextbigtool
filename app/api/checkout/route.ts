@@ -41,9 +41,18 @@ export async function GET(request: NextRequest) {
       cancel_url:  `${SITE_URL}/dashboard/plan`,
     });
 
-    return NextResponse.redirect(session.checkout_url!);
-  } catch (err) {
-    console.error("[checkout] Dodo error:", err);
-    return NextResponse.redirect(new URL("/dashboard/plan?error=1", request.url));
+    if (!session.checkout_url) {
+      console.error("[checkout] No checkout_url in response:", session);
+      return NextResponse.redirect(new URL("/dashboard/plan?error=no_url", request.url));
+    }
+
+    return NextResponse.redirect(session.checkout_url);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : JSON.stringify(err);
+    console.error("[checkout] Dodo error:", msg);
+    const url = new URL("/dashboard/plan", request.url);
+    url.searchParams.set("error", "1");
+    url.searchParams.set("msg", msg.slice(0, 200));
+    return NextResponse.redirect(url);
   }
 }

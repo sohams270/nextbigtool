@@ -20,9 +20,9 @@ const PLAN_DESCRIPTIONS: Record<string, string> = {
 export default async function PlanPage({
   searchParams,
 }: {
-  searchParams: Promise<{ upgraded?: string; error?: string }>;
+  searchParams: Promise<{ upgraded?: string; error?: string; msg?: string }>;
 }) {
-  const { upgraded, error: checkoutError } = await searchParams;
+  const { upgraded, error: checkoutError, msg: errorMsg } = await searchParams;
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
@@ -58,9 +58,16 @@ export default async function PlanPage({
 
       {/* Error banner */}
       {checkoutError === "1" && (
-        <div style={{ marginBottom: 20, padding: "14px 18px", borderRadius: 10, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 18 }}>⚠️</span>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#ef4444" }}>Something went wrong with checkout. Please try again or contact support.</span>
+        <div style={{ marginBottom: 20, padding: "14px 18px", borderRadius: 10, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 18 }}>⚠️</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "#ef4444" }}>Something went wrong with checkout. Please try again or contact support.</span>
+          </div>
+          {errorMsg && (
+            <div style={{ fontSize: 11, color: "rgba(239,68,68,0.7)", fontFamily: "monospace", paddingLeft: 28 }}>
+              {decodeURIComponent(errorMsg)}
+            </div>
+          )}
         </div>
       )}
 
