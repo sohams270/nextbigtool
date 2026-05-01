@@ -620,3 +620,40 @@ body {
   .blog-post-hero { grid-template-columns: 1fr; }
   .blog-post-hero-image { display: none; }
 }
+
+/* ── Discover pages: hover states (replaces inline onMouseEnter/Leave) ─── */
+.discover-cat-box {
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.discover-cat-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+.discover-tool-row {
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.discover-tool-row:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  border-color: rgba(59,127,255,0.35) !important;
+}
+.discover-hof-row-premium {
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.discover-hof-row-premium:hover {
+  box-shadow: 0 6px 28px rgba(255,215,0,0.18);
+  border-color: rgba(255,215,0,0.55) !important;
+}
+.discover-hof-row-std {
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.discover-hof-row-std:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  border-color: rgba(255,215,0,0.4) !important;
+}
+.discover-free-row {
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.discover-free-row:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  border-color: rgba(255,107,53,0.35) !important;
+}

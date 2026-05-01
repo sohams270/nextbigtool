@@ -13,7 +13,6 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
-/* ── Static use-case list ─────────────────────────────────────────────── */
 const USE_CASES: { name: string; emoji: string; searchTags: string[] }[] = [
   { name: "Content Creation",      emoji: "✍️",  searchTags: ["content", "writing", "blog", "copywriting", "cms"] },
   { name: "Marketing Automation",  emoji: "📢",  searchTags: ["marketing", "automation", "campaign", "ads"] },
@@ -33,7 +32,6 @@ const USE_CASES: { name: string; emoji: string; searchTags: string[] }[] = [
   { name: "No-code & Low-code",    emoji: "🔧",  searchTags: ["no-code", "low-code", "builder", "nocode", "workflow"] },
 ];
 
-/* ── Color palette (cycling) ─────────────────────────────────────────── */
 const PALETTE = [
   { gradient: "linear-gradient(135deg,#10B981,#059669)", light: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.3)", text: "#10B981" },
   { gradient: "linear-gradient(135deg,#06B6D4,#0891B2)", light: "rgba(6,182,212,0.1)",  border: "rgba(6,182,212,0.3)",  text: "#06B6D4" },
@@ -66,28 +64,13 @@ export default async function UseCasesPage({
   const selectedUC = uc ? USE_CASES.find((u) => u.name.toLowerCase() === uc.toLowerCase()) : null;
 
   if (selectedUC) {
-    /* ── Search tags table for matching tag IDs ─────────────────────── */
-    const tagFilter = selectedUC.searchTags
-      .map((t) => `name.ilike.%${t}%`)
-      .join(",");
-
-    const { data: matchedTags } = await supabase
-      .from("tags")
-      .select("id")
-      .or(tagFilter)
-      .limit(30);
-
+    const tagFilter = selectedUC.searchTags.map((t) => `name.ilike.%${t}%`).join(",");
+    const { data: matchedTags } = await supabase.from("tags").select("id").or(tagFilter).limit(30);
     const tagIds = (matchedTags ?? []).map((t: { id: string }) => t.id);
 
     if (tagIds.length > 0) {
-      const { data: junctionRows } = await supabase
-        .from("tool_tags")
-        .select("tool_id")
-        .in("tag_id", tagIds)
-        .limit(60);
-
+      const { data: junctionRows } = await supabase.from("tool_tags").select("tool_id").in("tag_id", tagIds).limit(60);
       const toolIds = [...new Set((junctionRows ?? []).map((r: { tool_id: string }) => r.tool_id))];
-
       if (toolIds.length > 0) {
         const { data: toolRows } = await supabase
           .from("tools")
@@ -99,17 +82,10 @@ export default async function UseCasesPage({
       }
     }
 
-    /* ── Also try matching by name/tagline/description ───────────────── */
     if (filteredTools.length === 0) {
-      const keywordFilter = selectedUC.searchTags
-        .slice(0, 3)
-        .flatMap((kw) => [
-          `name.ilike.%${kw}%`,
-          `tagline.ilike.%${kw}%`,
-          `description.ilike.%${kw}%`,
-        ])
+      const keywordFilter = selectedUC.searchTags.slice(0, 3)
+        .flatMap((kw) => [`name.ilike.%${kw}%`, `tagline.ilike.%${kw}%`, `description.ilike.%${kw}%`])
         .join(",");
-
       const { data: fallbackRows } = await supabase
         .from("tools")
         .select("id, slug, name, tagline, logo_url, website_url, pricing, upvote_count")
@@ -126,32 +102,16 @@ export default async function UseCasesPage({
       <TopNav />
 
       {/* ── Page Header ───────────────────────────────────────────────── */}
-      <div style={{
-        background: "linear-gradient(135deg,#10B981 0%,#0891B2 100%)",
-        padding: "36px 28px 32px",
-        position: "relative", overflow: "hidden",
-      }}>
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.12) 0%, transparent 60%)",
-          pointerEvents: "none",
-        }} />
+      <div style={{ background: "linear-gradient(135deg,#10B981 0%,#0891B2 100%)", padding: "36px 28px 32px", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.12) 0%, transparent 60%)", pointerEvents: "none" }} />
         <div style={{ maxWidth: 1160, margin: "0 auto", position: "relative" }}>
           {uc && (
-            <Link
-              href="/discover/use-cases"
-              style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "rgba(255,255,255,0.75)", textDecoration: "none", marginBottom: 12, fontWeight: 500 }}
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M11 6l-6 6 6 6"/>
-              </svg>
+            <Link href="/discover/use-cases" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "rgba(255,255,255,0.75)", textDecoration: "none", marginBottom: 12, fontWeight: 500 }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
               All Use Cases
             </Link>
           )}
-          <h1 style={{
-            fontSize: 28, fontWeight: 800, color: "#fff",
-            letterSpacing: "-0.02em", margin: "0 0 8px",
-          }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", margin: "0 0 8px" }}>
             {uc ? (selectedUC ? `${selectedUC.emoji} ${selectedUC.name}` : uc) : "Browse by Use Case"}
           </h1>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", margin: 0 }}>
@@ -165,55 +125,23 @@ export default async function UseCasesPage({
       {/* ── Main Content ─────────────────────────────────────────────── */}
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "32px 28px 80px", width: "100%", boxSizing: "border-box" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 28 }}>
-
-          {/* ── Left content ─────────────────────────────────────────── */}
           <div>
             {!uc ? (
-              /* Grid of use-case boxes */
               <>
                 <div style={{ marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>
-                    All Use Cases
-                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>All Use Cases</span>
                   <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-                  <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>
-                    {USE_CASES.length} use cases
-                  </span>
+                  <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>{USE_CASES.length} use cases</span>
                 </div>
-                <div style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-                  gap: 14,
-                }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 14 }}>
                   {USE_CASES.map((uc, i) => {
                     const p = palette(i);
                     return (
-                      <Link
-                        key={uc.name}
-                        href={`/discover/use-cases?uc=${encodeURIComponent(uc.name)}`}
-                        style={{ textDecoration: "none" }}
-                      >
-                        <div
-                          style={{
-                            borderRadius: 12, padding: "18px 16px",
-                            background: p.light, border: `1px solid ${p.border}`,
-                            cursor: "pointer", transition: "transform .15s, box-shadow .15s",
-                            position: "relative", overflow: "hidden",
-                          }}
-                          onMouseEnter={(e) => {
-                            (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
-                            (e.currentTarget as HTMLDivElement).style.boxShadow = `0 6px 20px ${p.border}`;
-                          }}
-                          onMouseLeave={(e) => {
-                            (e.currentTarget as HTMLDivElement).style.transform = "none";
-                            (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-                          }}
-                        >
+                      <Link key={uc.name} href={`/discover/use-cases?uc=${encodeURIComponent(uc.name)}`} style={{ textDecoration: "none" }}>
+                        <div className="discover-cat-box" style={{ borderRadius: 12, padding: "18px 16px", background: p.light, border: `1px solid ${p.border}`, cursor: "pointer", position: "relative", overflow: "hidden" }}>
                           <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: p.gradient }} />
                           <div style={{ fontSize: 22, marginBottom: 8 }}>{uc.emoji}</div>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: p.text, lineHeight: 1.3 }}>
-                            {uc.name}
-                          </div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: p.text, lineHeight: 1.3 }}>{uc.name}</div>
                         </div>
                       </Link>
                     );
@@ -221,24 +149,14 @@ export default async function UseCasesPage({
                 </div>
               </>
             ) : (
-              /* Filtered tool list */
               filteredTools.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "80px 0" }}>
                   <div style={{ fontSize: 40, marginBottom: 16 }}>📭</div>
-                  <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)", marginBottom: 8 }}>
-                    No Tool Listed Here
-                  </div>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)", marginBottom: 8 }}>No Tool Listed Here</div>
                   <div style={{ fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: 20 }}>
                     No tools found for this use case yet. Submit yours and be the first!
                   </div>
-                  <Link
-                    href="/dashboard/submit"
-                    style={{
-                      display: "inline-block", padding: "10px 24px", borderRadius: 8,
-                      background: "#10B981", color: "#fff",
-                      textDecoration: "none", fontSize: 13, fontWeight: 700,
-                    }}
-                  >
+                  <Link href="/dashboard/submit" style={{ display: "inline-block", padding: "10px 24px", borderRadius: 8, background: "#10B981", color: "#fff", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
                     Submit Your Tool →
                   </Link>
                 </div>
@@ -247,39 +165,15 @@ export default async function UseCasesPage({
                   {filteredTools.map((tool, i) => {
                     let logoSrc: string | null = tool.logo_url;
                     if (!logoSrc && tool.website_url) {
-                      try {
-                        const d = new URL(tool.website_url).hostname.replace(/^www\./, "");
-                        logoSrc = `https://logo.clearbit.com/${d}`;
-                      } catch { /* no-op */ }
+                      try { const d = new URL(tool.website_url).hostname.replace(/^www\./, ""); logoSrc = `https://logo.clearbit.com/${d}`; } catch { /* no-op */ }
                     }
                     return (
                       <Link key={tool.id} href={`/tools/${tool.slug}`} style={{ textDecoration: "none" }}>
-                        <div style={{
-                          display: "flex", alignItems: "center", gap: 14,
-                          padding: "14px 16px", borderRadius: 12,
-                          background: "var(--surface)", border: "1px solid var(--border)",
-                          transition: "box-shadow .15s, border-color .15s",
-                        }}
-                          onMouseEnter={(e) => {
-                            (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)";
-                            (e.currentTarget as HTMLDivElement).style.borderColor = "#10B98155";
-                          }}
-                          onMouseLeave={(e) => {
-                            (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-                            (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)";
-                          }}
-                        >
-                          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-muted)", width: 24, textAlign: "center", flexShrink: 0 }}>
-                            #{i + 1}
-                          </span>
-                          <div style={{
-                            width: 44, height: 44, borderRadius: 10, overflow: "hidden", flexShrink: 0,
-                            background: "var(--surface-alt)",
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            fontSize: 18, fontWeight: 700, color: "var(--ink-muted)",
-                          }}>
+                        <div className="discover-tool-row" style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderRadius: 12, background: "var(--surface)", border: "1px solid var(--border)" }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-muted)", width: 24, textAlign: "center", flexShrink: 0 }}>#{i + 1}</span>
+                          <div style={{ width: 44, height: 44, borderRadius: 10, overflow: "hidden", flexShrink: 0, background: "var(--surface-alt)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 700, color: "var(--ink-muted)" }}>
                             {logoSrc
-                              ? <img src={logoSrc} alt={tool.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                              ? <img src={logoSrc} alt={tool.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                               : tool.name[0]}
                           </div>
                           <div style={{ flex: 1, minWidth: 0 }}>
@@ -287,9 +181,7 @@ export default async function UseCasesPage({
                             <div style={{ fontSize: 12, color: "var(--ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tool.tagline}</div>
                           </div>
                           <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 10 }}>
-                            <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "var(--surface-alt)", color: "var(--ink-muted)", border: "1px solid var(--border)", textTransform: "capitalize" }}>
-                              {tool.pricing}
-                            </span>
+                            <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "var(--surface-alt)", color: "var(--ink-muted)", border: "1px solid var(--border)", textTransform: "capitalize" }}>{tool.pricing}</span>
                             <span style={{ fontSize: 12, color: "var(--ink-muted)", fontWeight: 600 }}>▲ {tool.upvote_count}</span>
                           </div>
                         </div>
@@ -301,7 +193,6 @@ export default async function UseCasesPage({
             )}
           </div>
 
-          {/* ── Right: Sidebar ───────────────────────────────────────── */}
           <div style={{ alignSelf: "start", position: "sticky", top: 90 }}>
             <DiscoverSidebar />
           </div>

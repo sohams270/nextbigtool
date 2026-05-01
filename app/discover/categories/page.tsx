@@ -119,11 +119,8 @@ export default async function CategoriesPage({
               All Categories
             </Link>
           )}
-          <h1 style={{
-            fontSize: 28, fontWeight: 800, color: "#fff",
-            letterSpacing: "-0.02em", margin: "0 0 8px",
-          }}>
-            {cat ? `${selectedCat?.name ?? cat}` : "Browse by Category"}
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", margin: "0 0 8px" }}>
+            {cat ? (selectedCat?.name ?? cat) : "Browse by Category"}
           </h1>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", margin: 0 }}>
             {cat
@@ -140,63 +137,35 @@ export default async function CategoriesPage({
           {/* ── Left: Category grid OR filtered tool list ─────────────── */}
           <div>
             {!cat ? (
-              /* Grid of category boxes */
               <>
                 <div style={{ marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>
-                    All Categories
-                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>All Categories</span>
                   <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-                  <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>
-                    {categories.length} categories
-                  </span>
+                  <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>{categories.length} categories</span>
                 </div>
-                <div style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-                  gap: 14,
-                }}>
+
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 14 }}>
                   {categories.map((cat, i) => {
                     const p = palette(i);
                     return (
-                      <Link
-                        key={cat.id}
-                        href={`/discover/categories?cat=${encodeURIComponent(cat.name)}`}
-                        style={{ textDecoration: "none" }}
-                      >
+                      <Link key={cat.id} href={`/discover/categories?cat=${encodeURIComponent(cat.name)}`} style={{ textDecoration: "none" }}>
                         <div
+                          className="discover-cat-box"
                           style={{
                             borderRadius: 12, padding: "18px 16px",
-                            background: p.light,
-                            border: `1px solid ${p.border}`,
-                            cursor: "pointer", transition: "transform .15s, box-shadow .15s",
-                            position: "relative", overflow: "hidden",
-                          }}
-                          onMouseEnter={(e) => {
-                            (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
-                            (e.currentTarget as HTMLDivElement).style.boxShadow = `0 6px 20px ${p.border}`;
-                          }}
-                          onMouseLeave={(e) => {
-                            (e.currentTarget as HTMLDivElement).style.transform = "none";
-                            (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                            background: p.light, border: `1px solid ${p.border}`,
+                            cursor: "pointer", position: "relative", overflow: "hidden",
                           }}
                         >
-                          {/* Color bar at top */}
-                          <div style={{
-                            position: "absolute", top: 0, left: 0, right: 0,
-                            height: 3, background: p.gradient,
-                          }} />
-                          <div style={{ fontSize: 13, fontWeight: 700, color: p.text, marginBottom: 4 }}>
-                            {cat.name}
-                          </div>
-                          <div style={{ fontSize: 11, color: "var(--ink-muted)" }}>
-                            {cat.count} tool{cat.count !== 1 ? "s" : ""}
-                          </div>
+                          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: p.gradient }} />
+                          <div style={{ fontSize: 13, fontWeight: 700, color: p.text, marginBottom: 4 }}>{cat.name}</div>
+                          <div style={{ fontSize: 11, color: "var(--ink-muted)" }}>{cat.count} tool{cat.count !== 1 ? "s" : ""}</div>
                         </div>
                       </Link>
                     );
                   })}
                 </div>
+
                 {categories.length === 0 && (
                   <div style={{ textAlign: "center", padding: "60px 0", color: "var(--ink-muted)", fontSize: 14 }}>
                     No categories yet.
@@ -204,101 +173,47 @@ export default async function CategoriesPage({
                 )}
               </>
             ) : (
-              /* Filtered tool list */
-              <>
-                {filteredTools.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "80px 0" }}>
-                    <div style={{ fontSize: 40, marginBottom: 16 }}>📭</div>
-                    <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)", marginBottom: 8 }}>
-                      No Tool Listed Here
-                    </div>
-                    <div style={{ fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: 20 }}>
-                      No approved tools in this category yet. Be the first to submit one!
-                    </div>
-                    <Link
-                      href="/dashboard/submit"
-                      style={{
-                        display: "inline-block", padding: "10px 24px", borderRadius: 8,
-                        background: "#FF6B35", color: "#fff",
-                        textDecoration: "none", fontSize: 13, fontWeight: 700,
-                      }}
-                    >
-                      Submit Your Tool →
-                    </Link>
+              filteredTools.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "80px 0" }}>
+                  <div style={{ fontSize: 40, marginBottom: 16 }}>📭</div>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)", marginBottom: 8 }}>No Tool Listed Here</div>
+                  <div style={{ fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: 20 }}>
+                    No approved tools in this category yet. Be the first to submit one!
                   </div>
-                ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {filteredTools.map((tool, i) => {
-                      let logoSrc: string | null = tool.logo_url;
-                      if (!logoSrc && tool.website_url) {
-                        try {
-                          const d = new URL(tool.website_url).hostname.replace(/^www\./, "");
-                          logoSrc = `https://logo.clearbit.com/${d}`;
-                        } catch { /* no-op */ }
-                      }
-                      return (
-                        <Link
-                          key={tool.id}
-                          href={`/tools/${tool.slug}`}
-                          style={{ textDecoration: "none" }}
-                        >
-                          <div style={{
-                            display: "flex", alignItems: "center", gap: 14,
-                            padding: "14px 16px", borderRadius: 12,
-                            background: "var(--surface)", border: "1px solid var(--border)",
-                            transition: "box-shadow .15s, border-color .15s",
-                          }}
-                            onMouseEnter={(e) => {
-                              (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)";
-                              (e.currentTarget as HTMLDivElement).style.borderColor = "#3B7FFF55";
-                            }}
-                            onMouseLeave={(e) => {
-                              (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-                              (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)";
-                            }}
-                          >
-                            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-muted)", width: 24, textAlign: "center", flexShrink: 0 }}>
-                              #{i + 1}
-                            </span>
-                            <div style={{
-                              width: 44, height: 44, borderRadius: 10,
-                              overflow: "hidden", flexShrink: 0,
-                              background: "var(--surface-alt)",
-                              display: "flex", alignItems: "center", justifyContent: "center",
-                              fontSize: 18, fontWeight: 700, color: "var(--ink-muted)",
-                            }}>
-                              {logoSrc
-                                ? <img src={logoSrc} alt={tool.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
-                                : tool.name[0]}
-                            </div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", marginBottom: 3 }}>
-                                {tool.name}
-                              </div>
-                              <div style={{ fontSize: 12, color: "var(--ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                {tool.tagline}
-                              </div>
-                            </div>
-                            <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 10 }}>
-                              <span style={{
-                                fontSize: 10, fontWeight: 700, padding: "2px 8px",
-                                borderRadius: 20, background: "var(--surface-alt)",
-                                color: "var(--ink-muted)", border: "1px solid var(--border)",
-                                textTransform: "capitalize",
-                              }}>
-                                {tool.pricing}
-                              </span>
-                              <span style={{ fontSize: 12, color: "var(--ink-muted)", fontWeight: 600 }}>
-                                ▲ {tool.upvote_count}
-                              </span>
-                            </div>
+                  <Link href="/dashboard/submit" style={{ display: "inline-block", padding: "10px 24px", borderRadius: 8, background: "#FF6B35", color: "#fff", textDecoration: "none", fontSize: 13, fontWeight: 700 }}>
+                    Submit Your Tool →
+                  </Link>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {filteredTools.map((tool, i) => {
+                    let logoSrc: string | null = tool.logo_url;
+                    if (!logoSrc && tool.website_url) {
+                      try { const d = new URL(tool.website_url).hostname.replace(/^www\./, ""); logoSrc = `https://logo.clearbit.com/${d}`; } catch { /* no-op */ }
+                    }
+                    return (
+                      <Link key={tool.id} href={`/tools/${tool.slug}`} style={{ textDecoration: "none" }}>
+                        <div className="discover-tool-row" style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderRadius: 12, background: "var(--surface)", border: "1px solid var(--border)" }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-muted)", width: 24, textAlign: "center", flexShrink: 0 }}>#{i + 1}</span>
+                          <div style={{ width: 44, height: 44, borderRadius: 10, overflow: "hidden", flexShrink: 0, background: "var(--surface-alt)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 700, color: "var(--ink-muted)" }}>
+                            {logoSrc
+                              ? <img src={logoSrc} alt={tool.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                              : tool.name[0]}
                           </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", marginBottom: 3 }}>{tool.name}</div>
+                            <div style={{ fontSize: 12, color: "var(--ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tool.tagline}</div>
+                          </div>
+                          <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 10 }}>
+                            <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "var(--surface-alt)", color: "var(--ink-muted)", border: "1px solid var(--border)", textTransform: "capitalize" }}>{tool.pricing}</span>
+                            <span style={{ fontSize: 12, color: "var(--ink-muted)", fontWeight: 600 }}>▲ {tool.upvote_count}</span>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )
             )}
           </div>
 
