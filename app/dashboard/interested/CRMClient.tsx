@@ -103,6 +103,18 @@ export default function CRMClient({
     });
   }, [leads, selectedTool, search, sort]);
 
+  function triggerDownload(blob: Blob, filename: string) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setShowExportMenu(false);
+  }
+
   function exportCSV() {
     const header = ["Name", "Email", "Company", "Role", "Twitter", "LinkedIn", "Website", "Product", "Upvoted At"];
     const rows = filtered.map(r => [
@@ -110,12 +122,10 @@ export default function CRMClient({
       r.twitter_url ?? "", r.linkedin_url ?? "", r.website ?? "",
       r.tool_name, new Date(r.upvoted_at).toISOString(),
     ]);
-    const csv = [header, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "founders-crm.csv"; a.click();
-    URL.revokeObjectURL(url);
-    setShowExportMenu(false);
+    const csv = [header, ...rows]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    triggerDownload(new Blob([csv], { type: "text/csv;charset=utf-8;" }), "founders-crm.csv");
   }
 
   function exportExcel() {
@@ -125,15 +135,11 @@ export default function CRMClient({
       r.twitter_url ?? "", r.linkedin_url ?? "", r.website ?? "",
       r.tool_name, new Date(r.upvoted_at).toLocaleString(),
     ]);
-    const tableRows = [header, ...rows].map(r =>
-      `<tr>${r.map(c => `<td>${String(c).replace(/</g, "&lt;")}</td>`).join("")}</tr>`
-    ).join("");
-    const html = `<html><head><meta charset="utf-8"/></head><body><table>${tableRows}</table></body></html>`;
-    const blob = new Blob([html], { type: "application/vnd.ms-excel" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "founders-crm.xls"; a.click();
-    URL.revokeObjectURL(url);
-    setShowExportMenu(false);
+    const tableRows = [header, ...rows]
+      .map(r => `<tr>${r.map(c => `<td>${String(c).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>`).join("")}</tr>`)
+      .join("");
+    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"/><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Leads</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>${tableRows}</table></body></html>`;
+    triggerDownload(new Blob([html], { type: "application/vnd.ms-excel;charset=utf-8;" }), "founders-crm.xls");
   }
 
   const card: React.CSSProperties = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12 };
@@ -187,18 +193,20 @@ export default function CRMClient({
                 boxShadow: "0 8px 24px rgba(15,15,16,.14)",
               }}>
                 {[
-                  { label: "Export as CSV", fn: exportCSV, ext: ".csv" },
-                  { label: "Export as Excel", fn: exportExcel, ext: ".xls" },
+                  { label: "📊  Excel (.xls)", fn: exportExcel, ext: ".xls" },
+                  { label: "📄  CSV (.csv)",   fn: exportCSV,   ext: ".csv" },
                 ].map(opt => (
-                  <div key={opt.ext} onClick={opt.fn} style={{
+                  <button key={opt.ext} onClick={opt.fn} style={{
+                    display: "block", width: "100%", textAlign: "left",
                     padding: "10px 14px", fontSize: 13, fontWeight: 600,
                     color: "var(--ink)", cursor: "pointer", transition: "background .12s",
+                    background: "transparent", border: "none", fontFamily: "inherit",
                   }}
-                    onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = "var(--surface-alt)"}
-                    onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = "transparent"}
+                    onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-alt)"}
+                    onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = "transparent"}
                   >
                     {opt.label}
-                  </div>
+                  </button>
                 ))}
               </div>
             </>
