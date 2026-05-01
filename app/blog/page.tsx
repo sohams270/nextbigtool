@@ -21,21 +21,26 @@ async function getPublishedPosts(): Promise<BlogPost[]> {
     const { data, error } = await supabase
       .from("cms_blog_posts")
       .select(`
-        id, title, slug, excerpt, author, featured,
+        id, title, slug, excerpt, author, author_avatar_url, featured,
         read_time, publish_date, created_at, featured_image_url,
-        cms_blog_categories(name)
+        cms_blog_categories(name),
+        cms_authors(avatar_url)
       `)
       .eq("status", "published")
       .order("publish_date", { ascending: false });
 
     if (error || !data) return [];
 
-    return data.map((p) => ({
+    return data.map((p: any) => ({
       slug: p.slug ?? p.id,
-      category: (p.cms_blog_categories as unknown as { name: string } | null)?.name ?? "Uncategorized",
+      category: (p.cms_blog_categories as { name: string } | null)?.name ?? "Uncategorized",
       title: p.title,
       excerpt: p.excerpt ?? "",
       author: p.author ?? "The NBT Team",
+      author_avatar_url:
+        p.author_avatar_url ||
+        (p.cms_authors as { avatar_url: string | null } | null)?.avatar_url ||
+        null,
       date: new Date(p.publish_date ?? p.created_at).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",

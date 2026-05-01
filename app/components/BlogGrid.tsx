@@ -130,11 +130,13 @@ function FeaturedCard({ post }: { post: BlogPost }) {
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{
                 width: 28, height: 28, borderRadius: "50%",
-                background: m.gradient,
+                background: m.gradient, flexShrink: 0, overflow: "hidden",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 11, fontWeight: 700, color: "#fff", flexShrink: 0,
+                fontSize: 11, fontWeight: 700, color: "#fff",
               }}>
-                N
+                {post.author_avatar_url
+                  ? <img src={post.author_avatar_url} alt={post.author} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  : post.author?.[0]?.toUpperCase() ?? "N"}
               </div>
               <div>
                 <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink)", lineHeight: 1.2 }}>{post.author}</div>
@@ -202,10 +204,14 @@ function PostCard({ post }: { post: BlogPost }) {
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div style={{
                 width: 22, height: 22, borderRadius: "50%",
-                background: m.gradient,
+                background: m.gradient, flexShrink: 0, overflow: "hidden",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 9, fontWeight: 700, color: "#fff", flexShrink: 0,
-              }}>N</div>
+                fontSize: 9, fontWeight: 700, color: "#fff",
+              }}>
+                {post.author_avatar_url
+                  ? <img src={post.author_avatar_url} alt={post.author} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  : post.author?.[0]?.toUpperCase() ?? "N"}
+              </div>
               <span style={{ fontSize: 10, color: "var(--ink-muted)" }}>{post.date} · {post.readTime}</span>
             </div>
             <span style={{ fontSize: 11, fontWeight: 700, color: m.text }}>Read →</span>

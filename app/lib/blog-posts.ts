@@ -4,6 +4,7 @@ export type BlogPost = {
   title: string;
   excerpt: string;
   author: string;
+  author_avatar_url?: string | null;
   date: string;
   readTime: string;
   featured: boolean;
