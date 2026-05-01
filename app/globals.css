@@ -64,15 +64,17 @@ html {
 }
 
 /* html and body stay at natural viewport width — zero side gaps possible */
+/* overflow-x: clip (not hidden) — clips horizontal overflow without creating
+   a new scroll container, so position:sticky children still work correctly. */
 body {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* All page content lives inside this wrapper; zoom applied here, not on
    html/body, so the browser never shows gaps outside the root element. */
 .zoom-root {
   zoom: 1.25;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -532,14 +534,8 @@ body {
 
 /* ── Blog post 3-column layout ──────────────────────────────────────────── */
 .blog-post-layout { display: grid; grid-template-columns: 240px 1fr 300px; gap: 36px; align-items: start; }
-.blog-post-layout-left {
-  position: sticky; top: 90px; align-self: start;
-  max-height: calc(100vh - 110px); overflow-y: auto;
-}
-.blog-post-layout-right {
-  position: sticky; top: 90px; align-self: start;
-  max-height: calc(100vh - 110px); overflow-y: auto;
-}
+.blog-post-layout-left { position: sticky; top: 90px; align-self: start; }
+.blog-post-layout-right { position: sticky; top: 90px; align-self: start; }
 @media (max-width: 1100px) {
   .blog-post-layout { grid-template-columns: 1fr 280px; }
   .blog-post-layout-left { display: none; }
