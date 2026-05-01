@@ -16,6 +16,7 @@ import Image from "@tiptap/extension-image";
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 type Category = { id: string; name: string; slug: string };
+type Author = { id: string; name: string; bio: string; linkedin_url: string; avatar_url: string };
 
 /* ─── Toolbar ────────────────────────────────────────────────────────────── */
 function Toolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
@@ -406,7 +407,8 @@ export default function EditBlogPostPage() {
   const [featuredImageUrl, setFeaturedImageUrl] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [publishDate, setPublishDate] = useState("");
-  const [author, setAuthor] = useState("The NBT Team");
+  const [authorId, setAuthorId] = useState<string | null>(null);
+  const [authors, setAuthors] = useState<Author[]>([]);
   const [authorBio, setAuthorBio] = useState("");
   const [authorAvatarUrl, setAuthorAvatarUrl] = useState("");
   const [authorLinkedinUrl, setAuthorLinkedinUrl] = useState("");
@@ -471,7 +473,7 @@ export default function EditBlogPostPage() {
 
         setTitle(post.title ?? "");
         setStatus(post.status ?? "draft");
-        setAuthor(post.author ?? "The NBT Team");
+        setAuthorId(post.author_id ?? null);
         setAuthorBio(post.author_bio ?? "");
         setAuthorAvatarUrl(post.author_avatar_url ?? "");
         setAuthorLinkedinUrl(post.author_linkedin_url ?? "");
@@ -508,11 +510,14 @@ export default function EditBlogPostPage() {
     loadPost();
   }, [id]);
 
-  // Fetch categories
+  // Fetch categories and authors
   useEffect(() => {
     fetch("/api/cms/blog/categories")
       .then((r) => r.json())
       .then((d) => setCategories(d.categories ?? []));
+    fetch("/api/cms/authors")
+      .then((r) => r.json())
+      .then((d) => setAuthors(d.authors ?? []));
   }, []);
 
   // Image upload handler
@@ -579,7 +584,8 @@ export default function EditBlogPostPage() {
           content,
           excerpt,
           featured_image_url: featuredImageUrl,
-          author,
+          author_id: authorId,
+          author: authors.find((x) => x.id === authorId)?.name ?? "The NBT Team",
           author_bio: authorBio,
           author_avatar_url: authorAvatarUrl,
           author_linkedin_url: authorLinkedinUrl,
@@ -921,48 +927,42 @@ export default function EditBlogPostPage() {
                 {/* Author */}
                 <div>
                   <FieldLabel label="Writer" />
-                  <input
-                    value={author}
-                    onChange={(e) => setAuthor(e.target.value)}
-                    style={inputStyle}
-                    placeholder="The NBT Team"
-                  />
-                </div>
-
-                {/* Author Bio */}
-                <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-                    <FieldLabel label="Author Bio" />
-                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}>{authorBio.length}/300</span>
-                  </div>
-                  <textarea
-                    value={authorBio}
-                    onChange={(e) => setAuthorBio(e.target.value.slice(0, 300))}
-                    style={textareaStyle}
-                    placeholder="A short bio about the author…"
-                  />
-                </div>
-
-                {/* Author Avatar URL */}
-                <div>
-                  <FieldLabel label="Author Avatar URL" />
-                  <input
-                    value={authorAvatarUrl}
-                    onChange={(e) => setAuthorAvatarUrl(e.target.value)}
-                    style={inputStyle}
-                    placeholder="https://... (or leave blank for initials)"
-                  />
-                </div>
-
-                {/* Author LinkedIn URL */}
-                <div>
-                  <FieldLabel label="Author LinkedIn URL" />
-                  <input
-                    value={authorLinkedinUrl}
-                    onChange={(e) => setAuthorLinkedinUrl(e.target.value)}
-                    style={inputStyle}
-                    placeholder="https://linkedin.com/in/..."
-                  />
+                  {authors.length === 0 ? (
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", padding: "6px 0" }}>
+                      <a href="/cms/authors" style={{ color: "#FF6B35", textDecoration: "none", fontWeight: 600 }}>
+                        Add an author first →
+                      </a>
+                    </div>
+                  ) : (
+                    <>
+                      <select
+                        value={authorId ?? ""}
+                        onChange={(e) => setAuthorId(e.target.value || null)}
+                        style={{ ...inputStyle, cursor: "pointer" }}
+                      >
+                        <option value="">— Select author —</option>
+                        {authors.map((a) => (
+                          <option key={a.id} value={a.id}>{a.name}</option>
+                        ))}
+                      </select>
+                      {authorId && (() => {
+                        const a = authors.find((x) => x.id === authorId);
+                        if (!a) return null;
+                        return (
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "rgba(255,255,255,0.04)", borderRadius: 8, marginTop: 6 }}>
+                            {a.avatar_url ? (
+                              <img src={a.avatar_url} style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover" }} alt={a.name} />
+                            ) : (
+                              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#FF6B35,#FF4500)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#fff" }}>
+                                {a.name[0].toUpperCase()}
+                              </div>
+                            )}
+                            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>{a.name}</span>
+                          </div>
+                        );
+                      })()}
+                    </>
+                  )}
                 </div>
 
                 {/* Excerpt */}

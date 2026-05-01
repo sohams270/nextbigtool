@@ -134,6 +134,7 @@ export async function POST(request: NextRequest) {
     excerpt: body.excerpt ?? "",
     featured_image_url: body.featured_image_url ?? null,
     author: body.author ?? "The NBT Team",
+    author_id: body.author_id ?? null,
     category_id: body.category_id ?? null,
     tags: body.tags ?? [],
     status: body.status ?? "draft",

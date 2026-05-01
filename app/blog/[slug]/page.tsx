@@ -41,7 +41,7 @@ async function getPost(slug: string) {
   const supabase = createClient(cookieStore);
   const { data, error } = await supabase
     .from("cms_blog_posts")
-    .select(`*, cms_blog_categories(id, name, slug)`)
+    .select(`*, cms_blog_categories(id, name, slug), cms_authors(id, name, bio, linkedin_url, avatar_url)`)
     .eq("slug", slug)
     .eq("status", "published")
     .single();
@@ -235,6 +235,12 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   const category = post.cms_blog_categories as { name: string; slug: string } | null;
+  const authorObj = post.cms_authors as { name: string; bio: string; linkedin_url: string; avatar_url: string } | null;
+  const authorName = authorObj?.name ?? post.author ?? "The NBT Team";
+  const authorBio = authorObj?.bio || post.author_bio || "";
+  const authorLinkedin = authorObj?.linkedin_url || post.author_linkedin_url || "";
+  const authorAvatar = authorObj?.avatar_url || post.author_avatar_url || "";
+
   const publishDate = post.publish_date
     ? new Date(post.publish_date).toLocaleDateString("en-US", {
         month: "long",
@@ -319,10 +325,10 @@ export default async function BlogPostPage({ params }: Props) {
               <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                 {/* Avatar + name + date */}
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  {post.author_avatar_url ? (
+                  {authorAvatar ? (
                     <img
-                      src={post.author_avatar_url}
-                      alt={post.author ?? "Author"}
+                      src={authorAvatar}
+                      alt={authorName}
                       style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
                     />
                   ) : (
@@ -339,12 +345,12 @@ export default async function BlogPostPage({ params }: Props) {
                       color: "#fff",
                       flexShrink: 0,
                     }}>
-                      {(post.author ?? "N")[0].toUpperCase()}
+                      {authorName[0].toUpperCase()}
                     </div>
                   )}
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)" }}>
-                      {post.author ?? "The NBT Team"}
+                      {authorName}
                     </div>
                     {publishDate && (
                       <div style={{ fontSize: 11, color: "var(--ink-muted)" }}>{publishDate}</div>
@@ -453,7 +459,7 @@ export default async function BlogPostPage({ params }: Props) {
             )}
 
             {/* Author Bio */}
-            {(post.author_bio || post.author_linkedin_url) && (
+            {(authorBio || authorLinkedin) && (
               <div style={{
                 marginTop: 40,
                 background: "var(--surface)",
@@ -464,10 +470,10 @@ export default async function BlogPostPage({ params }: Props) {
                 gap: 16,
                 alignItems: "flex-start",
               }}>
-                {post.author_avatar_url ? (
+                {authorAvatar ? (
                   <img
-                    src={post.author_avatar_url}
-                    alt={post.author ?? "Author"}
+                    src={authorAvatar}
+                    alt={authorName}
                     style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
                   />
                 ) : (
@@ -484,21 +490,21 @@ export default async function BlogPostPage({ params }: Props) {
                     color: "#fff",
                     flexShrink: 0,
                   }}>
-                    {(post.author ?? "N")[0].toUpperCase()}
+                    {authorName[0].toUpperCase()}
                   </div>
                 )}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", marginBottom: 6 }}>
-                    {post.author ?? "The NBT Team"}
+                    {authorName}
                   </div>
-                  {post.author_bio && (
+                  {authorBio && (
                     <div style={{ fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: 8 }}>
-                      {post.author_bio}
+                      {authorBio}
                     </div>
                   )}
-                  {post.author_linkedin_url && (
+                  {authorLinkedin && (
                     <a
-                      href={post.author_linkedin_url}
+                      href={authorLinkedin}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
