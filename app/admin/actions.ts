@@ -55,16 +55,26 @@ export async function rejectBlogRequest(requestId: string) {
 
 export async function inductHofNomination(nominationId: string) {
   const { supabase } = await getAdminUser();
-  await supabase.from("hall_of_fame")
+  const { error } = await supabase.from("hall_of_fame")
     .update({ status: "approved", inducted_at: new Date().toISOString() })
     .eq("id", nominationId);
+  if (error) {
+    console.error("[inductHofNomination] error:", JSON.stringify(error));
+    throw new Error(error.message);
+  }
   revalidatePath("/admin");
   revalidatePath("/");
 }
 
 export async function rejectHofNomination(nominationId: string) {
   const { supabase } = await getAdminUser();
-  await supabase.from("hall_of_fame").update({ status: "rejected" }).eq("id", nominationId);
+  const { error } = await supabase.from("hall_of_fame")
+    .update({ status: "rejected" })
+    .eq("id", nominationId);
+  if (error) {
+    console.error("[rejectHofNomination] error:", JSON.stringify(error));
+    throw new Error(error.message);
+  }
   revalidatePath("/admin");
 }
 
