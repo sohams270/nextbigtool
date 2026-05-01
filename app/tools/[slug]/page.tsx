@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import TopNav from "@/app/components/TopNav";
 import Footer from "@/app/components/Footer";
 import UpvoteButton from "@/app/components/UpvoteButton";
+import UpvoteBox from "@/app/components/UpvoteBox";
 import CommentSection from "./CommentSection";
 import CopyLinkButton from "./CopyLinkButton";
 import { BLOG_POSTS } from "@/app/lib/blog-posts";
@@ -447,13 +448,12 @@ export default async function ToolPage({ params }: Props) {
                 <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ink-muted)", marginBottom: 12 }}>Product info</div>
               </div>
               <div>
-                <div style={{ margin: "0 12px 12px", padding: "11px 13px", borderRadius: 10, background: "linear-gradient(135deg, #fff7f4, #fff0eb)", border: "1px solid #ffd9cc", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 12, color: "#FF6B35", fontWeight: 700 }}>Upvotes</span>
-                  <span style={{ fontSize: 20, fontWeight: 900, color: "#FF6B35", letterSpacing: "-0.04em", display: "flex", alignItems: "center", gap: 5 }}>
-                    <svg width={13} height={13} viewBox="0 0 12 12" fill="#FF6B35"><path d="M6 2L10 8H2L6 2Z"/></svg>
-                    {tool.upvote_count}
-                  </span>
-                </div>
+                <UpvoteBox
+                  toolId={tool.id}
+                  userId={user?.id ?? null}
+                  initialCount={tool.upvote_count}
+                  initialActive={isUpvoted}
+                />
                 <div style={{ padding: "0 16px 16px", display: "flex", flexDirection: "column", gap: 9 }}>
                   <InfoRow label="Pricing" value={pricingLabel(tool.pricing)} />
                   {categoryName && <InfoRow label="Category" value={categoryName} />}
