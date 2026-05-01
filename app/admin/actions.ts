@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "sohams270@gmail.com";
 
 async function getAdminUser() {
   const cookieStore = await cookies();
