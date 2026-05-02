@@ -91,7 +91,7 @@ export default async function ToolPage({ params }: Props) {
     .from("tools")
     .select(`
       id, slug, name, tagline, description, website_url, logo_url, pricing,
-      status, upvote_count, demo_url, created_at, submitter_id, screenshots,
+      status, upvote_count, demo_url, created_at, submitter_id, screenshots, video_links,
       twitter_url, linkedin_url, youtube_url, instagram_url,
       tool_tags ( tags ( name ) ),
       categories ( name )
@@ -145,6 +145,22 @@ export default async function ToolPage({ params }: Props) {
   const categoryName = (tool.categories as any)?.name ?? null;
   const shots: string[] = Array.isArray(tool.screenshots)
     ? (tool.screenshots as string[]).filter(Boolean) : [];
+
+  // YouTube video links
+  const videoLinks: string[] = Array.isArray(tool.video_links)
+    ? (tool.video_links as string[]).filter(Boolean) : [];
+
+  function getYouTubeId(url: string): string | null {
+    try {
+      const u = new URL(url);
+      if (u.hostname.includes("youtu.be")) return u.pathname.slice(1).split("?")[0];
+      if (u.hostname.includes("youtube.com")) {
+        if (u.pathname.startsWith("/shorts/")) return u.pathname.split("/")[2];
+        return u.searchParams.get("v");
+      }
+    } catch { /* no-op */ }
+    return null;
+  }
 
   // Logo helper
   function getLogoSrc(logoUrl: string | null, websiteUrl: string | null): string | null {
@@ -433,6 +449,51 @@ export default async function ToolPage({ params }: Props) {
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* YouTube Videos */}
+            {videoLinks.length > 0 && (
+              <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "24px 26px" }}>
+                <SectionHeader
+                  icon={<svg width={13} height={13} viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>}
+                  iconBg="#fff0f0" iconBorder="#ffc9c9" title="Product Videos"
+                />
+                <div style={{ display: "grid", gridTemplateColumns: videoLinks.length === 1 ? "1fr" : "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
+                  {videoLinks.map((link, i) => {
+                    const videoId = getYouTubeId(link);
+                    const thumb = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
+                    return (
+                      <a
+                        key={i}
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: "block", borderRadius: 12, overflow: "hidden", border: "1px solid var(--border)", position: "relative", aspectRatio: "16/9", textDecoration: "none", flexShrink: 0 }}
+                      >
+                        {thumb ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={thumb} alt={`Video ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                        ) : (
+                          <div style={{ width: "100%", height: "100%", background: "#111", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <svg width={40} height={40} viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                          </div>
+                        )}
+                        {/* Play button overlay */}
+                        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.25)", transition: "background 0.15s" }}>
+                          <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(255,0,0,0.92)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(0,0,0,0.4)" }}>
+                            <svg width={20} height={20} viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+                          </div>
+                        </div>
+                        {/* YouTube badge */}
+                        <div style={{ position: "absolute", bottom: 8, right: 8, display: "flex", alignItems: "center", gap: 4, background: "rgba(0,0,0,0.75)", borderRadius: 6, padding: "3px 7px", backdropFilter: "blur(4px)" }}>
+                          <svg width={12} height={12} viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                          <span style={{ fontSize: 10, color: "#fff", fontWeight: 600 }}>Watch on YouTube</span>
+                        </div>
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             )}
