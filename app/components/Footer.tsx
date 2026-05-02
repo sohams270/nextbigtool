@@ -17,6 +17,7 @@ const COMPANY_LINKS = [
   { label: "About",           href: "/about" },
   { label: "Blog",            href: "/blog" },
   { label: "Press Release",   href: "/press-release" },
+  { label: "Comparison",      href: "/compare" },
   { label: "Pricing",         href: "/pricing" },
   { label: "Contact",         href: "/contact" },
   { label: "Privacy Policy",  href: "/privacy" },

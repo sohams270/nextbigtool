@@ -38,7 +38,9 @@
       "Bash(xargs cat *)",
       "Bash(mkdir -p /Users/sohams17/NextBigTool/app/cms/blog/edit/\\\\[id\\\\])",
       "Bash(mkdir -p /Users/sohams17/NextBigTool/app/api/cms/press-releases/\\\\[id\\\\])",
-      "Bash(mkdir -p /Users/sohams17/NextBigTool/app/cms/press-release/edit/\\\\[id\\\\])"
+      "Bash(mkdir -p /Users/sohams17/NextBigTool/app/cms/press-release/edit/\\\\[id\\\\])",
+      "Bash(curl -s \"https://www.nextbigtool.com/discover/categories\")",
+      "Bash(npx vercel *)"
     ]
   },
   "hooks": {
