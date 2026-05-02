@@ -640,12 +640,14 @@ export default function ProductShowcase({
   userUpvotedIds,
   hofEntries = [],
   sort = "trending",
+  price = "all",
 }: {
   tools: ShowcaseTool[];
   userId: string | null;
   userUpvotedIds: string[];
   hofEntries?: HofEntry[];
   sort?: string;
+  price?: string;
 }) {
   if (tools.length === 0 && hofEntries.length === 0) {
     return (
@@ -728,16 +730,34 @@ export default function ProductShowcase({
                 lineHeight: 1.05, color: "var(--ink)", margin: 0,
               }}>
                 {sort === "new"
-                  ? "New Tool Additions"
+                  ? price === "free" ? "Free Tools Added Today"
+                  : price === "freemium" ? "Freemium Tools Added Today"
+                  : price === "paid" ? "Paid Tools Added Today"
+                  : "New Tool Additions"
                   : sort === "top"
-                  ? "Top Voted Tools"
+                  ? price === "free" ? "Top Free Tools"
+                  : price === "freemium" ? "Top Freemium Tools"
+                  : price === "paid" ? "Top Paid Tools"
+                  : "Top Voted Tools"
+                  : price === "free" ? "Best Free Tools"
+                  : price === "freemium" ? "Best Freemium Tools"
+                  : price === "paid" ? "Best Paid Tools"
                   : "Featured Tools"}
               </h2>
               <p style={{ margin: "6px 0 0", color: "var(--ink-muted)", fontSize: 13 }}>
                 {sort === "new"
-                  ? "The latest indie tools added to the platform"
+                  ? price === "free" ? "The latest free indie tools — no credit card, no catch"
+                  : price === "freemium" ? "The latest freemium tools — start free, upgrade when ready"
+                  : price === "paid" ? "The latest paid tools added to the platform"
+                  : "The latest indie tools added to the platform"
                   : sort === "top"
-                  ? "The highest-upvoted tools of all time, ranked by the community"
+                  ? price === "free" ? "The highest-upvoted free tools, ranked by the community"
+                  : price === "freemium" ? "The highest-upvoted freemium tools, ranked by the community"
+                  : price === "paid" ? "The highest-upvoted paid tools, ranked by the community"
+                  : "The highest-upvoted tools of all time, ranked by the community"
+                  : price === "free" ? "Discover the best free tools — handpicked and ranked by builders"
+                  : price === "freemium" ? "Freemium tools worth trying — start for free, scale as you grow"
+                  : price === "paid" ? "Premium tools builders are betting on — tried, tested, upvoted"
                   : "Hand-picked tools, ranked by builders"}
               </p>
             </div>

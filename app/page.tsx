@@ -428,6 +428,7 @@ export default async function HomePage({
                   userUpvotedIds={userUpvotedIds}
                   hofEntries={hofEntries}
                   sort={sort}
+                  price={price}
                 />
               </>
             )}
