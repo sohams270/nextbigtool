@@ -58,7 +58,12 @@ export default function UpvoteButton({
   return (
     <>
       <div
+        role="button"
+        tabIndex={0}
+        aria-label={active ? "Remove upvote" : "Upvote this tool"}
+        aria-pressed={active}
         onClick={handleClick}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleClick(); } }}
         style={{
           display: "inline-flex",
           flexDirection: "column",

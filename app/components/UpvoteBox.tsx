@@ -47,7 +47,12 @@ export default function UpvoteBox({
   return (
     <>
       <div
+        role="button"
+        tabIndex={0}
+        aria-label={active ? "Remove upvote" : "Upvote this tool"}
+        aria-pressed={active}
         onClick={handleClick}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleClick(); } }}
         style={{
           margin: "0 12px 12px",
           padding: "11px 13px",

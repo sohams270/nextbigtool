@@ -198,14 +198,14 @@ function RedirectBtn({ subtle = false, href }: { subtle?: boolean; href?: string
     </svg>
   );
   if (href) {
-    return <Link href={href} style={style} target="_blank" rel="noopener noreferrer">{inner}</Link>;
+    return <Link href={href} aria-label="View tool details" style={style} target="_blank" rel="noopener noreferrer">{inner}</Link>;
   }
-  return <button style={style}>{inner}</button>;
+  return <button aria-label="View tool details" style={style}>{inner}</button>;
 }
 
 function CommentBtn({ count }: { count: number }) {
   return (
-    <button style={{
+    <button aria-label={`${count} comments`} style={{
       display: "inline-flex", alignItems: "center", gap: 6,
       padding: "7px 12px", borderRadius: 10,
       background: "var(--surface)", border: "1px solid var(--border)",
@@ -213,7 +213,7 @@ function CommentBtn({ count }: { count: number }) {
       cursor: "pointer", fontFamily: "inherit",
       transition: "border-color .15s",
     }}>
-      <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg aria-hidden="true" width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15a4 4 0 0 1-4 4H8l-5 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
       </svg>
       {count}

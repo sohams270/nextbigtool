@@ -166,12 +166,12 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
 
   return (
     <div ref={wrapRef} style={{ position: "relative", width: "100%" }}>
-      <form onSubmit={(e) => e.preventDefault()}>
+      <form onSubmit={(e) => e.preventDefault()} role="search">
         {/* Rainbow border wrapper */}
         <div className={`smart-search-wrap${showDropdown ? " ss-open" : ""}`}>
           <div className="smart-search-inner">
-            {/* Left sparkle icon */}
-            <div style={{
+            {/* Left sparkle icon — decorative */}
+            <div aria-hidden="true" style={{
               display: "flex", alignItems: "center", paddingLeft: 14, gap: 8,
               flexShrink: 0, color: focused ? "#FF6B35" : "#B0B0BA",
               transition: "color 0.2s",
@@ -179,8 +179,14 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
               <SparkleIcon size={14} color={focused ? "#FF6B35" : "#B0B0BA"} />
             </div>
 
+            {/* Visually-hidden label for screen readers */}
+            <label htmlFor="smart-search-input" style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 }}>
+              Search tools
+            </label>
+
             {/* Input */}
             <input
+              id="smart-search-input"
               ref={inputRef}
               value={query}
               onChange={onChange}
@@ -190,6 +196,9 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
               placeholder={focused && query.length === 0 ? placeholder : "Describe what you're looking for…"}
               autoComplete="off"
               spellCheck={false}
+              aria-autocomplete="list"
+              aria-expanded={showDropdown}
+              aria-controls={showDropdown ? "smart-search-results" : undefined}
               style={{
                 flex: 1,
                 border: "none", outline: "none",
@@ -216,6 +225,7 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
             {/* Clear */}
             {!loading && query.length > 0 && (
               <button type="button"
+                aria-label="Clear search"
                 onClick={() => { setQuery(""); setResults([]); setOpen(false); setSearched(false); inputRef.current?.focus(); }}
                 style={{ display: "flex", alignItems: "center", padding: "0 8px", background: "none", border: "none", cursor: "pointer", color: "#C0C0C8", fontSize: 18, lineHeight: 1, flexShrink: 0 }}>
                 ×
@@ -259,7 +269,7 @@ export default function SmartSearch({ compact = false }: { compact?: boolean }) 
 
       {/* ── Dropdown — offset by 2px to align with outer gradient border ── */}
       {showDropdown && (
-        <div style={{
+        <div id="smart-search-results" role="listbox" aria-label="Search results" style={{
           position: "absolute", top: "calc(100% - 2px)", left: 0, right: 0, zIndex: 900,
           background: "var(--surface)",
           borderRadius: "0 0 12px 12px",

@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "./components/ThemeProvider";
 import ThemeToggle from "./components/ThemeToggle";
 import OnboardingGate from "./components/OnboardingGate";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+  preload: true,
+});
 
 export const viewport = {
   width: "device-width",
@@ -29,8 +37,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full antialiased" data-theme="dark" suppressHydrationWarning>
+    <html lang="en" className={`h-full antialiased ${inter.variable}`} data-theme="dark" suppressHydrationWarning>
       <head>
+        {/* Preconnect to Supabase for faster API/image requests */}
+        <link rel="preconnect" href="https://yqocgsuolryhioggmwlr.supabase.co" />
         {/* Google tag (gtag.js) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-D7D4CK7NQ7"

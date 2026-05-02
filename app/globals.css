@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+/* Inter loaded via next/font in layout.tsx — no @import needed */
 @import "tailwindcss";
 
 @theme inline {
@@ -80,7 +80,7 @@ body {
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-inter), "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.5;
   margin: 0;
