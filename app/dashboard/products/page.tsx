@@ -242,6 +242,8 @@ export default function AddYourToolPage() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [screenshots, setScreenshots] = useState<{ file: File; preview: string }[]>([]);
+  const [videoLinks, setVideoLinks] = useState<string[]>([]);
+  const [videoLinkInput, setVideoLinkInput] = useState("");
   const videoRef = useRef<HTMLInputElement>(null);
 
   function set<K extends keyof typeof form>(k: K, v: typeof form[K]) {
@@ -350,6 +352,7 @@ export default function AddYourToolPage() {
           instagram_url: form.instagram_url || null,
           demo_url:      video_url          || null,
           screenshots:   screenshotUrls.length ? screenshotUrls : null,
+          video_links:   videoLinks.length ? videoLinks : null,
           maker_comment: pricingNote,
           plan:          "free",
           status:        "pending",
@@ -451,7 +454,7 @@ export default function AddYourToolPage() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 24, marginBottom: 18 }}>
-            <Field label="Brand Logo" required hint="PNG or JPG, min 200×200px">
+            <Field label="Brand Logo" required hint="PNG or JPG, 1080×1080px">
               <div
                 onClick={() => {
                   const input = document.createElement("input");
@@ -561,6 +564,85 @@ export default function AddYourToolPage() {
                 </div>
               )}
             </div>
+          </Field>
+
+          {/* YouTube Video Links */}
+          <Field label="YouTube Video Links" hint={`Add up to 3 YouTube video links — they'll appear as previews on your product page (${videoLinks.length}/3 added)`}>
+            {videoLinks.length < 3 && (
+              <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                <div style={{ position: "relative", flex: 1 }}>
+                  <span style={{ position: "absolute", left: 9, top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", pointerEvents: "none" }}>
+                    <svg width={15} height={15} viewBox="0 0 24 24" fill="#FF0000">
+                      <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                  </span>
+                  <input
+                    style={{ ...inp, paddingLeft: 32 }}
+                    type="url"
+                    placeholder="https://youtube.com/watch?v=…"
+                    value={videoLinkInput}
+                    onChange={e => setVideoLinkInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        const url = videoLinkInput.trim();
+                        if (url && videoLinks.length < 3 && !videoLinks.includes(url)) {
+                          setVideoLinks(p => [...p, url]);
+                          setVideoLinkInput("");
+                        }
+                      }
+                    }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = videoLinkInput.trim();
+                    if (url && videoLinks.length < 3 && !videoLinks.includes(url)) {
+                      setVideoLinks(p => [...p, url]);
+                      setVideoLinkInput("");
+                    }
+                  }}
+                  style={{
+                    padding: "9px 16px", borderRadius: 8, fontSize: 12, fontWeight: 700,
+                    background: "#FF0000", color: "#fff", border: "none", cursor: "pointer",
+                    fontFamily: "inherit", whiteSpace: "nowrap",
+                  }}
+                >+ Add</button>
+              </div>
+            )}
+            {videoLinks.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {videoLinks.map((link, i) => {
+                  let videoId: string | null = null;
+                  try {
+                    const u = new URL(link);
+                    if (u.hostname.includes("youtu.be")) videoId = u.pathname.slice(1).split("?")[0];
+                    else if (u.hostname.includes("youtube.com")) {
+                      if (u.pathname.startsWith("/shorts/")) videoId = u.pathname.split("/")[2];
+                      else videoId = u.searchParams.get("v");
+                    }
+                  } catch { /* no-op */ }
+                  const thumb = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null;
+                  return (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: "var(--surface-alt)", borderRadius: 8, border: "1px solid var(--border)" }}>
+                      {thumb
+                        ? <img src={thumb} alt="" style={{ width: 64, height: 36, objectFit: "cover", borderRadius: 5, flexShrink: 0 }} />
+                        : <div style={{ width: 64, height: 36, borderRadius: 5, background: "#FF0000", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <svg width={16} height={16} viewBox="0 0 24 24" fill="#fff"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                          </div>
+                      }
+                      <span style={{ flex: 1, fontSize: 11, color: "var(--ink-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{link}</span>
+                      <button
+                        type="button"
+                        onClick={() => setVideoLinks(p => p.filter((_, idx) => idx !== i))}
+                        style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(0,0,0,0.12)", border: "none", color: "var(--ink-muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, flexShrink: 0 }}
+                      >×</button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </Field>
         </div>
 
