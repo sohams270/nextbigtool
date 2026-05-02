@@ -98,7 +98,6 @@ export default async function HallOfFamePage() {
                     const tool = entry.tools!;
                     const tags = tool.tool_tags.map((tt) => tt.tags?.name).filter(Boolean) as string[];
                     const palette = CARD_PALETTES[i % CARD_PALETTES.length];
-                    const rank = String(i + 1).padStart(2, "0");
                     const inductedDate = entry.inducted_at
                       ? new Date(entry.inducted_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })
                       : null;
@@ -127,7 +126,7 @@ export default async function HallOfFamePage() {
                             background: palette.bg,
                             overflow: "hidden",
                             position: "relative",
-                            minHeight: 340,
+                            minHeight: 300,
                             display: "flex",
                             flexDirection: "column",
                           }}>
@@ -152,20 +151,12 @@ export default async function HallOfFamePage() {
                               }} />
                             </div>
 
-                            {/* ── TOP CORNER: rank + badge ── */}
+                            {/* ── TOP: inducted badge only ── */}
                             <div style={{
                               position: "relative", zIndex: 2,
-                              display: "flex", justifyContent: "space-between", alignItems: "flex-start",
-                              padding: "14px 14px 0",
+                              display: "flex", justifyContent: "flex-end",
+                              padding: "12px 12px 0",
                             }}>
-                              <div style={{ textAlign: "left" }}>
-                                <div style={{ fontSize: 26, fontWeight: 900, color: palette.corner, letterSpacing: "-0.04em", lineHeight: 1, textShadow: "0 2px 8px rgba(0,0,0,0.4)", fontFamily: "Inter, sans-serif" }}>
-                                  {rank}
-                                </div>
-                                <div style={{ fontSize: 8, fontWeight: 800, color: "rgba(255,255,255,0.6)", letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 1 }}>
-                                  RANK
-                                </div>
-                              </div>
                               <div style={{
                                 fontSize: 9, fontWeight: 800, padding: "3px 8px", borderRadius: 20,
                                 background: "rgba(255,255,255,0.15)", backdropFilter: "blur(4px)",
@@ -175,41 +166,28 @@ export default async function HallOfFamePage() {
                               </div>
                             </div>
 
-                            {/* ── CENTER: logo oval ── */}
+                            {/* ── CENTER: large logo ── */}
                             <div style={{
                               position: "relative", zIndex: 2,
                               display: "flex", justifyContent: "center", alignItems: "center",
-                              padding: "16px 0 12px",
+                              padding: "12px 0 16px",
                               flex: 1,
                             }}>
                               <div style={{
-                                width: 88, height: 88,
+                                width: 120, height: 120,
                                 borderRadius: "50%",
                                 background: "rgba(255,255,255,0.95)",
-                                border: "4px solid rgba(255,255,255,0.4)",
-                                boxShadow: "0 8px 24px rgba(0,0,0,0.35), inset 0 2px 4px rgba(255,255,255,0.5)",
+                                border: "5px solid rgba(255,255,255,0.45)",
+                                boxShadow: "0 10px 30px rgba(0,0,0,0.4), inset 0 2px 6px rgba(255,255,255,0.6)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
                                 overflow: "hidden",
                                 flexShrink: 0,
                               }}>
                                 {logoSrc ? (
-                                  <img src={logoSrc} alt={tool.name} style={{ width: "78%", height: "78%", objectFit: "contain" }} />
+                                  <img src={logoSrc} alt={tool.name} style={{ width: "82%", height: "82%", objectFit: "contain" }} />
                                 ) : (
-                                  <span style={{ fontSize: 32, fontWeight: 900, color: palette.bg }}>{tool.name[0]}</span>
+                                  <span style={{ fontSize: 44, fontWeight: 900, color: palette.bg }}>{tool.name[0]}</span>
                                 )}
-                              </div>
-                            </div>
-
-                            {/* ── BOTTOM CORNER: rank mirrored ── */}
-                            <div style={{
-                              position: "relative", zIndex: 2,
-                              display: "flex", justifyContent: "flex-end",
-                              padding: "0 14px 10px",
-                            }}>
-                              <div style={{ textAlign: "right", transform: "rotate(180deg)" }}>
-                                <div style={{ fontSize: 20, fontWeight: 900, color: "rgba(255,255,255,0.4)", letterSpacing: "-0.04em", lineHeight: 1, fontFamily: "Inter, sans-serif" }}>
-                                  {rank}
-                                </div>
                               </div>
                             </div>
 
