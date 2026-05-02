@@ -657,3 +657,41 @@ body {
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
   border-color: rgba(255,107,53,0.35) !important;
 }
+
+/* ── Compare page article prose ─────────────────────────────────────── */
+.compare-article h2 {
+  font-size: 22px; font-weight: 800; letter-spacing: -0.02em;
+  color: var(--ink); margin: 40px 0 14px; line-height: 1.25;
+  scroll-margin-top: 90px;
+}
+.compare-article h3 {
+  font-size: 16px; font-weight: 700; color: var(--ink);
+  margin: 28px 0 10px; line-height: 1.35;
+}
+.compare-article p {
+  font-size: 15px; color: var(--ink-2); line-height: 1.75;
+  margin: 0 0 18px;
+}
+.compare-article ul, .compare-article ol {
+  padding-left: 22px; margin: 0 0 18px;
+}
+.compare-article li {
+  font-size: 15px; color: var(--ink-2); line-height: 1.7; margin-bottom: 6px;
+}
+.compare-article strong { color: var(--ink); font-weight: 700; }
+.compare-article a { color: #FF6B35; text-decoration: underline; text-underline-offset: 2px; }
+.compare-article hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+.compare-article table {
+  width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px;
+}
+.compare-article th {
+  text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted);
+  background: var(--surface-alt); border-bottom: 2px solid var(--border);
+}
+.compare-article td {
+  padding: 12px 14px; border-bottom: 1px solid var(--border);
+  color: var(--ink-2); vertical-align: top; line-height: 1.5;
+}
+.compare-article tr:last-child td { border-bottom: none; }
+.compare-article tr:nth-child(even) td { background: var(--surface-alt); }
