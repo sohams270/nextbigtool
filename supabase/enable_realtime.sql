@@ -3,3 +3,5 @@
 ALTER PUBLICATION supabase_realtime ADD TABLE tools;
 ALTER PUBLICATION supabase_realtime ADD TABLE hall_of_fame;
 ALTER PUBLICATION supabase_realtime ADD TABLE posts;
+ALTER PUBLICATION supabase_realtime ADD TABLE upvotes;
+ALTER PUBLICATION supabase_realtime ADD TABLE tool_comments;

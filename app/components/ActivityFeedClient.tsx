@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/client";
 
 export type ActivityItem = {
   id: string;
-  type: "tool_added" | "hof_inducted" | "bip_post";
+  type: "tool_added" | "hof_inducted" | "bip_post" | "upvote" | "comment";
   timestamp: string;
   title: string;
   description: string;
@@ -18,6 +18,8 @@ const BADGE_COLORS: Record<string, { bg: string; color: string }> = {
   "New Launch":      { bg: "rgba(59,130,246,0.12)",  color: "#60a5fa" },
   "Hall of Fame":    { bg: "rgba(255,215,0,0.12)",    color: "#FFD700" },
   "Build in Public": { bg: "rgba(0,184,122,0.12)",    color: "#00B87A" },
+  "Upvote":          { bg: "rgba(255,107,53,0.12)",   color: "#FF6B35" },
+  "Comment":         { bg: "rgba(139,92,246,0.12)",   color: "#8B5CF6" },
 };
 
 function formatTimeAgo(timestamp: string): string {
@@ -155,11 +157,69 @@ export default function ActivityFeedClient({
       )
       .subscribe();
 
+    // ── upvotes: new upvote on any tool ──────────────────────────────────
+    const upvotesSub = supabase
+      .channel("realtime:upvotes")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "upvotes" },
+        async (payload) => {
+          const u = payload.new as { tool_id: string; user_id: string; created_at: string };
+          const { data: tool } = await supabase
+            .from("tools")
+            .select("name, slug")
+            .eq("id", u.tool_id)
+            .maybeSingle();
+          if (!tool) return;
+          prepend({
+            id: `upvote-${u.tool_id}-${u.user_id}-${u.created_at}`,
+            type: "upvote",
+            timestamp: u.created_at,
+            title: `${tool.name} received an upvote`,
+            description: "",
+            href: `/tools/${tool.slug}`,
+            emoji: "🔺",
+            badge: "Upvote",
+          });
+        }
+      )
+      .subscribe();
+
+    // ── tool_comments: new comment on any tool ────────────────────────────
+    const commentsSub = supabase
+      .channel("realtime:tool_comments")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "tool_comments" },
+        async (payload) => {
+          const c = payload.new as { id: string; tool_id: string; content: string; created_at: string };
+          const { data: tool } = await supabase
+            .from("tools")
+            .select("name, slug")
+            .eq("id", c.tool_id)
+            .maybeSingle();
+          if (!tool) return;
+          prepend({
+            id: `comment-${c.id}`,
+            type: "comment",
+            timestamp: c.created_at,
+            title: `New comment on ${tool.name}`,
+            description: typeof c.content === "string" ? c.content.slice(0, 120) : "",
+            href: `/tools/${tool.slug}`,
+            emoji: "💬",
+            badge: "Comment",
+          });
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(toolsSub);
       supabase.removeChannel(toolsUpdateSub);
       supabase.removeChannel(hofSub);
       supabase.removeChannel(postsSub);
+      supabase.removeChannel(upvotesSub);
+      supabase.removeChannel(commentsSub);
     };
   }, [prepend]);
 
