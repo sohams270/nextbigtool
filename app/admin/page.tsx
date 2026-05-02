@@ -185,6 +185,13 @@ export default async function AdminPage() {
     .select("id, full_name, email, plan, company, role, created_at")
     .order("created_at", { ascending: false });
 
+  // Newsletter subscribers
+  const { data: allSubscribers } = await adminDb
+    .from("newsletter_subscribers")
+    .select("id, email, source, subscribed, subscribed_at")
+    .eq("subscribed", true)
+    .order("subscribed_at", { ascending: false });
+
   // Tool count per user
   const { data: toolCounts } = await adminDb
     .from("tools")
@@ -750,6 +757,75 @@ export default async function AdminPage() {
                 </div>
               );
             })
+          )}
+        </div>
+      </div>
+
+      {/* ── Newsletter Subscribers ─────────────────────────────────────────── */}
+      <div style={{ marginTop: 40 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <div>
+            <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)", margin: "0 0 4px", letterSpacing: "-0.01em" }}>
+              📧 Newsletter Subscribers
+            </h2>
+            <p style={{ fontSize: 12, color: "var(--ink-muted)", margin: 0 }}>
+              Everyone who subscribed to The Founder's Weekly
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            {[
+              { label: "Total", value: (allSubscribers ?? []).length },
+              {
+                label: "This Week", value: (allSubscribers ?? []).filter(s => {
+                  const d = new Date((s as any).subscribed_at);
+                  return d > new Date(Date.now() - 7 * 86400000);
+                }).length
+              },
+            ].map(stat => (
+              <div key={stat.label} style={{ ...card, padding: "10px 18px", textAlign: "center", minWidth: 80 }}>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ink)" }}>{stat.value}</div>
+                <div style={{ fontSize: 10, color: "var(--ink-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ ...card, overflow: "hidden", padding: 0 }}>
+          {/* Header row */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 130px 100px", padding: "10px 16px", borderBottom: "1px solid var(--border)", fontSize: 10, fontWeight: 700, color: "var(--ink-muted)", letterSpacing: "0.07em", textTransform: "uppercase" }}>
+            <div>Email</div>
+            <div>Source</div>
+            <div>Subscribed</div>
+          </div>
+
+          {(allSubscribers ?? []).length === 0 ? (
+            <div style={{ padding: "40px", textAlign: "center", color: "var(--ink-muted)", fontSize: 13 }}>No subscribers yet.</div>
+          ) : (
+            (allSubscribers ?? []).map((s: any, idx: number) => (
+              <div key={s.id} style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 130px 100px",
+                padding: "10px 16px",
+                borderBottom: idx < (allSubscribers ?? []).length - 1 ? "1px solid var(--border-faint)" : "none",
+                alignItems: "center",
+              }}>
+                <div style={{ fontSize: 13, color: "var(--ink)", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {s.email}
+                </div>
+                <div>
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99,
+                    background: "rgba(99,102,241,0.1)", color: "#818cf8",
+                    textTransform: "uppercase", letterSpacing: "0.04em",
+                  }}>
+                    {s.source ?? "—"}
+                  </span>
+                </div>
+                <div style={{ fontSize: 11, color: "var(--ink-muted)" }}>
+                  {s.subscribed_at ? new Date(s.subscribed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}
+                </div>
+              </div>
+            ))
           )}
         </div>
       </div>

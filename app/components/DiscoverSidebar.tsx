@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import Pill from "./Pill";
 import HofUpgradeBtn from "./HofUpgradeBtn";
+import NewsletterForm from "./NewsletterForm";
 
 export default async function DiscoverSidebar() {
   const cookieStore = await cookies();
@@ -157,20 +158,7 @@ export default async function DiscoverSidebar() {
         <span style={{ fontSize: 10, color: "rgba(255,255,255,0.65)", display: "block", marginBottom: 10 }}>
           Hand-picked indie tools worth your attention — no spam, unsubscribe anytime.
         </span>
-        <div style={{
-          border: "1px solid rgba(255,255,255,0.2)", borderRadius: 6,
-          padding: "8px 10px", background: "rgba(255,255,255,0.06)",
-          fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 8,
-        }}>
-          name@company.com
-        </div>
-        <button style={{
-          width: "100%", background: "#FF6B35", color: "#fff",
-          border: "none", borderRadius: 6, padding: "8px 0",
-          fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-        }}>
-          Subscribe
-        </button>
+        <NewsletterForm source="discover-sidebar" dark />
       </div>
 
       {/* ── Hall of Fame Promo ────────────────────────────────────────── */}

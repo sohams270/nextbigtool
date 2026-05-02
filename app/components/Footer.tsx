@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import NBTWordmark from "./NBTWordmark";
 import AuthModal from "./AuthModal";
+import NewsletterForm from "./NewsletterForm";
 
 const DISCOVER_LINKS = [
   { label: "Categories",   href: "/discover/categories" },
@@ -241,42 +242,7 @@ export default function Footer() {
               <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", lineHeight: 1.6, marginBottom: 12, marginTop: 0 }}>
                 Hand-picked indie tools worth your attention — no spam, unsubscribe anytime.
               </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <input
-                  type="email"
-                  placeholder="name@company.com"
-                  style={{
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.15)",
-                    borderRadius: 7,
-                    padding: "8px 10px",
-                    fontSize: 11,
-                    color: "#fff",
-                    outline: "none",
-                    fontFamily: "inherit",
-                    width: "100%",
-                    boxSizing: "border-box",
-                  }}
-                />
-                <button
-                  style={{
-                    background: "#FF6B35",
-                    border: "none",
-                    borderRadius: 7,
-                    padding: "8px 0",
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: "#fff",
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                    width: "100%",
-                    transition: "opacity 0.15s",
-                  }}
-                  className="footer-subscribe-btn"
-                >
-                  Subscribe
-                </button>
-              </div>
+              <NewsletterForm source="footer" dark />
             </div>
           </div>
 
