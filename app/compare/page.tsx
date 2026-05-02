@@ -78,11 +78,11 @@ export default function ComparePage() {
       <TopNav />
       <CompareHero />
 
-      <div style={{ flex: 1, padding: "48px 40px 80px", maxWidth: 1160, margin: "0 auto", width: "100%" }}>
+      <div style={{ flex: 1, padding: "48px 40px 80px", maxWidth: 1200, margin: "0 auto", width: "100%" }}>
         <div style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-          gap: 20,
+          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+          gap: 16,
         }}>
           {COMPARISONS.map((c) => (
             <CompareCard
