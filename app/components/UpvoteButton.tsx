@@ -50,6 +50,12 @@ export default function UpvoteButton({
       await supabase
         .from("upvotes")
         .insert({ user_id: userId, tool_id: toolId });
+      // Notify owner — fire and forget, don't block UI
+      fetch("/api/notify-owner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "upvote", toolId }),
+      }).catch(() => {});
     }
 
     setLoading(false);

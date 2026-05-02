@@ -105,6 +105,17 @@ export default function CommentSection({ toolId, userId }: { toolId: string; use
       const normalized = { ...(data as any), profiles: Array.isArray((data as any).profiles) ? ((data as any).profiles[0] ?? null) : (data as any).profiles };
       setComments((prev) => [normalized as Comment, ...prev]);
       setDraft("");
+      // Notify tool owner — fire and forget
+      fetch("/api/notify-owner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "comment",
+          toolId,
+          comment: text,
+          commenterName: currentUser?.full_name ?? "Someone",
+        }),
+      }).catch(() => {});
     }
     setSubmitting(false);
   }

@@ -39,6 +39,11 @@ export default function UpvoteBox({
       await supabase.from("upvotes").delete().match({ user_id: userId, tool_id: toolId });
     } else {
       await supabase.from("upvotes").insert({ user_id: userId, tool_id: toolId });
+      fetch("/api/notify-owner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "upvote", toolId }),
+      }).catch(() => {});
     }
 
     setLoading(false);
