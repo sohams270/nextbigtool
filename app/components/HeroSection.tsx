@@ -90,7 +90,7 @@ export default function HeroSection() {
 
   function handleLaunchClick() {
     if (userId) {
-      window.location.href = "/dashboard/submit";
+      window.location.href = "/dashboard/products";
     } else {
       setShowAuth(true);
     }
