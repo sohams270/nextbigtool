@@ -24,12 +24,12 @@ const FEATURES: Record<GatedFeature, {
   crm: {
     emoji: "👥",
     title: "Founder's CRM",
-    tagline: "See exactly who's interested in your product.",
+    tagline: "Know exactly who wants your product — and reach out.",
     benefits: [
       "Name, email, company & role of every upvoter",
-      "One follow-up message per lead — right from the platform",
       "Filter & sort by tool, date, or company",
-      "CSV export of all your leads",
+      "Export all leads as CSV or Excel",
+      "New leads added automatically as you get upvotes",
     ],
   },
   blog: {
