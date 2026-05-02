@@ -27,6 +27,21 @@ type HofEntry = {
   tools: ToolRow | null;
 };
 
+/* ── UNO card colour palette — cycles per card ───────────────────────── */
+const CARD_PALETTES = [
+  { bg: "#D72B2B", oval: "#B01E1E", border: "#FF6B6B", corner: "#fff" },   // red
+  { bg: "#1A5FB4", oval: "#0F3D7A", border: "#6BAEFF", corner: "#fff" },   // blue
+  { bg: "#2E8B57", oval: "#1A5C38", border: "#6FE0A0", corner: "#fff" },   // green
+  { bg: "#D4A017", oval: "#9A7210", border: "#FFD966", corner: "#fff" },   // yellow
+  { bg: "#7B2FBE", oval: "#521F80", border: "#C084FC", corner: "#fff" },   // purple
+  { bg: "#E07B39", oval: "#A85420", border: "#FDBA74", corner: "#fff" },   // orange
+];
+
+function pricingLabel(p: string) {
+  const map: Record<string, string> = { free: "Free", freemium: "Freemium", paid: "Paid", contact: "Contact" };
+  return map[p] ?? p;
+}
+
 export default async function HallOfFamePage() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -38,7 +53,6 @@ export default async function HallOfFamePage() {
     .order("inducted_at", { ascending: false });
 
   const hofEntries = ((hofRows ?? []) as unknown as HofEntry[]).filter((e) => e.tools);
-  const medals = ["🥇", "🥈", "🥉"];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
@@ -48,7 +62,7 @@ export default async function HallOfFamePage() {
         badge="🏆 Hall of Fame"
         title="Hall of"
         titleAccent="Fame"
-        subtitle={`The gold standard of indie tools — permanently recognised, community approved`}
+        subtitle="The gold standard of indie tools — permanently recognised, community approved"
         accent="gold"
       />
 
@@ -56,7 +70,8 @@ export default async function HallOfFamePage() {
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "32px 28px 80px", width: "100%", boxSizing: "border-box" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 28 }}>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>All Inductees</span>
               <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
               <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>{hofEntries.length} products</span>
@@ -72,84 +87,230 @@ export default async function HallOfFamePage() {
                 <HofUpgradeBtn />
               </div>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                {hofEntries.map((entry, i) => {
-                  const tool = entry.tools!;
-                  const tags = tool.tool_tags.map((tt) => tt.tags?.name).filter(Boolean) as string[];
-                  const isTop3 = i < 3;
+              <>
+                {/* UNO card grid */}
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+                  gap: 24,
+                }}>
+                  {hofEntries.map((entry, i) => {
+                    const tool = entry.tools!;
+                    const tags = tool.tool_tags.map((tt) => tt.tags?.name).filter(Boolean) as string[];
+                    const palette = CARD_PALETTES[i % CARD_PALETTES.length];
+                    const rank = String(i + 1).padStart(2, "0");
+                    const inductedDate = entry.inducted_at
+                      ? new Date(entry.inducted_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+                      : null;
 
-                  let logoSrc: string | null = tool.logo_url;
-                  if (!logoSrc && tool.website_url) {
-                    try { const d = new URL(tool.website_url).hostname.replace(/^www\./, ""); logoSrc = `https://logo.clearbit.com/${d}`; } catch { /* no-op */ }
-                  }
+                    let logoSrc: string | null = tool.logo_url;
+                    if (!logoSrc && tool.website_url) {
+                      try { const d = new URL(tool.website_url).hostname.replace(/^www\./, ""); logoSrc = `https://logo.clearbit.com/${d}`; } catch { /* no-op */ }
+                    }
 
-                  return (
-                    <Link key={tool.id} href={`/tools/${tool.slug}`} style={{ textDecoration: "none" }}>
-                      <div
-                        className={isTop3 ? "discover-hof-row-premium" : "discover-hof-row-std"}
-                        style={{
-                          display: "flex", alignItems: "center", gap: 16,
-                          padding: "18px 20px", borderRadius: 14,
-                          background: isTop3 ? "linear-gradient(135deg,#0D0E22,#15102A)" : "var(--surface)",
-                          border: isTop3 ? "1px solid rgba(255,215,0,0.28)" : "1px solid var(--border)",
-                          position: "relative", overflow: "hidden",
+                    return (
+                      <div key={tool.id} style={{ perspective: "1000px" }}>
+                        {/* Card shell */}
+                        <div style={{
+                          position: "relative",
+                          borderRadius: 20,
+                          padding: 5,
+                          background: `linear-gradient(145deg, ${palette.border}, ${palette.bg}, ${palette.oval})`,
+                          boxShadow: `0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.15)`,
+                          transition: "transform 0.2s, box-shadow 0.2s",
                         }}
-                      >
-                        {isTop3 && (
-                          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg,#FFD700,#FFA500,#FFD700)" }} />
-                        )}
-                        <div style={{ fontSize: 22, flexShrink: 0, width: 32, textAlign: "center" }}>
-                          {i < 3 ? medals[i] : (
-                            <span style={{ fontSize: 12, fontWeight: 700, color: isTop3 ? "rgba(255,215,0,0.7)" : "var(--ink-muted)" }}>#{i + 1}</span>
-                          )}
-                        </div>
-                        <div style={{ width: 52, height: 52, borderRadius: 12, overflow: "hidden", flexShrink: 0, background: isTop3 ? "rgba(255,215,0,0.1)" : "var(--surface-alt)", border: isTop3 ? "1.5px solid rgba(255,215,0,0.3)" : "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 800, color: isTop3 ? "#FFD700" : "var(--ink-muted)" }}>
-                          {logoSrc
-                            ? <img src={logoSrc} alt={tool.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                            : tool.name[0]}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                            <span style={{ fontSize: 15, fontWeight: 800, color: isTop3 ? "#fff" : "var(--ink)" }}>{tool.name}</span>
-                            <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "rgba(255,215,0,0.15)", color: isTop3 ? "#FFD700" : "#9a6a00", border: "1px solid rgba(255,215,0,0.3)", letterSpacing: "0.03em" }}>
-                              🏆 Inducted
-                            </span>
-                          </div>
-                          <div style={{ fontSize: 12.5, color: isTop3 ? "rgba(255,255,255,0.55)" : "var(--ink-2)", marginBottom: 8, lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tool.tagline}</div>
-                          <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-                            {tags.slice(0, 3).map((tag) => (
-                              <span key={tag} style={{ fontSize: 10, padding: "1px 7px", borderRadius: 20, background: isTop3 ? "rgba(255,255,255,0.07)" : "var(--surface-alt)", color: isTop3 ? "rgba(255,255,255,0.4)" : "var(--ink-muted)", border: `1px solid ${isTop3 ? "rgba(255,255,255,0.1)" : "var(--border)"}` }}>{tag}</span>
-                            ))}
-                            <span style={{ fontSize: 10, padding: "1px 7px", borderRadius: 20, background: isTop3 ? "rgba(255,255,255,0.05)" : "var(--surface-alt)", color: isTop3 ? "rgba(255,215,0,0.7)" : "#9a6a00", border: "1px solid rgba(255,215,0,0.2)", textTransform: "capitalize" }}>{tool.pricing}</span>
-                          </div>
-                        </div>
-                        <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, fontWeight: 700, color: isTop3 ? "rgba(255,215,0,0.9)" : "var(--ink)" }}>
-                            ▲ <span>{tool.upvote_count}</span>
-                          </div>
-                          {entry.inducted_at && (
-                            <div style={{ fontSize: 10, color: isTop3 ? "rgba(255,255,255,0.3)" : "var(--ink-muted)" }}>
-                              {new Date(entry.inducted_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                          className="hof-uno-card"
+                        >
+                          {/* Inner card */}
+                          <div style={{
+                            borderRadius: 16,
+                            background: palette.bg,
+                            overflow: "hidden",
+                            position: "relative",
+                            minHeight: 340,
+                            display: "flex",
+                            flexDirection: "column",
+                          }}>
+
+                            {/* Background diagonal oval pattern */}
+                            <div style={{
+                              position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none",
+                            }}>
+                              <div style={{
+                                position: "absolute",
+                                top: "50%", left: "50%",
+                                transform: "translate(-50%, -50%) rotate(-30deg)",
+                                width: "150%", height: "70%",
+                                background: palette.oval,
+                                borderRadius: "50%",
+                                opacity: 0.6,
+                              }} />
+                              {/* Subtle noise overlay */}
+                              <div style={{
+                                position: "absolute", inset: 0,
+                                background: "radial-gradient(ellipse at top, rgba(255,255,255,0.05) 0%, transparent 70%)",
+                              }} />
                             </div>
-                          )}
+
+                            {/* ── TOP CORNER: rank + badge ── */}
+                            <div style={{
+                              position: "relative", zIndex: 2,
+                              display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+                              padding: "14px 14px 0",
+                            }}>
+                              <div style={{ textAlign: "left" }}>
+                                <div style={{ fontSize: 26, fontWeight: 900, color: palette.corner, letterSpacing: "-0.04em", lineHeight: 1, textShadow: "0 2px 8px rgba(0,0,0,0.4)", fontFamily: "Inter, sans-serif" }}>
+                                  {rank}
+                                </div>
+                                <div style={{ fontSize: 8, fontWeight: 800, color: "rgba(255,255,255,0.6)", letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 1 }}>
+                                  RANK
+                                </div>
+                              </div>
+                              <div style={{
+                                fontSize: 9, fontWeight: 800, padding: "3px 8px", borderRadius: 20,
+                                background: "rgba(255,255,255,0.15)", backdropFilter: "blur(4px)",
+                                color: "#fff", letterSpacing: "0.06em", border: "1px solid rgba(255,255,255,0.2)",
+                              }}>
+                                🏆 INDUCTED
+                              </div>
+                            </div>
+
+                            {/* ── CENTER: logo oval ── */}
+                            <div style={{
+                              position: "relative", zIndex: 2,
+                              display: "flex", justifyContent: "center", alignItems: "center",
+                              padding: "16px 0 12px",
+                              flex: 1,
+                            }}>
+                              <div style={{
+                                width: 88, height: 88,
+                                borderRadius: "50%",
+                                background: "rgba(255,255,255,0.95)",
+                                border: "4px solid rgba(255,255,255,0.4)",
+                                boxShadow: "0 8px 24px rgba(0,0,0,0.35), inset 0 2px 4px rgba(255,255,255,0.5)",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                overflow: "hidden",
+                                flexShrink: 0,
+                              }}>
+                                {logoSrc ? (
+                                  <img src={logoSrc} alt={tool.name} style={{ width: "78%", height: "78%", objectFit: "contain" }} />
+                                ) : (
+                                  <span style={{ fontSize: 32, fontWeight: 900, color: palette.bg }}>{tool.name[0]}</span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* ── BOTTOM CORNER: rank mirrored ── */}
+                            <div style={{
+                              position: "relative", zIndex: 2,
+                              display: "flex", justifyContent: "flex-end",
+                              padding: "0 14px 10px",
+                            }}>
+                              <div style={{ textAlign: "right", transform: "rotate(180deg)" }}>
+                                <div style={{ fontSize: 20, fontWeight: 900, color: "rgba(255,255,255,0.4)", letterSpacing: "-0.04em", lineHeight: 1, fontFamily: "Inter, sans-serif" }}>
+                                  {rank}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* ── INFO PANEL (bottom white section) ── */}
+                            <div style={{
+                              position: "relative", zIndex: 2,
+                              background: "rgba(8,9,20,0.92)",
+                              backdropFilter: "blur(8px)",
+                              padding: "14px 14px 14px",
+                              borderTop: `2px solid ${palette.border}`,
+                            }}>
+                              {/* Tool name */}
+                              <div style={{
+                                fontSize: 15, fontWeight: 900, color: "#fff",
+                                letterSpacing: "-0.02em", marginBottom: 4,
+                                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                              }}>
+                                {tool.name}
+                              </div>
+
+                              {/* Tagline */}
+                              <div style={{
+                                fontSize: 10.5, color: "rgba(255,255,255,0.5)", lineHeight: 1.45,
+                                marginBottom: 10,
+                                display: "-webkit-box",
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: "vertical",
+                                overflow: "hidden",
+                              }}>
+                                {tool.tagline}
+                              </div>
+
+                              {/* Tags + pricing row */}
+                              <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 10 }}>
+                                {tags.slice(0, 2).map((tag) => (
+                                  <span key={tag} style={{
+                                    fontSize: 9, padding: "2px 6px", borderRadius: 20,
+                                    background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.55)",
+                                    border: "1px solid rgba(255,255,255,0.12)",
+                                  }}>{tag}</span>
+                                ))}
+                                <span style={{
+                                  fontSize: 9, padding: "2px 6px", borderRadius: 20,
+                                  background: `${palette.bg}33`, color: palette.border,
+                                  border: `1px solid ${palette.border}55`,
+                                }}>
+                                  {pricingLabel(tool.pricing)}
+                                </span>
+                              </div>
+
+                              {/* Stats row */}
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: palette.border }}>
+                                  <svg width={9} height={9} viewBox="0 0 12 12" fill={palette.border}><path d="M6 2L10 8H2L6 2Z"/></svg>
+                                  {tool.upvote_count} upvotes
+                                </div>
+                                {inductedDate && (
+                                  <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", fontWeight: 600 }}>
+                                    {inductedDate}
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Redirect button */}
+                              <Link
+                                href={`/tools/${tool.slug}`}
+                                style={{
+                                  display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                                  width: "100%", padding: "8px 0", borderRadius: 10,
+                                  background: `linear-gradient(135deg, ${palette.bg}, ${palette.oval})`,
+                                  border: `1.5px solid ${palette.border}`,
+                                  color: "#fff", fontSize: 11, fontWeight: 800,
+                                  textDecoration: "none", letterSpacing: "0.04em",
+                                  boxShadow: `0 4px 12px ${palette.bg}66`,
+                                  transition: "opacity 0.15s",
+                                }}
+                              >
+                                View Product
+                                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M7 17L17 7M9 7h8v8"/>
+                                </svg>
+                              </Link>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
+                    );
+                  })}
+                </div>
 
-            {hofEntries.length > 0 && (
-              <div style={{ marginTop: 32, padding: "24px", borderRadius: 14, background: "linear-gradient(135deg,#0D0E22,#1A0D2E)", border: "1px solid rgba(255,215,80,0.2)", textAlign: "center" }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#FFD700", marginBottom: 6 }}>Want to be in the Hall of Fame?</div>
-                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 16, lineHeight: 1.5 }}>
-                  Submit your tool and apply for Hall of Fame induction. Only the best make it here.
+                {/* CTA */}
+                <div style={{ marginTop: 40, padding: "28px", borderRadius: 16, background: "linear-gradient(135deg,#0D0E22,#1A0D2E)", border: "1px solid rgba(255,215,80,0.2)", textAlign: "center" }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#FFD700", marginBottom: 6 }}>Want to be in the Hall of Fame?</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 16, lineHeight: 1.5 }}>
+                    Submit your tool and apply for Hall of Fame induction. Only the best make it here.
+                  </div>
+                  <div style={{ maxWidth: 240, margin: "0 auto" }}>
+                    <HofUpgradeBtn />
+                  </div>
                 </div>
-                <div style={{ maxWidth: 240, margin: "0 auto" }}>
-                  <HofUpgradeBtn />
-                </div>
-              </div>
+              </>
             )}
           </div>
 
@@ -158,6 +319,13 @@ export default async function HallOfFamePage() {
           </div>
         </div>
       </div>
+
+      <style>{`
+        .hof-uno-card:hover {
+          transform: translateY(-6px) rotate(1deg);
+          box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+        }
+      `}</style>
 
       <Footer />
     </div>
