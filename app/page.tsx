@@ -18,6 +18,7 @@ import HeroSection from "./components/HeroSection";
 import Pill from "./components/Pill";
 import Btn from "./components/Btn";
 import Footer from "./components/Footer";
+import ActivityFeedClient from "./components/ActivityFeedClient";
 import FilterBar from "./components/FilterBar";
 import SubmissionNudge, { type NudgeSubmission } from "./components/SubmissionNudge";
 import HofUpgradeBtn from "./components/HofUpgradeBtn";
@@ -37,16 +38,7 @@ type ToolRow = {
   tool_tags: { tags: { name: string } | null }[];
 };
 
-type ActivityItem = {
-  id: string;
-  type: "tool_added" | "hof_inducted" | "bip_post";
-  timestamp: string;
-  title: string;
-  description: string;
-  href: string;
-  emoji: string;
-  badge: string;
-};
+import type { ActivityItem } from "./components/ActivityFeedClient";
 
 type SearchParams = Promise<{ sort?: string; price?: string }>;
 
@@ -307,7 +299,7 @@ export default async function HomePage({
           <div>
             {/* ── Activity feed ── */}
             {sort === "activity" && (
-              <ActivityFeedSection activities={activities} />
+              <ActivityFeedClient initialActivities={activities} />
             )}
 
             {/* ── Hall of Fame full list ── */}
@@ -652,104 +644,6 @@ export default async function HomePage({
   );
 }
 
-// ── Activity Feed Section ─────────────────────────────────────────────────────
-
-function ActivityFeedSection({ activities }: { activities: ActivityItem[] }) {
-  if (activities.length === 0) {
-    return (
-      <div style={{ textAlign: "center", padding: "60px 0", color: "var(--ink-muted)", fontSize: 14 }}>
-        No recent activity yet.
-      </div>
-    );
-  }
-
-  const badgeColors: Record<string, { bg: string; color: string }> = {
-    "New Launch":    { bg: "rgba(59,130,246,0.12)", color: "#60a5fa" },
-    "Hall of Fame":  { bg: "rgba(255,215,0,0.12)",  color: "#FFD700" },
-    "Build in Public": { bg: "rgba(0,184,122,0.12)", color: "#00B87A" },
-  };
-
-  return (
-    <div>
-      <div style={{
-        display: "flex", alignItems: "center", gap: 10, marginBottom: 20,
-        padding: "12px 16px", borderRadius: 12,
-        background: "var(--surface)", border: "1px solid var(--border)",
-      }}>
-        <div className="pulse" style={{ width: 7, height: 7, borderRadius: "50%", background: "#00B87A", flexShrink: 0 }} />
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)" }}>Activity Feed</div>
-          <div style={{ fontSize: 11, color: "var(--ink-muted)", marginTop: 1 }}>
-            Latest launches, inductions, and founder updates
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {activities.map((item) => {
-          const colors = badgeColors[item.badge] ?? { bg: "rgba(255,255,255,0.08)", color: "var(--ink-2)" };
-          const timeAgo = formatTimeAgo(item.timestamp);
-          return (
-            <a key={item.id} href={item.href} style={{ textDecoration: "none" }}>
-              <div style={{
-                display: "flex", alignItems: "flex-start", gap: 14,
-                padding: "14px 16px", borderRadius: 12,
-                background: "var(--surface)", border: "1px solid var(--border)",
-                transition: "border-color 0.15s",
-              }}>
-                <div style={{
-                  width: 36, height: 36, borderRadius: 9, flexShrink: 0,
-                  background: colors.bg, border: `1px solid ${colors.color}33`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 17,
-                }}>
-                  {item.emoji}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {item.title}
-                    </span>
-                    <span style={{
-                      flexShrink: 0,
-                      fontSize: 9, fontWeight: 700,
-                      padding: "2px 7px", borderRadius: 99,
-                      background: colors.bg, color: colors.color,
-                      border: `1px solid ${colors.color}33`,
-                    }}>
-                      {item.badge}
-                    </span>
-                  </div>
-                  {item.description && (
-                    <div style={{
-                      fontSize: 11, color: "var(--ink-muted)", lineHeight: 1.4,
-                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                    }}>
-                      {item.description}
-                    </div>
-                  )}
-                </div>
-                <div style={{ fontSize: 10, color: "var(--ink-muted)", flexShrink: 0, marginTop: 2 }}>
-                  {timeAgo}
-                </div>
-              </div>
-            </a>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function formatTimeAgo(timestamp: string): string {
-  const now = Date.now();
-  const then = new Date(timestamp).getTime();
-  const diff = Math.floor((now - then) / 1000);
-  if (diff < 60)   return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  return `${Math.floor(diff / 86400)}d ago`;
-}
 
 // ── Filter bar skeleton ───────────────────────────────────────────────────────
 
