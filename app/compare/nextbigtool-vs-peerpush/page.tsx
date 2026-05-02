@@ -44,22 +44,18 @@ const rows: [string, string, string][] = [
   ["Sustained feed",                "Yes, no daily reset",                  "Partial"],
   ["Build-in-Public feed",          "NextBigTool only",                     "Not available"],
   ["Founder CRM",                   "Core plan",                            "Not available"],
-  ["Message interested users",      "Core plan (1x per user)",              "Not available"],
   ["Hall of Fame placement",        "Core plan",                            "Yes"],
   ["Press Release written for you", "Core plan",                            "Not available"],
-  ["Newsletter included",           "14k+ subscribers",                     "Newsletter available"],
   ["Unlimited product listings",    "Core plan",                            "Yes (pay per product)"],
   ["AI / MCP integration",          "Not yet",                              "MCP + API + AI Agents"],
   ["Product rating system",         "No",                                   "Yes"],
   ["Discount / deal listings",      "No",                                   "Yes"],
   ["CSV data export",               "Core plan",                            "No"],
-  ["Money-back guarantee",          "7-day on Core",                        "No"],
 ];
 
 const nbtPositive = new Set([
   "Yes, lifetime, instant", "DR 70+ on free plan", "Yes, no daily reset",
-  "NextBigTool only", "Core plan", "Core plan (1x per user)",
-  "14k+ subscribers", "7-day on Core",
+  "NextBigTool only", "Core plan",
 ]);
 
 export default function PeerPushComparePage() {
