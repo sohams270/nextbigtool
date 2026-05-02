@@ -105,10 +105,10 @@ export async function PUT(
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
   }
 
-  // Get existing post to preserve slug if not changed
+  // Get existing post to preserve slug + check previous status
   const { data: existing } = await supabase
     .from("cms_blog_posts")
-    .select("slug")
+    .select("slug, status")
     .eq("id", id)
     .single();
 
@@ -178,6 +178,19 @@ export async function PUT(
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Notify only when a draft is being published for the first time (fire and forget)
+  const wasPublishedNow = body.status === "published" && existing?.status !== "published";
+  if (wasPublishedNow && data?.id) {
+    fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.nextbigtool.com"}/api/notify-new-blog`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-internal-secret": process.env.INTERNAL_API_SECRET ?? "",
+      },
+      body: JSON.stringify({ postId: data.id }),
+    }).catch(err => console.error("[cms/blog PUT] notify-new-blog failed:", err));
   }
 
   return NextResponse.json({ post: data });

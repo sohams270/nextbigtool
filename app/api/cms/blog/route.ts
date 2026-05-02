@@ -168,5 +168,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  // Notify all users + subscribers when published (fire and forget)
+  if (body.status === "published" && data?.id) {
+    fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.nextbigtool.com"}/api/notify-new-blog`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-internal-secret": process.env.INTERNAL_API_SECRET ?? "",
+      },
+      body: JSON.stringify({ postId: data.id }),
+    }).catch(err => console.error("[cms/blog POST] notify-new-blog failed:", err));
+  }
+
   return NextResponse.json({ post: data }, { status: 201 });
 }
