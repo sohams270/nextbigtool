@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import TopNav from "@/app/components/TopNav";
 import Footer from "@/app/components/Footer";
 import CompareHero from "@/app/components/CompareHero";
+import CompareCard from "@/app/components/CompareCard";
 
 export const metadata: Metadata = {
   title: "Compare NextBigTool – vs Product Hunt, AppSumo & More",
@@ -85,71 +85,13 @@ export default function ComparePage() {
           gap: 20,
         }}>
           {COMPARISONS.map((c) => (
-            <Link key={c.slug} href={`/compare/${c.slug}`} style={{ textDecoration: "none" }}>
-              <div
-                style={{
-                  background: "var(--surface)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 14,
-                  padding: "24px 26px",
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 12,
-                  transition: "border-color 0.15s, box-shadow 0.15s",
-                  cursor: "pointer",
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = "#FF6B35";
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 20px rgba(255,107,53,0.1)";
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)";
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-                }}
-              >
-                {/* Title */}
-                <h2 style={{
-                  fontSize: 16, fontWeight: 800, color: "var(--ink)",
-                  margin: 0, letterSpacing: "-0.02em",
-                }}>
-                  NextBigTool vs {c.competitor}
-                </h2>
-
-                {/* Description */}
-                <p style={{
-                  fontSize: 13, color: "var(--ink-muted)",
-                  margin: 0, lineHeight: 1.6,
-                }}>
-                  {c.description}
-                </p>
-
-                {/* Bullets */}
-                <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-                  {c.bullets.map((b) => (
-                    <li key={b} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12, color: "var(--ink-muted)" }}>
-                      <span style={{
-                        width: 5, height: 5, borderRadius: "50%",
-                        background: "#FF6B35", flexShrink: 0, marginTop: 5,
-                      }} />
-                      {b}
-                    </li>
-                  ))}
-                </ul>
-
-                {/* CTA */}
-                <div style={{
-                  display: "inline-flex", alignItems: "center", gap: 5,
-                  fontSize: 12, fontWeight: 700, color: "#FF6B35",
-                  marginTop: 4,
-                }}>
-                  View full comparison
-                  <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14M13 6l6 6-6 6"/>
-                  </svg>
-                </div>
-              </div>
-            </Link>
+            <CompareCard
+              key={c.slug}
+              slug={c.slug}
+              competitor={c.competitor}
+              description={c.description}
+              bullets={c.bullets}
+            />
           ))}
         </div>
       </div>
