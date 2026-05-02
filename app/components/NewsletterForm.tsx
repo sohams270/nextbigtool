@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function NewsletterForm({
   source = "sidebar",
@@ -9,27 +9,29 @@ export default function NewsletterForm({
   source?: string;
   dark?: boolean;
 }) {
-  const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!email.trim()) return;
+    const email = inputRef.current?.value?.trim() ?? "";
+    if (!email) return;
+
     setStatus("loading");
 
     try {
       const res = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), source }),
+        body: JSON.stringify({ email, source }),
       });
       const json = await res.json();
 
       if (res.ok) {
         setStatus("success");
         setMessage("You're in! 🎉 Welcome to The Founder's Weekly.");
-        setEmail("");
+        if (inputRef.current) inputRef.current.value = "";
       } else {
         setStatus("error");
         setMessage(json.error ?? "Something went wrong. Try again.");
@@ -39,34 +41,6 @@ export default function NewsletterForm({
       setMessage("Something went wrong. Try again.");
     }
   }
-
-  const inputStyle: React.CSSProperties = {
-    width: "100%",
-    boxSizing: "border-box",
-    background: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
-    border: `1px solid ${dark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"}`,
-    borderRadius: 7,
-    padding: "8px 10px",
-    fontSize: 11,
-    color: dark ? "#fff" : "#111",
-    outline: "none",
-    fontFamily: "inherit",
-  };
-
-  const btnStyle: React.CSSProperties = {
-    width: "100%",
-    background: status === "loading" ? "#c94f22" : "#FF6B35",
-    border: "none",
-    borderRadius: 7,
-    padding: "8px 0",
-    fontSize: 11,
-    fontWeight: 700,
-    color: "#fff",
-    cursor: status === "loading" ? "default" : "pointer",
-    fontFamily: "inherit",
-    transition: "background 0.15s, opacity 0.15s",
-    opacity: status === "loading" ? 0.8 : 1,
-  };
 
   if (status === "success") {
     return (
@@ -86,12 +60,25 @@ export default function NewsletterForm({
   return (
     <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <input
+        ref={inputRef}
         type="email"
+        name="email"
         required
-        value={email}
-        onChange={(e) => { setEmail(e.target.value); setStatus("idle"); setMessage(""); }}
+        defaultValue=""
         placeholder="name@company.com"
-        style={inputStyle}
+        disabled={status === "loading"}
+        style={{
+          width: "100%",
+          boxSizing: "border-box",
+          background: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
+          border: `1px solid ${dark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"}`,
+          borderRadius: 7,
+          padding: "8px 10px",
+          fontSize: 11,
+          color: dark ? "#fff" : "#111",
+          outline: "none",
+          fontFamily: "inherit",
+        }}
       />
 
       {status === "error" && (
@@ -100,7 +87,23 @@ export default function NewsletterForm({
         </div>
       )}
 
-      <button type="submit" disabled={status === "loading"} style={btnStyle}>
+      <button
+        type="submit"
+        disabled={status === "loading"}
+        style={{
+          width: "100%",
+          background: status === "loading" ? "#c94f22" : "#FF6B35",
+          border: "none",
+          borderRadius: 7,
+          padding: "8px 0",
+          fontSize: 11,
+          fontWeight: 700,
+          color: "#fff",
+          cursor: status === "loading" ? "default" : "pointer",
+          fontFamily: "inherit",
+          opacity: status === "loading" ? 0.8 : 1,
+        }}
+      >
         {status === "loading" ? "Subscribing…" : "Subscribe"}
       </button>
     </form>
