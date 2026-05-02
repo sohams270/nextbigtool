@@ -9,6 +9,7 @@ import UpvoteButton from "@/app/components/UpvoteButton";
 import UpvoteBox from "@/app/components/UpvoteBox";
 import CommentSection from "./CommentSection";
 import CopyLinkButton from "./CopyLinkButton";
+import ViewTracker from "@/app/components/ViewTracker";
 import { BLOG_POSTS } from "@/app/lib/blog-posts";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -206,6 +207,7 @@ export default async function ToolPage({ params }: Props) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
+      <ViewTracker toolId={tool.id} />
       <TopNav />
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
