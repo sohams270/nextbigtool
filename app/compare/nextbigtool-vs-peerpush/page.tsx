@@ -250,33 +250,6 @@ export default function PeerPushComparePage() {
         The two platforms are not mutually exclusive. Many founders will launch on both. But if you are choosing where to build your launch home, NextBigTool is the platform built for what comes after day one.
       </p>
 
-      {/* CTA */}
-      <div style={{
-        marginTop: 40, padding: "28px 32px", borderRadius: 16,
-        background: "linear-gradient(135deg, rgba(255,107,53,0.08) 0%, rgba(255,107,53,0.03) 100%)",
-        border: "1px solid rgba(255,107,53,0.2)", textAlign: "center",
-      }}>
-        <div style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)", marginBottom: 8, letterSpacing: "-0.02em" }}>
-          Submit your tool free at NextBigTool
-        </div>
-        <p style={{ fontSize: 14, color: "var(--ink-muted)", margin: "0 0 20px", lineHeight: 1.6 }}>
-          No credit card. No queue. Instant listing with a DR 70+ backlink.
-        </p>
-        <a
-          href="/dashboard/products"
-          style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            padding: "12px 28px", borderRadius: 10,
-            background: "#FF6B35", color: "#fff",
-            textDecoration: "none", fontSize: 14, fontWeight: 700,
-          }}
-        >
-          List Your Tool Free
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </a>
-      </div>
 
     </ComparePageLayout>
   );

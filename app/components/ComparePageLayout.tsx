@@ -2,6 +2,7 @@ import TopNav from "./TopNav";
 import Footer from "./Footer";
 import TableOfContents from "./blog/TableOfContents";
 import LaunchCTABox from "./blog/LaunchCTABox";
+import CompareCtaBlock from "./CompareCtaBlock";
 import Link from "next/link";
 
 type TocItem = { id: string; text: string };
@@ -120,6 +121,7 @@ export default function ComparePageLayout({
           {/* CENTER: Content */}
           <article className="compare-article">
             {children}
+            <CompareCtaBlock />
           </article>
 
           {/* RIGHT: Launch CTA */}
