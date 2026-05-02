@@ -15,10 +15,13 @@ function createTransporter() {
   });
 }
 
+const NBT_LOGO = `<div style="margin-bottom:24px;"><a href="https://www.nextbigtool.com" style="font-size:15px;font-weight:900;color:#FF6B35;text-decoration:none;letter-spacing:-0.02em;">NextBigTool</a></div>`;
+
 function buildUpvoteHtml(toolName: string, toolSlug: string) {
   const toolUrl = `https://www.nextbigtool.com/tools/${toolSlug}`;
   return `
     <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#0A0B1A;color:#fff;border-radius:12px;">
+      ${NBT_LOGO}
       <div style="margin-bottom:20px;">
         <div style="display:inline-block;background:rgba(255,107,53,0.15);border:1px solid rgba(255,107,53,0.4);border-radius:99px;padding:4px 12px;font-size:11px;font-weight:700;color:#FF6B35;letter-spacing:0.06em;text-transform:uppercase;">
           🔺 New Upvote
@@ -28,13 +31,13 @@ function buildUpvoteHtml(toolName: string, toolSlug: string) {
         Someone upvoted <span style="color:#FF6B35;">${toolName}</span>!
       </h1>
       <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:0 0 28px;line-height:1.6;">
-        Your product is getting traction. Keep sharing it to get more eyes on it.
+        Your product is getting traction on NextBigTool. Keep sharing it to get more eyes on it.
       </p>
       <a href="${toolUrl}" style="display:inline-block;padding:12px 24px;background:linear-gradient(90deg,#FF6B35,#ff3d88);color:#fff;text-decoration:none;border-radius:9px;font-weight:700;font-size:13px;">
         View your product →
       </a>
       <div style="margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07);font-size:11px;color:rgba(255,255,255,0.3);">
-        You're receiving this because you listed <strong style="color:rgba(255,255,255,0.5);">${toolName}</strong> on Next Big Tool.
+        You're receiving this because you listed <strong style="color:rgba(255,255,255,0.5);">${toolName}</strong> on <a href="https://www.nextbigtool.com" style="color:#FF6B35;text-decoration:none;">NextBigTool</a>.
       </div>
     </div>
   `;
@@ -44,6 +47,7 @@ function buildCommentHtml(toolName: string, toolSlug: string, comment: string, c
   const toolUrl = `https://www.nextbigtool.com/tools/${toolSlug}`;
   return `
     <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#0A0B1A;color:#fff;border-radius:12px;">
+      ${NBT_LOGO}
       <div style="margin-bottom:20px;">
         <div style="display:inline-block;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.4);border-radius:99px;padding:4px 12px;font-size:11px;font-weight:700;color:#8B5CF6;letter-spacing:0.06em;text-transform:uppercase;">
           💬 New Comment
@@ -53,7 +57,7 @@ function buildCommentHtml(toolName: string, toolSlug: string, comment: string, c
         New comment on <span style="color:#8B5CF6;">${toolName}</span>
       </h1>
       <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:0 0 20px;">
-        <strong style="color:rgba(255,255,255,0.7);">${commenterName}</strong> left a comment:
+        <strong style="color:rgba(255,255,255,0.7);">${commenterName}</strong> left a comment on your NextBigTool listing:
       </p>
       <div style="background:rgba(255,255,255,0.05);border-left:3px solid #8B5CF6;border-radius:0 8px 8px 0;padding:14px 16px;margin-bottom:28px;font-size:14px;color:rgba(255,255,255,0.85);line-height:1.6;">
         ${comment}
@@ -62,7 +66,7 @@ function buildCommentHtml(toolName: string, toolSlug: string, comment: string, c
         Reply to comment →
       </a>
       <div style="margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07);font-size:11px;color:rgba(255,255,255,0.3);">
-        You're receiving this because you listed <strong style="color:rgba(255,255,255,0.5);">${toolName}</strong> on Next Big Tool.
+        You're receiving this because you listed <strong style="color:rgba(255,255,255,0.5);">${toolName}</strong> on <a href="https://www.nextbigtool.com" style="color:#FF6B35;text-decoration:none;">NextBigTool</a>.
       </div>
     </div>
   `;
@@ -115,14 +119,14 @@ export async function POST(request: Request) {
       await transporter.sendMail({
         from: `"Next Big Tool" <${process.env.ZOHO_EMAIL}>`,
         to: profile.email,
-        subject: `🔺 ${tool.name} just received an upvote!`,
+        subject: `🔺 [NextBigTool] ${tool.name} just received an upvote!`,
         html: buildUpvoteHtml(tool.name, tool.slug),
       });
     } else if (type === "comment") {
       await transporter.sendMail({
         from: `"Next Big Tool" <${process.env.ZOHO_EMAIL}>`,
         to: profile.email,
-        subject: `💬 New comment on ${tool.name}`,
+        subject: `💬 [NextBigTool] New comment on ${tool.name}`,
         html: buildCommentHtml(tool.name, tool.slug, comment ?? "", commenterName ?? "Someone"),
       });
     }
