@@ -21,6 +21,7 @@ import Footer from "./components/Footer";
 import FilterBar from "./components/FilterBar";
 import SubmissionNudge, { type NudgeSubmission } from "./components/SubmissionNudge";
 import HofUpgradeBtn from "./components/HofUpgradeBtn";
+import NewsletterForm from "./components/NewsletterForm";
 
 
 type ToolRow = {
@@ -503,20 +504,7 @@ export default async function HomePage({
               <span style={{ fontSize: 10, color: "rgba(255,255,255,0.65)", display: "block", marginBottom: 10 }}>
                 Hand-picked indie tools worth your attention — no spam, unsubscribe anytime.
               </span>
-              <div
-                style={{
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  borderRadius: 6,
-                  padding: "8px 10px",
-                  background: "rgba(255,255,255,0.06)",
-                  fontSize: 12,
-                  color: "rgba(255,255,255,0.45)",
-                  marginBottom: 8,
-                }}
-              >
-                name@company.com
-              </div>
-              <Btn variant="primary" size="sm" full>Subscribe</Btn>
+              <NewsletterForm source="home-sidebar" dark />
             </div>
 
             {/* Hall of Fame promo */}
