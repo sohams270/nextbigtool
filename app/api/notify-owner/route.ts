@@ -14,7 +14,7 @@ function createTransporter() {
   });
 }
 
-const NBT_LOGO = `<div style="margin-bottom:24px;"><a href="https://www.nextbigtool.com" style="font-size:15px;font-weight:900;color:#FF6B35;text-decoration:none;letter-spacing:-0.02em;">NextBigTool</a></div>`;
+const NBT_LOGO = `<div style="margin-bottom:24px;"><a href="https://www.nextbigtool.com" style="display:inline-block;text-decoration:none;"><img src="https://www.nextbigtool.com/logo-white.png" alt="NextBigTool" width="160" style="display:block;height:auto;" /></a></div>`;
 
 function buildUpvoteHtml(toolName: string, toolSlug: string) {
   const toolUrl = `https://www.nextbigtool.com/tools/${toolSlug}`;
