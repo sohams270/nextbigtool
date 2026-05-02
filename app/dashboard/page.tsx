@@ -253,8 +253,14 @@ export default async function DashboardPage() {
 
       {/* My Products preview */}
       <div style={card}>
-        <div style={{ marginBottom: 16 }}>
+        <div style={{ marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>My Products</div>
+          <div style={{ fontSize: 11, color: "var(--ink-muted)", display: "flex", alignItems: "center", gap: 4 }}>
+            Want to remove a tool?{" "}
+            <a href="mailto:soham@nextbigtool.com" style={{ color: "#FF6B35", textDecoration: "none", fontWeight: 600 }}>
+              soham@nextbigtool.com
+            </a>
+          </div>
         </div>
         {myTools.length === 0 ? (
           <div style={{ textAlign: "center", padding: "24px 0", color: "var(--ink-muted)" }}>

@@ -291,6 +291,19 @@ export default function AddYourToolPage() {
       setError(`Please complete the following required fields: ${missing.join(", ")}.`);
       return;
     }
+
+    // Check if website URL already exists
+    const normalizedUrl = form.website_url.replace(/\/+$/, "").toLowerCase();
+    const { data: existing } = await supabase
+      .from("tools")
+      .select("id")
+      .ilike("website_url", normalizedUrl)
+      .limit(1);
+    if (existing && existing.length > 0) {
+      setError("This product has already been submitted. Each product can only be listed once on NextBigTool.");
+      return;
+    }
+
     setSubmitting(true);
     setError("");
 
@@ -433,7 +446,21 @@ export default function AddYourToolPage() {
 
           <Field label="Website URL" required>
             <input style={inp} type="url" placeholder="https://yourproduct.com"
-              value={form.website_url} onChange={e => set("website_url", e.target.value)} />
+              value={form.website_url}
+              onChange={e => { set("website_url", e.target.value); setError(""); }}
+              onBlur={async () => {
+                if (!form.website_url) return;
+                const normalized = form.website_url.replace(/\/+$/, "").toLowerCase();
+                const { data } = await supabase
+                  .from("tools")
+                  .select("id")
+                  .ilike("website_url", normalized)
+                  .limit(1);
+                if (data && data.length > 0) {
+                  setError("This product has already been submitted. Each product can only be listed once on NextBigTool.");
+                }
+              }}
+            />
           </Field>
 
           <Field label="Product Name" required>
