@@ -17,8 +17,22 @@ export async function POST(
     return NextResponse.json({ ok: true, counted: false });
   }
 
-  // Increment view_count via RPC
   const supabase = createClient(cookieStore);
+
+  // Don't count if the visitor is the tool's own submitter
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    const { data: tool } = await supabase
+      .from("tools")
+      .select("submitter_id")
+      .eq("id", id)
+      .maybeSingle();
+    if (tool?.submitter_id === user.id) {
+      return NextResponse.json({ ok: true, counted: false });
+    }
+  }
+
+  // Increment view_count via RPC
   await supabase.rpc("increment_view_count", { tool_id: id });
 
   // Set cookie for 24 hours so the same browser doesn't count again
