@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import { cookies } from "next/headers";
-import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 
 function createTransporter() {
   return nodemailer.createTransport({
@@ -91,10 +90,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+  // Use admin client to bypass RLS — needed to read other users' profile emails
+  const supabase = createAdminClient();
 
-  // Fetch tool + owner email
+  // Fetch tool + owner
   const { data: tool } = await supabase
     .from("tools")
     .select("name, slug, submitter_id")
