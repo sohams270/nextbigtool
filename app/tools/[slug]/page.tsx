@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import TopNav from "@/app/components/TopNav";
 import Footer from "@/app/components/Footer";
@@ -10,6 +12,57 @@ import CopyLinkButton from "./CopyLinkButton";
 import { BLOG_POSTS } from "@/app/lib/blog-posts";
 
 type Props = { params: Promise<{ slug: string }> };
+
+/* ── Per-tool Open Graph metadata ─────────────────────────────────────── */
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+
+  const { data: tool } = await supabase
+    .from("tools")
+    .select("name, tagline, description, logo_url, website_url")
+    .eq("slug", slug)
+    .eq("status", "approved")
+    .maybeSingle();
+
+  if (!tool) {
+    return { title: "Tool not found — Next Big Tool" };
+  }
+
+  // Use uploaded logo, or fall back to Clearbit favicon
+  let image = tool.logo_url;
+  if (!image && tool.website_url) {
+    try {
+      const domain = new URL(tool.website_url).hostname.replace(/^www\./, "");
+      image = `https://logo.clearbit.com/${domain}`;
+    } catch { /* no-op */ }
+  }
+
+  const title = `${tool.name} — Next Big Tool`;
+  const description = tool.tagline
+    ?? tool.description?.slice(0, 155)
+    ?? `Discover ${tool.name} on Next Big Tool.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://www.nextbigtool.com/tools/${slug}`,
+      siteName: "Next Big Tool",
+      ...(image ? { images: [{ url: image, width: 400, height: 400, alt: tool.name }] } : {}),
+      type: "website",
+    },
+    twitter: {
+      card: image ? "summary" : "summary",
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
+    },
+  };
+}
 
 function pricingLabel(p: string) {
   const map: Record<string, string> = { free: "Free", freemium: "Freemium", paid: "Paid", contact: "Contact" };
@@ -29,7 +82,6 @@ function isVideoUrl(url: string) {
 
 export default async function ToolPage({ params }: Props) {
   const { slug } = await params;
-  const { cookies } = await import("next/headers");
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
