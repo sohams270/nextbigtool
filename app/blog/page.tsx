@@ -8,8 +8,8 @@ import BlogHero from "../components/BlogHero";
 import type { BlogPost } from "../lib/blog-posts";
 
 export const metadata: Metadata = {
-  title: "Blog — Next Big Tool",
-  description: "Launch strategies, growth playbooks, and founder lessons — no fluff, just signal.",
+  title: "Blog – Indie Founder Tips & Tool Discovery | NextBigTool",
+  description: "Founder strategy, launch playbooks, and tool discovery insights from the NextBigTool team. Built for builders and buyers.",
 };
 
 export const revalidate = 60; // ISR: revalidate every 60s

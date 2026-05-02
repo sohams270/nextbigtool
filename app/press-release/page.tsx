@@ -4,8 +4,8 @@ import Footer from "../components/Footer";
 import PressReleaseHero from "../components/PressReleaseHero";
 
 export const metadata: Metadata = {
-  title: "Press Release — Next Big Tool",
-  description: "Publish a press release and put your product in front of thousands of founders, builders, and early adopters on Next Big Tool.",
+  title: "Press Release – NextBigTool in the News",
+  description: "Read official announcements and press coverage about NextBigTool. Built for indie founders and the tools worth talking about.",
 };
 
 const BENEFITS = [

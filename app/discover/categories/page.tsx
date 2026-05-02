@@ -8,8 +8,8 @@ import DiscoverSidebar from "../../components/DiscoverSidebar";
 import DiscoverHero from "../../components/DiscoverHero";
 
 export const metadata: Metadata = {
-  title: "Browse by Category — Next Big Tool",
-  description: "Explore indie tools sorted by category — find exactly what you need.",
+  title: "Browse Tool Categories – Discover Indie Software | NextBigTool",
+  description: "Explore indie tools by category on NextBigTool. Find curated software across productivity, marketing, dev tools, and more.",
 };
 
 export const revalidate = 60;

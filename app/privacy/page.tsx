@@ -5,8 +5,8 @@ import Footer from "@/app/components/Footer";
 import { BLOG_POSTS } from "@/app/lib/blog-posts";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Next Big Tool",
-  description: "Read the Next Big Tool privacy policy to understand how we collect, use, and protect your personal data.",
+  title: "Privacy Policy | NextBigTool",
+  description: "Read NextBigTool's privacy policy to understand how we collect, use, and protect your data.",
 };
 
 const SECTIONS = [

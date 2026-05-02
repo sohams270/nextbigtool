@@ -8,9 +8,8 @@ import AuthTriggerButton from "@/app/components/AuthTriggerButton";
 import { BLOG_POSTS } from "@/app/lib/blog-posts";
 
 export const metadata: Metadata = {
-  title: "How Next Big Tool Works — Rules and Guidelines",
-  description:
-    "Everything you need to know about how Next Big Tool works, including rules for founders, users, and the community. Read before you launch or engage.",
+  title: "Listing Rules & Guidelines | NextBigTool",
+  description: "Understand the rules for listing your product on NextBigTool. Keep our directory fair, curated, and useful for every buyer.",
 };
 
 type HofTool = {

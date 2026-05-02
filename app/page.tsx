@@ -3,8 +3,8 @@ import { cookies } from "next/headers";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "NextBigTool | Where Indie Founders Launch and Buyers Discover",
-  description: "The product discovery platform for indie founders. List your tool, build in public, and connect with people genuinely interested.",
+  title: "NextBigTool – Where Indie Founders Launch & Buyers Discover",
+  description: "NextBigTool is where indie founders launch their products and buyers discover the tools worth knowing about. Find your next tool today.",
 };
 
 export const dynamic = "force-dynamic";

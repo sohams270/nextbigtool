@@ -20,8 +20,8 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Next Big Tool — Where Builders Launch. Where Buyers Discover.",
-  description: "Find the next big thing before it goes mainstream. Or launch your product to an audience that gets it.",
+  title: "NextBigTool",
+  description: "Where indie founders launch and buyers discover the tools worth knowing about. Explore NextBigTool.",
   icons: {
     icon: [
       { url: "/favicon.ico",        sizes: "any" },

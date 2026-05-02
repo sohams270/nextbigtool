@@ -5,8 +5,8 @@ import Footer from "@/app/components/Footer";
 import { BLOG_POSTS } from "@/app/lib/blog-posts";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Next Big Tool",
-  description: "Read the Next Big Tool Terms of Service to understand your rights and responsibilities when using the platform.",
+  title: "Terms of Service | NextBigTool",
+  description: "Review the terms of service for using NextBigTool, the indie product launch and discovery platform.",
 };
 
 const SECTIONS = [

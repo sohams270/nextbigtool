@@ -9,8 +9,8 @@ import HofUpgradeBtn from "../../components/HofUpgradeBtn";
 import DiscoverHero from "../../components/DiscoverHero";
 
 export const metadata: Metadata = {
-  title: "Hall of Fame — Next Big Tool",
-  description: "The best indie tools, permanently inducted by the NextBigTool community.",
+  title: "Hall of Fame – Top Indie Tools on NextBigTool",
+  description: "The NextBigTool Hall of Fame spotlights the best-performing indie products. Permanent placement, evergreen visibility.",
 };
 
 export const revalidate = 60;

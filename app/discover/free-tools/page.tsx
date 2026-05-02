@@ -8,8 +8,8 @@ import DiscoverSidebar from "../../components/DiscoverSidebar";
 import DiscoverHero from "../../components/DiscoverHero";
 
 export const metadata: Metadata = {
-  title: "Free Tools — Next Big Tool",
-  description: "Browse all free indie tools — no credit card, no trial, just free.",
+  title: "Free Indie Tools – Discover No-Cost Software | NextBigTool",
+  description: "Browse free indie tools on NextBigTool. Handpicked software you can use at no cost, found before they go mainstream.",
 };
 
 export const revalidate = 60;

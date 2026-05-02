@@ -9,9 +9,8 @@ import FaqAccordion from "@/app/components/FaqAccordion";
 import { BLOG_POSTS } from "@/app/lib/blog-posts";
 
 export const metadata: Metadata = {
-  title: "Frequently Asked Questions | Next Big Tool",
-  description:
-    "Got questions about Next Big Tool? Find answers about how the platform works, how to submit your product, pricing, the Founder CRM, and more.",
+  title: "FAQ – NextBigTool Help & Common Questions",
+  description: "Get answers about listing your product, plans, the Founder CRM, Hall of Fame, and more on NextBigTool.",
 };
 
 const FAQ_SECTIONS = [
