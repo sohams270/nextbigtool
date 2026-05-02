@@ -154,10 +154,10 @@ export default function CRMClient({
             Founder's CRM · Core Feature
           </div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: "var(--ink)", margin: "0 0 6px", letterSpacing: "-0.02em" }}>
-            Interested Users
+            Your Warm Leads
           </h1>
-          <p style={{ fontSize: 13, color: "var(--ink-muted)", margin: 0 }}>
-            People who upvoted your products — with enriched contact info.
+          <p style={{ fontSize: 13, color: "var(--ink-muted)", margin: 0, maxWidth: 480, lineHeight: 1.6 }}>
+            Every person who upvoted your product is a potential customer. See who they are, where they work, and how to reach them.
           </p>
         </div>
 
@@ -300,7 +300,7 @@ export default function CRMClient({
         {/* Rows */}
         {filtered.length === 0 ? (
           <div style={{ padding: "48px 20px", textAlign: "center", color: "var(--ink-muted)", fontSize: 14 }}>
-            {leads.length === 0 ? "No upvotes yet — share your product to get your first leads!" : "No results match your search."}
+            {leads.length === 0 ? "No leads yet. Share your product link to start building your pipeline." : "No results match your search."}
           </div>
         ) : (
           filtered.map((lead, i) => (
@@ -399,10 +399,10 @@ export default function CRMClient({
                 </svg>
               </div>
               <div style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)", marginBottom: 8 }}>
-                Unlock Founder's CRM
+                Turn Upvotes Into Conversations
               </div>
               <p style={{ fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.6, marginBottom: 20 }}>
-                See the name, email, company and role of everyone who upvotes your products. Available on Core and Premium plans.
+                You're getting interest — but you can't act on it yet. Upgrade to Core to unlock the name, email, company, and role of every person who upvoted your product.
               </p>
               <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
                 <a href="/dashboard/plan" style={{ textDecoration: "none" }}>
@@ -429,7 +429,7 @@ export default function CRMClient({
               </div>
               {leads.length > 0 && (
                 <div style={{ marginTop: 14, fontSize: 12, color: "var(--ink-muted)" }}>
-                  Your data is waiting · {leads.length} contact{leads.length !== 1 ? "s" : ""} pending reveal
+                  {leads.length} {leads.length === 1 ? "person has" : "people have"} already shown interest — their details are waiting for you
                 </div>
               )}
             </div>
