@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import TopNav from "../components/TopNav";
 import Footer from "../components/Footer";
 import Link from "next/link";
+import AuthModal from "../components/AuthModal";
+import { createClient } from "@/utils/supabase/client";
 
 /* ─── Toggle ──────────────────────────────────────────────────────────── */
 function Toggle({ yearly, onChange }: { yearly: boolean; onChange: (v: boolean) => void }) {
@@ -119,10 +122,35 @@ function FaqAccordion() {
 /* ─── Main Page ───────────────────────────────────────────────────────── */
 export default function PricingPage() {
   const [yearly, setYearly] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const [userId, setUserId] = useState<string | null | undefined>(undefined);
+  const router = useRouter();
   const corePrice = yearly ? "$29" : "$49";
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data: { user } }) => setUserId(user?.id ?? null));
+  }, []);
+
+  function handleFree() {
+    if (userId) {
+      router.push("/dashboard");
+    } else {
+      setShowAuth(true);
+    }
+  }
+
+  function handleCore() {
+    if (userId) {
+      // Payment not enabled yet — show a friendly alert
+      alert("Payment coming soon! We'll notify you when Core is available.");
+    } else {
+      setShowAuth(true);
+    }
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)", fontFamily: "Inter, sans-serif" }}>
+      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
       <TopNav />
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 32px 80px", width: "100%" }}>
@@ -158,11 +186,9 @@ export default function PricingPage() {
                 </div>
               ))}
             </div>
-            <Link href="/auth/login" style={{ textDecoration: "none" }}>
-              <button style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "1.5px solid var(--border)", background: "transparent", fontSize: 14, fontWeight: 700, color: "var(--ink-2)", cursor: "pointer", fontFamily: "inherit" }}>
-                Get Started Free
-              </button>
-            </Link>
+            <button onClick={handleFree} style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "1.5px solid var(--border)", background: "transparent", fontSize: 14, fontWeight: 700, color: "var(--ink-2)", cursor: "pointer", fontFamily: "inherit" }}>
+              Get Started Free
+            </button>
           </div>
 
           {/* CORE */}
@@ -216,11 +242,9 @@ export default function PricingPage() {
                 </div>
               ))}
             </div>
-            <a href={`/api/checkout?interval=${yearly ? "yearly" : "monthly"}`} style={{ textDecoration: "none" }}>
-              <button style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", background: "#fff", fontSize: 14, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
-                Upgrade to Core →
-              </button>
-            </a>
+            <button onClick={handleCore} style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", background: "#fff", fontSize: 14, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
+              Upgrade to Core →
+            </button>
           </div>
         </div>
 
@@ -248,22 +272,18 @@ export default function PricingPage() {
                 <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>FREE</div>
                 <div style={{ fontSize: 20, fontWeight: 900, color: "var(--ink)", letterSpacing: "-0.03em", marginBottom: 2 }}>$0</div>
                 <div style={{ fontSize: 11, color: "var(--ink-muted)", marginBottom: 12 }}>forever</div>
-                <Link href="/auth/login" style={{ textDecoration: "none" }}>
-                  <button style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "1.5px solid var(--border)", background: "transparent", fontSize: 12, fontWeight: 700, color: "var(--ink-2)", cursor: "pointer", fontFamily: "inherit" }}>
-                    Get Started
-                  </button>
-                </Link>
+                <button onClick={handleFree} style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "1.5px solid var(--border)", background: "transparent", fontSize: 12, fontWeight: 700, color: "var(--ink-2)", cursor: "pointer", fontFamily: "inherit" }}>
+                  Get Started
+                </button>
               </div>
               {/* CORE col header */}
               <div style={{ padding: "20px 16px", borderLeft: "1px solid #e5e5e3", textAlign: "center", background: "rgba(255,107,53,0.05)" }}>
                 <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "#FF6B35", marginBottom: 4 }}>CORE</div>
                 <div style={{ fontSize: 20, fontWeight: 900, color: "var(--ink)", letterSpacing: "-0.03em", marginBottom: 2 }}>{corePrice}</div>
                 <div style={{ fontSize: 11, color: "var(--ink-muted)", marginBottom: 12 }}>/month · unlimited</div>
-                <Link href="/auth/login" style={{ textDecoration: "none" }}>
-                  <button style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "none", background: "#FF6B35", fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
-                    Start Core
-                  </button>
-                </Link>
+                <button onClick={handleCore} style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "none", background: "#FF6B35", fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
+                  Start Core
+                </button>
               </div>
             </div>
 
