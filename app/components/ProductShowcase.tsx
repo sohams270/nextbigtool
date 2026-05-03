@@ -658,7 +658,8 @@ export default function ProductShowcase({
     );
   }
 
-  const [hero, mini1, mini2, ...rest] = tools;
+  const newlyAdded = tools.slice(0, 10);
+  const climbingCharts = tools.slice(10, 20);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
@@ -776,25 +777,26 @@ export default function ProductShowcase({
             </div>
           </div>
 
-          {/* Ranked list — same layout as Trending */}
+          {/* Ranked list — 10 tools */}
           <ol style={{
             display: "flex", flexDirection: "column", gap: 0,
             border: "1px solid var(--border)", borderRadius: 16,
             background: "var(--surface)", overflow: "hidden",
             listStyle: "none", margin: 0, padding: 0,
           }}>
-            {[hero, mini1, mini2].filter((t): t is ShowcaseTool => !!t).map((t, i) => (
+            {newlyAdded.map((t, i) => (
               <RankedRow
                 key={t.id} tool={t} rank={i + 1}
                 userId={userId} isUpvoted={userUpvotedIds.includes(t.id)}
               />
             ))}
+            <style>{`ol li:last-child { border-bottom: none !important; }`}</style>
           </ol>
         </div>
       )}
 
       {/* ── Trending This Week ───────────────────────────────────── */}
-      {rest.length > 0 && (
+      {climbingCharts.length > 0 && (
         <div>
           {/* Section header */}
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 16 }}>
@@ -811,21 +813,18 @@ export default function ProductShowcase({
                 Climbing the charts
               </h3>
             </div>
-            <Link href="/discover/categories" style={{ fontSize: 12.5, fontWeight: 600, color: "#ff6a3d", textDecoration: "none" }}>
-              See all →
-            </Link>
           </div>
 
-          {/* Compact ranked rows — up to 10 */}
+          {/* Compact ranked rows — 10 tools */}
           <ol style={{
             display: "flex", flexDirection: "column", gap: 0,
             border: "1px solid var(--border)", borderRadius: 16,
             background: "var(--surface)", overflow: "hidden",
             listStyle: "none", margin: 0, padding: 0,
           }}>
-            {rest.slice(0, 10).map((t, i) => (
+            {climbingCharts.map((t, i) => (
               <RankedRow
-                key={t.id} tool={t} rank={i + 4}
+                key={t.id} tool={t} rank={i + 11}
                 userId={userId} isUpvoted={userUpvotedIds.includes(t.id)}
                 compact
               />
