@@ -5,7 +5,6 @@ import { createClient } from "@/utils/supabase/server";
 import TopNav from "@/app/components/TopNav";
 import Footer from "@/app/components/Footer";
 import AuthTriggerButton from "@/app/components/AuthTriggerButton";
-import { BLOG_POSTS } from "@/app/lib/blog-posts";
 
 export const metadata: Metadata = {
   title: "About NextBigTool – Built for Founders & Tool Buyers",
@@ -62,7 +61,21 @@ export default async function AboutPage() {
     .filter((t: any) => !hofIds.has(t.id))
     .slice(0, 5) as FeaturedTool[];
 
-  const latestPosts = BLOG_POSTS.slice(0, 3);
+  // Latest 3 published blog posts from DB
+  const { data: blogRows } = await supabase
+    .from("cms_blog_posts")
+    .select("id, title, slug, excerpt, read_time, publish_date, created_at")
+    .eq("status", "published")
+    .order("publish_date", { ascending: false })
+    .limit(3);
+
+  const latestPosts = (blogRows ?? []).map((p: any) => ({
+    slug: p.slug ?? p.id,
+    title: p.title as string,
+    excerpt: (p.excerpt ?? "") as string,
+    date: new Date(p.publish_date ?? p.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+    readTime: (p.read_time ?? "5 min") as string,
+  }));
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
@@ -306,8 +319,10 @@ export default async function AboutPage() {
                 <Link href="/blog" style={{ fontSize: 10, fontWeight: 700, color: "#FF6B35", textDecoration: "none" }}>View all →</Link>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {latestPosts.map((post, i) => (
-                  <Link key={post.slug} href="/blog" style={{ textDecoration: "none" }}>
+                {latestPosts.length === 0 ? (
+                  <p style={{ fontSize: 11, color: "var(--ink-muted)", margin: 0 }}>No posts yet.</p>
+                ) : latestPosts.map((post, i) => (
+                  <Link key={post.slug} href={`/blog/${post.slug}`} style={{ textDecoration: "none" }}>
                     <div style={{ paddingBottom: i < latestPosts.length - 1 ? 12 : 0, borderBottom: i < latestPosts.length - 1 ? "1px solid var(--border-faint)" : "none" }}>
                       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
@@ -328,9 +343,9 @@ export default async function AboutPage() {
               <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ink-muted)", marginBottom: 12 }}>Quick Links</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {[
-                  { label: "Browse all tools", href: "/" },
+                  { label: "Browse all tools", href: "/discover/categories" },
                   { label: "Pricing", href: "/pricing" },
-                  { label: "Hall of Fame", href: "/discover?tab=hall-of-fame" },
+                  { label: "Hall of Fame", href: "/discover/hall-of-fame" },
                   { label: "Contact us", href: "/contact" },
                 ].map(({ label, href }) => (
                   <Link key={label} href={href} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 10px", borderRadius: 9, border: "1px solid var(--border)", background: "var(--surface-dim)", textDecoration: "none", fontSize: 12, fontWeight: 600, color: "var(--ink)" }}>
