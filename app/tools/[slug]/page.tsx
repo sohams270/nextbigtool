@@ -10,7 +10,6 @@ import UpvoteBox from "@/app/components/UpvoteBox";
 import CommentSection from "./CommentSection";
 import CopyLinkButton from "./CopyLinkButton";
 import ViewTracker from "@/app/components/ViewTracker";
-import { BLOG_POSTS } from "@/app/lib/blog-posts";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -203,7 +202,17 @@ export default async function ToolPage({ params }: Props) {
   });
 
   const pb = pricingBadge(tool.pricing);
-  const latestPosts = BLOG_POSTS.slice(0, 3);
+
+  // Latest blog posts from DB
+  const { data: blogRows } = await supabase
+    .from("cms_blog_posts")
+    .select("title, slug, excerpt, seo_description, author, read_time, publish_date, featured_image_url")
+    .eq("status", "published")
+    .order("publish_date", { ascending: false })
+    .limit(3);
+
+  type LatestPost = { title: string; slug: string; excerpt: string; seo_description: string | null; author: string; read_time: string; publish_date: string | null; featured_image_url: string | null };
+  const latestPosts: LatestPost[] = (blogRows ?? []) as LatestPost[];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
@@ -634,26 +643,40 @@ export default async function ToolPage({ params }: Props) {
                   View all →
                 </Link>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {latestPosts.map((post, i) => (
-                  <Link key={post.slug} href="/blog" style={{ textDecoration: "none" }}>
-                    <div style={{ paddingBottom: i < latestPosts.length - 1 ? 12 : 0, borderBottom: i < latestPosts.length - 1 ? "1px solid var(--border-faint)" : "none" }}>
-                      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink)", lineHeight: 1.4, marginBottom: 4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
-                            {post.title}
+              {latestPosts.length === 0 ? (
+                <p style={{ fontSize: 11, color: "var(--ink-muted)", margin: 0 }}>No posts yet — check back soon.</p>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {latestPosts.map((post, i) => {
+                    const blurb = (post.seo_description || post.excerpt || "").trim();
+                    const date = post.publish_date
+                      ? new Date(post.publish_date).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+                      : "";
+                    return (
+                      <Link key={post.slug} href={`/blog/${post.slug}`} style={{ textDecoration: "none" }}>
+                        <div style={{ paddingBottom: i < latestPosts.length - 1 ? 12 : 0, borderBottom: i < latestPosts.length - 1 ? "1px solid var(--border-faint)" : "none" }}>
+                          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink)", lineHeight: 1.4, marginBottom: 4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
+                                {post.title}
+                              </div>
+                              {blurb && (
+                                <div style={{ fontSize: 10, color: "var(--ink-muted)", lineHeight: 1.4, marginBottom: 5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
+                                  {blurb}
+                                </div>
+                              )}
+                              <div style={{ fontSize: 10, color: "var(--ink-faint)" }}>
+                                {[date, post.read_time ? `${post.read_time} read` : ""].filter(Boolean).join(" · ")}
+                              </div>
+                            </div>
+                            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="#FF6B35" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}><path d="M7 17L17 7M9 7h8v8"/></svg>
                           </div>
-                          <div style={{ fontSize: 10, color: "var(--ink-muted)", lineHeight: 1.4, marginBottom: 5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
-                            {post.excerpt}
-                          </div>
-                          <div style={{ fontSize: 10, color: "var(--ink-faint)" }}>{post.date} · {post.readTime} read</div>
                         </div>
-                        <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="#FF6B35" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}><path d="M7 17L17 7M9 7h8v8"/></svg>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
           </div>
