@@ -810,7 +810,7 @@ export default function ProductShowcase({
                 Climbing the charts
               </h3>
             </div>
-            <Link href="/discover" style={{ fontSize: 12.5, fontWeight: 600, color: "#ff6a3d", textDecoration: "none" }}>
+            <Link href="/discover/categories" style={{ fontSize: 12.5, fontWeight: 600, color: "#ff6a3d", textDecoration: "none" }}>
               See all →
             </Link>
           </div>
