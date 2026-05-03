@@ -18,7 +18,7 @@ const NBT_LOGO = `<div style="margin-bottom:24px;"><a href="https://www.nextbigt
 
 function buildUpvoteHtml(toolName: string, toolSlug: string) {
   const toolUrl = `https://www.nextbigtool.com/tools/${toolSlug}`;
-  const crmUrl = `https://www.nextbigtool.com/dashboard/founder-crm`;
+  const crmUrl = `https://www.nextbigtool.com/dashboard`;
   const upgradeUrl = `https://www.nextbigtool.com/pricing`;
   return `
     <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#0A0B1A;color:#fff;border-radius:12px;">
@@ -53,7 +53,7 @@ function buildUpvoteHtml(toolName: string, toolSlug: string) {
         <p style="font-size:12px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.65;">
           Upgrade to <strong style="color:#FFD700;">Core</strong> to unlock the full upvoter details — name, email, company &amp; role — and start turning interest into real pipeline.
         </p>
-        <a href="${upgradeUrl}" style="display:inline-block;padding:9px 18px;background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.35);color:#FFD700;text-decoration:none;border-radius:8px;font-weight:700;font-size:12px;">
+        <a href="${upgradeUrl}" style="display:inline-block;padding:9px 18px;background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.35);color:#FF4444;text-decoration:none;border-radius:8px;font-weight:700;font-size:12px;">
           Upgrade to Core →
         </a>
       </div>
