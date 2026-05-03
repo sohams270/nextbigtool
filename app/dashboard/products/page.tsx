@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { sendAdminNotification } from "@/app/admin/actions";
 import Btn from "../../components/Btn";
 import Link from "next/link";
 
@@ -389,6 +390,15 @@ export default function AddYourToolPage() {
       }
 
       setDone(true);
+
+      // Notify admin — fire and forget, never blocks user
+      sendAdminNotification({
+        type:         "tool_submission",
+        toolName:     form.name,
+        tagline:      form.tagline,
+        plan:         "free",
+        website:      form.website_url,
+      }).catch(() => {});
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
