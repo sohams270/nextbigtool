@@ -395,7 +395,7 @@ export default function HallOfFamePage() {
                   border: nom.status === "approved" ? "2px solid #ffd700" : "1px solid var(--border)",
                 }}>
                   {nom.tools?.logo_url
-                    ? <img src={nom.tools.logo_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ? <img src={nom.tools.logo_url} alt="" style={{ width: "80%", height: "80%", objectFit: "contain", display: "block" }} />
                     : (nom.tools?.name[0] ?? "?")}
                 </div>
 
@@ -500,7 +500,7 @@ export default function HallOfFamePage() {
                     fontSize: 18, fontWeight: 800, color: "#fff",
                   }}>
                     {tool.logo_url
-                      ? <img src={tool.logo_url} alt={tool.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ? <img src={tool.logo_url} alt={tool.name} style={{ width: "80%", height: "80%", objectFit: "contain", display: "block" }} />
                       : tool.name[0]}
                   </div>
 

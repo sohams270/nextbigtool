@@ -102,7 +102,11 @@ function ProductLogo({
           border: "1px solid rgba(0,0,0,0.08)",
           boxShadow: "inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.06)",
           background: "#fff",
-          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: Math.round(size * 0.1),
+          boxSizing: "border-box",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -110,12 +114,9 @@ function ProductLogo({
           src={src}
           alt={`${tool.name} logo`}
           style={{
-            position: "absolute",
-            top: "-15%",
-            left: "-15%",
-            width: "130%",
-            height: "130%",
-            objectFit: "cover",
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
             display: "block",
           }}
           onError={() => setFailed(true)}

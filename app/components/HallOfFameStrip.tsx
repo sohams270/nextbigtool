@@ -109,7 +109,7 @@ export default async function HallOfFameStrip() {
                 border: "1.5px solid rgba(255,215,0,0.3)",
               }}>
                 {tool.logo_url
-                  ? <img src={tool.logo_url} alt={tool.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ? <img src={tool.logo_url} alt={tool.name} style={{ width: "80%", height: "80%", objectFit: "contain", display: "block" }} />
                   : tool.name[0]}
               </div>
 

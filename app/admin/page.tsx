@@ -272,7 +272,7 @@ export default async function AdminPage() {
                   border: "1px solid var(--border)",
                 }}>
                   {t.logo_url
-                    ? <img src={t.logo_url} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ? <img src={t.logo_url} alt={t.name} style={{ width: "80%", height: "80%", objectFit: "contain", display: "block" }} />
                     : t.name[0]}
                 </div>
 
@@ -386,7 +386,7 @@ export default async function AdminPage() {
                 border: "1.5px solid rgba(255,215,0,0.4)",
               }}>
                 {n.tools?.logo_url
-                  ? <img src={n.tools.logo_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ? <img src={n.tools.logo_url} alt="" style={{ width: "80%", height: "80%", objectFit: "contain", display: "block" }} />
                   : (n.tools?.name[0] ?? "?")}
               </div>
 
@@ -449,7 +449,7 @@ export default async function AdminPage() {
                   fontSize: 16, fontWeight: 800, color: "#fff", overflow: "hidden",
                 }}>
                   {n.tools?.logo_url
-                    ? <img src={n.tools.logo_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ? <img src={n.tools.logo_url} alt="" style={{ width: "80%", height: "80%", objectFit: "contain", display: "block" }} />
                     : (n.tools?.name?.[0] ?? "?")}
                 </div>
                 <div style={{ minWidth: 0 }}>

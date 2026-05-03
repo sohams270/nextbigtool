@@ -300,7 +300,7 @@ export default async function DashboardPage() {
                     {logoSrc ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={logoSrc} alt={t.name}
-                        style={{ position: "absolute", top: "-15%", left: "-15%", width: "130%", height: "130%", objectFit: "cover" }}
+                        style={{ width: "80%", height: "80%", objectFit: "contain", display: "block" }}
                       />
                     ) : t.name[0]}
                   </div>

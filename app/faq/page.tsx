@@ -254,7 +254,7 @@ export default async function FaqPage() {
                             <div style={{ width: 32, height: 32, borderRadius: 8, flexShrink: 0, overflow: "hidden", position: "relative", background: lSrc ? "#fff" : `hsl(${t.name.charCodeAt(0) * 7 % 360},60%,50%)`, border: "1px solid rgba(255,215,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: "#fff" }}>
                               {lSrc ? (
                                 // eslint-disable-next-line @next/next/no-img-element
-                                <img src={lSrc} alt={t.name} style={{ position: "absolute", top: "-15%", left: "-15%", width: "130%", height: "130%", objectFit: "cover" }} />
+                                <img src={lSrc} alt={t.name} style={{ width: "80%", height: "80%", objectFit: "contain", display: "block" }} />
                               ) : t.name[0]}
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
@@ -285,7 +285,7 @@ export default async function FaqPage() {
                           <div style={{ width: 30, height: 30, borderRadius: 7, flexShrink: 0, overflow: "hidden", position: "relative", background: lSrc ? "#fff" : `hsl(${t.name.charCodeAt(0) * 7 % 360},60%,50%)`, border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#fff" }}>
                             {lSrc ? (
                               // eslint-disable-next-line @next/next/no-img-element
-                              <img src={lSrc} alt={t.name} style={{ position: "absolute", top: "-15%", left: "-15%", width: "130%", height: "130%", objectFit: "cover" }} />
+                              <img src={lSrc} alt={t.name} style={{ width: "80%", height: "80%", objectFit: "contain", display: "block" }} />
                             ) : t.name[0]}
                           </div>
                           <div style={{ flex: 1, minWidth: 0 }}>
