@@ -357,7 +357,21 @@ export default function AddYourToolPage() {
         category_id = catRow?.id ?? null;
       }
 
-      const slug = toSlug(form.name) + "-" + ts.toString(36);
+      // Build a clean slug — only add numeric suffix on collision
+      let baseSlug = toSlug(form.name) || "tool-" + ts.toString(36);
+      let slug = baseSlug;
+      let attempt = 0;
+      while (true) {
+        const { data: existing } = await supabase
+          .from("tools")
+          .select("id")
+          .eq("slug", slug)
+          .maybeSingle();
+        if (!existing) break;
+        attempt++;
+        slug = `${baseSlug}-${attempt}`;
+      }
+
       const pricingNote = form.pricing_amount ? `~$${form.pricing_amount}/mo` : null;
 
       const { data: tool, error: toolErr } = await supabase
