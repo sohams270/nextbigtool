@@ -217,6 +217,9 @@ export default function AddYourToolPage() {
   const router = useRouter();
   const supabase = createClient();
   const [userId, setUserId] = useState<string | null>(null);
+  const [userPlan, setUserPlan] = useState<string>("free");
+  const [toolCount, setToolCount] = useState<number>(0);
+  const [planLoading, setPlanLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
@@ -252,9 +255,18 @@ export default function AddYourToolPage() {
   }
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) { router.push("/"); return; }
       setUserId(user.id);
+
+      // Fetch plan + existing tool count in parallel
+      const [profileRes, toolsRes] = await Promise.all([
+        supabase.from("profiles").select("plan").eq("id", user.id).single(),
+        supabase.from("tools").select("id", { count: "exact", head: true }).eq("submitter_id", user.id),
+      ]);
+      setUserPlan(profileRes.data?.plan ?? "free");
+      setToolCount(toolsRes.count ?? 0);
+      setPlanLoading(false);
     });
   }, []);
 
@@ -404,6 +416,49 @@ export default function AddYourToolPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  // ── Plan gate: free users limited to 1 tool ──
+  if (!planLoading && userPlan !== "core" && toolCount >= 1) {
+    return (
+      <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)", padding: "40px 24px" }}>
+        <div style={{
+          background: "var(--surface)", border: "1px solid var(--border)",
+          borderRadius: 20, padding: "48px 40px", maxWidth: 460, width: "100%", textAlign: "center",
+        }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: "50%",
+            background: "rgba(255,107,53,0.1)", border: "1.5px solid rgba(255,107,53,0.25)",
+            display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px",
+          }}>
+            <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#FF6B35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <div style={{ fontSize: 19, fontWeight: 800, color: "var(--ink)", marginBottom: 10, letterSpacing: "-0.02em" }}>
+            Upgrade to Core to list more tools
+          </div>
+          <p style={{ fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.65, margin: "0 0 28px" }}>
+            The Free plan includes <strong>1 product listing</strong>. You&apos;ve already used it.
+            Upgrade to Core for <strong>unlimited listings</strong>, Founder CRM, Hall of Fame placement, and more.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <a
+              href="/dashboard/plan"
+              style={{ display: "block", padding: "13px 0", borderRadius: 10, background: "#FF6B35", color: "#fff", fontSize: 14, fontWeight: 700, textDecoration: "none", textAlign: "center" }}
+            >
+              Upgrade to Core →
+            </a>
+            <a
+              href="/dashboard"
+              style={{ display: "block", padding: "11px 0", borderRadius: 10, border: "1px solid var(--border)", color: "var(--ink-muted)", fontSize: 13, fontWeight: 600, textDecoration: "none", textAlign: "center" }}
+            >
+              Back to Dashboard
+            </a>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   // ── Success screen ──
