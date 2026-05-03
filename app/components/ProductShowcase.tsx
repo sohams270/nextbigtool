@@ -658,8 +658,9 @@ export default function ProductShowcase({
     );
   }
 
-  const newlyAdded = tools.slice(0, 10);
-  const climbingCharts = tools.slice(10, 20);
+  const isTopSort = sort === "top";
+  const newlyAdded = isTopSort ? tools.slice(0, 50) : tools.slice(0, 10);
+  const climbingCharts = isTopSort ? [] : tools.slice(10, 20);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
@@ -777,7 +778,7 @@ export default function ProductShowcase({
             </div>
           </div>
 
-          {/* Ranked list — 10 tools */}
+          {/* Ranked list */}
           <ol style={{
             display: "flex", flexDirection: "column", gap: 0,
             border: "1px solid var(--border)", borderRadius: 16,
@@ -788,6 +789,7 @@ export default function ProductShowcase({
               <RankedRow
                 key={t.id} tool={t} rank={i + 1}
                 userId={userId} isUpvoted={userUpvotedIds.includes(t.id)}
+                compact={isTopSort && i >= 10}
               />
             ))}
             <style>{`ol li:last-child { border-bottom: none !important; }`}</style>
@@ -836,17 +838,17 @@ export default function ProductShowcase({
 
       {/* ── Footer ───────────────────────────────────────────────── */}
       <div style={{ display: "flex", justifyContent: "center", padding: "4px 0 8px" }}>
-        <Link href="/discover/categories" style={{
+        <a href="https://www.nextbigtool.com/discover/categories" style={{
           display: "inline-flex", alignItems: "center", gap: 8,
           padding: "11px 24px", borderRadius: 999,
           background: "var(--ink)", color: "var(--bg)",
           fontSize: 13, fontWeight: 600, textDecoration: "none",
         }}>
-          See all tools
+          See all tools →
           <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M5 12h14M13 6l6 6-6 6" />
           </svg>
-        </Link>
+        </a>
       </div>
 
       <style>{`

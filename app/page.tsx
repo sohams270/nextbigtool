@@ -196,7 +196,7 @@ export default async function HomePage({
         break;
     }
 
-    const { data: allTools } = await toolQuery.limit(20);
+    const { data: allTools } = await toolQuery.limit(sort === "top" ? 50 : 20);
     tools = (allTools ?? []) as unknown as ToolRow[];
 
     // "new" and "trending" (newly added) are chronological; "top" puts featured first
