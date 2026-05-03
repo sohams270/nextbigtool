@@ -124,6 +124,7 @@ export default function PricingPage() {
   const [yearly, setYearly] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const corePrice = yearly ? "$29" : "$49";
 
@@ -139,10 +140,23 @@ export default function PricingPage() {
     }
   }
 
-  function handleCore() {
+  async function handleCore() {
     if (userId) {
-      // Payment not enabled yet — show a friendly alert
-      alert("Payment coming soon! We'll notify you when Core is available.");
+      setLoading(true);
+      try {
+        const res = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ interval: yearly ? "yearly" : "monthly" }),
+        });
+        const data = await res.json();
+        if (!res.ok) { alert(data.error || "Could not initiate checkout."); setLoading(false); return; }
+        window.location.href = data.paymentLink;
+      } catch (err) {
+        console.error("Checkout error:", err);
+        alert("Something went wrong. Please try again.");
+        setLoading(false);
+      }
     } else {
       setShowAuth(true);
     }
@@ -242,8 +256,8 @@ export default function PricingPage() {
                 </div>
               ))}
             </div>
-            <button onClick={handleCore} style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", background: "#fff", fontSize: 14, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
-              Upgrade to Core →
+            <button onClick={handleCore} disabled={loading} style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", background: "#fff", fontSize: 14, fontWeight: 700, color: "#FF6B35", cursor: loading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: loading ? 0.7 : 1 }}>
+              {loading ? "Loading…" : "Upgrade to Core →"}
             </button>
           </div>
         </div>
@@ -281,8 +295,8 @@ export default function PricingPage() {
                 <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "#FF6B35", marginBottom: 4 }}>CORE</div>
                 <div style={{ fontSize: 20, fontWeight: 900, color: "var(--ink)", letterSpacing: "-0.03em", marginBottom: 2 }}>{corePrice}</div>
                 <div style={{ fontSize: 11, color: "var(--ink-muted)", marginBottom: 12 }}>/month · unlimited</div>
-                <button onClick={handleCore} style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "none", background: "#FF6B35", fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
-                  Start Core
+                <button onClick={handleCore} disabled={loading} style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "none", background: "#FF6B35", fontSize: 12, fontWeight: 700, color: "#fff", cursor: loading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: loading ? 0.7 : 1 }}>
+                  {loading ? "Loading…" : "Start Core"}
                 </button>
               </div>
             </div>
