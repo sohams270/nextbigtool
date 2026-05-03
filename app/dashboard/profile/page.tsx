@@ -53,6 +53,7 @@ export default function ProfilePage() {
   const [saving, setSaving]     = useState(false);
   const [saved, setSaved]       = useState(false);
   const [uploadProgress, setUploadProgress] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -184,6 +185,24 @@ export default function ProfilePage() {
 
   function ErrMsg({ k }: { k: string }) {
     return errors[k] ? <span style={{ fontSize: 11, color: "#dc2626", fontWeight: 600 }}>{errors[k]}</span> : null;
+  }
+
+  async function handleUpgrade() {
+    if (upgrading) return;
+    setUpgrading(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interval: "monthly" }),
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error || "Could not initiate checkout."); setUpgrading(false); return; }
+      window.location.href = data.paymentLink;
+    } catch {
+      alert("Something went wrong. Please try again.");
+      setUpgrading(false);
+    }
   }
 
   return (
@@ -404,22 +423,15 @@ export default function ProfilePage() {
             {plan !== "core" && (
               <div style={{ marginTop: 14, padding: 14, borderRadius: 10, background: "var(--surface-alt)", border: "1px solid var(--border)" }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink)", marginBottom: 8 }}>
-                  {plan === "free" ? "Unlock more features" : "Go further with Core"}
+                  Unlock more features
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {plan === "free" && (
-                    <Link href="/dashboard/plan" style={{ textDecoration: "none" }}>
-                      <button style={{ width: "100%", padding: "8px 0", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface)", fontSize: 12, fontWeight: 600, color: "var(--ink)", cursor: "pointer", fontFamily: "inherit" }}>
-                        Upgrade to Basic — $19
-                      </button>
-                    </Link>
-                  )}
-                  <Link href="/dashboard/plan" style={{ textDecoration: "none" }}>
-                    <button style={{ width: "100%", padding: "8px 0", borderRadius: 8, border: "none", background: "linear-gradient(90deg,#ff6a3d,#ff3d88)", fontSize: 12, fontWeight: 700, color: "#fff", cursor: "pointer", fontFamily: "inherit" }}>
-                      Upgrade to Core — $79/mo
-                    </button>
-                  </Link>
-                </div>
+                <button
+                  onClick={handleUpgrade}
+                  disabled={upgrading}
+                  style={{ width: "100%", padding: "8px 0", borderRadius: 8, border: "none", background: "linear-gradient(90deg,#ff6a3d,#ff3d88)", fontSize: 12, fontWeight: 700, color: "#fff", cursor: upgrading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: upgrading ? 0.7 : 1 }}
+                >
+                  {upgrading ? "Loading…" : "Upgrade to Core — $49/mo"}
+                </button>
               </div>
             )}
           </div>
