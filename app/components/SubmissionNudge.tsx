@@ -183,7 +183,7 @@ export default function SubmissionNudge({ submissions }: { submissions: NudgeSub
           </span>
         </div>
         <Link
-          href="/dashboard/products"
+          href="/dashboard"
           style={{
             fontSize: 11, fontWeight: 600,
             color: "var(--ink-muted)", textDecoration: "none",
