@@ -2,6 +2,26 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Razorpay: new (options: Record<string, unknown>) => { open(): void; on(event: string, cb: (data: unknown) => void): void };
+  }
+}
+
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (document.getElementById("razorpay-script")) { resolve(true); return; }
+    const script = document.createElement("script");
+    script.id  = "razorpay-script";
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload  = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 function Check({ dark }: { dark?: boolean }) {
   return (
@@ -90,6 +110,65 @@ const COMPARISON = [
 
 export default function PlanToggle({ currentPlan = "free" }: { currentPlan?: "free" | "core" }) {
   const [yearly, setYearly] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  async function handleUpgrade() {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const loaded = await loadRazorpayScript();
+      if (!loaded) { alert("Failed to load payment window. Please try again."); setLoading(false); return; }
+
+      // Create Razorpay subscription on server
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interval: yearly ? "yearly" : "monthly" }),
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error || "Could not initiate checkout."); setLoading(false); return; }
+
+      const { subscriptionId, keyId } = data as { subscriptionId: string; keyId: string };
+
+      const rzp = new window.Razorpay({
+        key:             keyId,
+        subscription_id: subscriptionId,
+        name:            "NextBigTool",
+        description:     `Core Plan — ${yearly ? "Yearly" : "Monthly"}`,
+        image:           "https://www.nextbigtool.com/favicon.ico",
+        theme:           { color: "#FF6B35" },
+        handler: async (response: unknown) => {
+          const { razorpay_payment_id, razorpay_subscription_id, razorpay_signature } =
+            response as { razorpay_payment_id: string; razorpay_subscription_id: string; razorpay_signature: string };
+
+          // Verify payment on server and upgrade plan
+          const verifyRes = await fetch("/api/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ razorpay_payment_id, razorpay_subscription_id, razorpay_signature }),
+          });
+          if (verifyRes.ok) {
+            router.push("/dashboard/plan?upgraded=1");
+          } else {
+            alert("Payment verified but upgrade failed. Please contact support.");
+          }
+        },
+        modal: { ondismiss: () => setLoading(false) },
+      });
+
+      rzp.on("payment.failed", () => {
+        alert("Payment failed. Please try again.");
+        setLoading(false);
+      });
+
+      rzp.open();
+    } catch (err) {
+      console.error("Checkout error:", err);
+      alert("Something went wrong. Please try again.");
+      setLoading(false);
+    }
+  }
 
   const PLANS = BASE_PLANS.map(p => ({
     ...p,
@@ -202,11 +281,13 @@ export default function PlanToggle({ currentPlan = "free" }: { currentPlan?: "fr
                   {plan.cta}
                 </button>
               ) : plan.isCore ? (
-                <a href={`/api/checkout?interval=${yearly ? "yearly" : "monthly"}`} style={{ textDecoration: "none" }}>
-                  <button style={{ width: "100%", padding: "10px 0", borderRadius: 9, border: "none", background: "#fff", fontSize: 13, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>
-                    {plan.cta}
-                  </button>
-                </a>
+                <button
+                  onClick={handleUpgrade}
+                  disabled={loading}
+                  style={{ width: "100%", padding: "10px 0", borderRadius: 9, border: "none", background: "#fff", fontSize: 13, fontWeight: 700, color: "#FF6B35", cursor: loading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: loading ? 0.7 : 1 }}
+                >
+                  {loading ? "Loading…" : plan.cta}
+                </button>
               ) : (
                 <Link href={plan.ctaHref} style={{ textDecoration: "none" }}>
                   <button style={{ width: "100%", padding: "10px 0", borderRadius: 9, border: "1.5px solid #FF6B35", background: "transparent", fontSize: 13, fontWeight: 700, color: "#FF6B35", cursor: "pointer", fontFamily: "inherit" }}>

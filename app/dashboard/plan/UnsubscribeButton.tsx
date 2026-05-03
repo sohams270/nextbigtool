@@ -11,7 +11,7 @@ export default function UnsubscribeButton({ currentPlan, userId }: { currentPlan
 
   async function handleUnsubscribe() {
     setLoading(true);
-    await createClient().from("profiles").update({ plan: "free" }).eq("id", userId);
+    await fetch("/api/cancel-subscription", { method: "POST" });
     setLoading(false);
     setShowConfirm(false);
     router.refresh();

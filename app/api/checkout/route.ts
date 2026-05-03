@@ -1,58 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
-import DodoPayments from "dodopayments";
+import Razorpay from "razorpay";
 
-const dodo = new DodoPayments({
-  bearerToken: process.env.DODO_API_KEY!,
-  environment: process.env.DODO_ENV === "live" ? "live_mode" : "test_mode",
+const rzp = new Razorpay({
+  key_id:     process.env.RAZORPAY_KEY_ID!,
+  key_secret: process.env.RAZORPAY_KEY_SECRET!,
 });
 
-const PRODUCTS: Record<string, string> = {
-  monthly: process.env.DODO_PRODUCT_MONTHLY!,
-  yearly:  process.env.DODO_PRODUCT_YEARLY!,
+const PLANS: Record<string, string> = {
+  monthly: process.env.RAZORPAY_PLAN_MONTHLY!,
+  yearly:  process.env.RAZORPAY_PLAN_YEARLY!,
 };
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.nextbigtool.com";
-
-export async function GET(request: NextRequest) {
-  const interval = request.nextUrl.searchParams.get("interval") ?? "monthly";
-
-  // Require auth
+export async function POST(request: NextRequest) {
+  // Auth check
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const productId = PRODUCTS[interval] ?? PRODUCTS.monthly;
+  const { interval = "monthly" } = await request.json().catch(() => ({}));
+  const planId = PLANS[interval] ?? PLANS.monthly;
 
   try {
-    const session = await dodo.checkoutSessions.create({
-      product_cart: [{ product_id: productId, quantity: 1 }],
-      customer: {
-        email: user.email!,
-        name: (user.user_metadata?.full_name as string | undefined) ?? undefined,
+    const subscription = await rzp.subscriptions.create({
+      plan_id:     planId,
+      total_count: 120,          // 10 years — effectively ongoing
+      quantity:    1,
+      customer_notify: 1,
+      notes: {
+        supabase_user_id: user.id,
+        user_email:       user.email ?? "",
+        interval,
       },
-      // stored in subscription.metadata — used by webhook to identify the user
-      metadata: { supabase_user_id: user.id },
-      return_url: `${SITE_URL}/dashboard/plan?upgraded=1`,
-      cancel_url:  `${SITE_URL}/dashboard/plan`,
     });
 
-    if (!session.checkout_url) {
-      console.error("[checkout] No checkout_url in response:", session);
-      return NextResponse.redirect(new URL("/dashboard/plan?error=no_url", request.url));
-    }
-
-    return NextResponse.redirect(session.checkout_url);
+    return NextResponse.json({
+      subscriptionId: subscription.id,
+      keyId:          process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+    });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : JSON.stringify(err);
-    console.error("[checkout] Dodo error:", msg);
-    const url = new URL("/dashboard/plan", request.url);
-    url.searchParams.set("error", "1");
-    url.searchParams.set("msg", msg.slice(0, 200));
-    return NextResponse.redirect(url);
+    console.error("[checkout/razorpay] Error:", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
