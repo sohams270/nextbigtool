@@ -95,13 +95,23 @@ export async function approveTool(toolId: string) {
   revalidatePath("/admin");
   revalidatePath("/");
 
-  // Notify all users + newsletter subscribers about the new tool (fire and forget)
-  fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.nextbigtool.com"}/api/notify-new-tool`, {
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.nextbigtool.com";
+  const headers = {
+    "Content-Type": "application/json",
+    "x-internal-secret": process.env.INTERNAL_API_SECRET ?? "",
+  };
+
+  // Notify the submitter that their tool is now live (fire and forget)
+  fetch(`${base}/api/notify-tool-approved`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-internal-secret": process.env.INTERNAL_API_SECRET ?? "",
-    },
+    headers,
+    body: JSON.stringify({ toolId }),
+  }).catch(err => console.error("[approveTool] notify-tool-approved failed:", err));
+
+  // Notify all users + newsletter subscribers about the new tool (fire and forget)
+  fetch(`${base}/api/notify-new-tool`, {
+    method: "POST",
+    headers,
     body: JSON.stringify({ toolId }),
   }).catch(err => console.error("[approveTool] notify-new-tool failed:", err));
 }
