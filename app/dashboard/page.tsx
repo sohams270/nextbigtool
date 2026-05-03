@@ -194,63 +194,36 @@ export default async function DashboardPage() {
       {/* Chart + activity */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 16, marginBottom: 20 }}>
         <div style={card}>
-          {(() => {
-            const hasUpvotes = upvoteBuckets.some(v => v > 0);
-            const hasViews   = viewBuckets.some(v => v > 0);
-            return (
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>Upvotes over time</div>
+              <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2 }}>Daily upvotes received across all your products — last 14 days</div>
+            </div>
+            <div style={{ display: "flex", gap: 5, alignItems: "center", fontSize: 11, color: "var(--ink-muted)" }}>
+              <span style={{ width: 24, height: 3, borderRadius: 2, background: "#ff6a3d", display: "inline-block" }}/>Upvotes
+            </div>
+          </div>
+
+          {/* Chart */}
+          <svg viewBox="0 0 600 160" preserveAspectRatio="none" style={{ width: "100%", height: 140 }}>
+            <defs>
+              <linearGradient id="gOrange" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stopColor="#ff6a3d" stopOpacity=".28"/>
+                <stop offset="1" stopColor="#ff6a3d" stopOpacity="0"/>
+              </linearGradient>
+            </defs>
+            {upvoteBuckets.every(v => v === 0) ? (
               <>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-                  <div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>Engagement over time</div>
-                    <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2 }}>
-                      Daily upvotes{hasViews ? " & profile views" : ""} across all your products — last 14 days
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", gap: 14, alignItems: "center", fontSize: 11, color: "var(--ink-muted)" }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                      <span style={{ width: 24, height: 3, borderRadius: 2, background: "#ff6a3d", display: "inline-block" }}/>Upvotes
-                    </span>
-                    <span style={{ display: "flex", alignItems: "center", gap: 5, opacity: hasViews ? 1 : 0.4 }}>
-                      <span style={{ width: 24, height: 3, borderRadius: 2, background: "#3b7fff", display: "inline-block" }}/>
-                      Views {!hasViews && <span style={{ fontSize: 10, marginLeft: 2 }}>(tracking started today)</span>}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Chart */}
-                <svg viewBox="0 0 600 160" preserveAspectRatio="none" style={{ width: "100%", height: 140 }}>
-                  <defs>
-                    <linearGradient id="gOrange" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0" stopColor="#ff6a3d" stopOpacity=".22"/>
-                      <stop offset="1" stopColor="#ff6a3d" stopOpacity="0"/>
-                    </linearGradient>
-                    <linearGradient id="gBlue" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0" stopColor="#3b7fff" stopOpacity=".18"/>
-                      <stop offset="1" stopColor="#3b7fff" stopOpacity="0"/>
-                    </linearGradient>
-                  </defs>
-
-                  {/* Zero-state: no upvotes at all */}
-                  {!hasUpvotes ? (
-                    <path d="M0,140 L600,140" fill="none" stroke="#ff6a3d" strokeWidth="2" opacity="0.4" strokeDasharray="4 4"/>
-                  ) : (
-                    <>
-                      {/* Views line — only if there's actual view log data */}
-                      {hasViews && (
-                        <>
-                          <path d={viewPaths.area} fill="url(#gBlue)"/>
-                          <path d={viewPaths.line} fill="none" stroke="#3b7fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="5 3"/>
-                        </>
-                      )}
-                      {/* Upvotes line */}
-                      <path d={upvotePaths.area} fill="url(#gOrange)"/>
-                      <path d={upvotePaths.line} fill="none" stroke="#ff6a3d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </>
-                  )}
-                </svg>
+                <path d="M0,140 L600,140 L600,160 L0,160 Z" fill="url(#gOrange)" opacity="0.4"/>
+                <path d="M0,140 L600,140" fill="none" stroke="#ff6a3d" strokeWidth="2" opacity="0.5"/>
               </>
-            );
-          })()}
+            ) : (
+              <>
+                <path d={upvotePaths.area} fill="url(#gOrange)"/>
+                <path d={upvotePaths.line} fill="none" stroke="#ff6a3d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </>
+            )}
+          </svg>
 
           {/* X-axis labels: first, middle, last */}
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "var(--ink-muted)", marginTop: 6, paddingTop: 4, borderTop: "1px solid var(--border-faint)" }}>
