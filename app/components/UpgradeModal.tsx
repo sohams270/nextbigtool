@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 
 export type GatedFeature = "crm" | "blog" | "hof" | "bip";
 
@@ -64,6 +65,25 @@ export default function UpgradeModal({
   onClose: () => void;
 }) {
   const f = FEATURES[feature];
+  const [loading, setLoading] = useState(false);
+
+  async function handleUpgrade() {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interval: "monthly" }),
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error || "Could not initiate checkout."); setLoading(false); return; }
+      window.location.href = data.paymentLink;
+    } catch {
+      alert("Something went wrong. Please try again.");
+      setLoading(false);
+    }
+  }
 
   return (
     <>
@@ -162,19 +182,21 @@ export default function UpgradeModal({
 
           {/* CTAs */}
           <div style={{ display: "flex", gap: 10 }}>
-            <a
-              href="/api/checkout?interval=monthly"
+            <button
+              onClick={handleUpgrade}
+              disabled={loading}
               style={{
                 flex: 1, textAlign: "center",
                 padding: "11px 0", borderRadius: 11,
                 background: "linear-gradient(90deg,#ff6a3d,#ff3d88)",
                 color: "#fff", fontSize: 13.5, fontWeight: 700,
-                textDecoration: "none",
+                border: "none", cursor: loading ? "not-allowed" : "pointer",
                 boxShadow: "0 4px 18px rgba(255,61,136,0.35)",
+                opacity: loading ? 0.7 : 1, fontFamily: "inherit",
               }}
             >
-              Upgrade to Core →
-            </a>
+              {loading ? "Loading…" : "Upgrade to Core →"}
+            </button>
             <Link
               href="/pricing"
               onClick={onClose}
