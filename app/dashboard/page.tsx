@@ -52,10 +52,13 @@ function timeAgo(isoString: string): string {
   return new Date(isoString).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-function buildChartPath(buckets: number[], viewBox = { w: 600, h: 160 }): { line: string; area: string } {
-  const n    = buckets.length;
-  const maxV = Math.max(...buckets, 1);
-  const PAD  = { t: 10, b: 20 };
+function buildSeriesPath(
+  buckets: number[],
+  maxV: number,
+  viewBox = { w: 600, h: 160 }
+): { line: string; area: string } {
+  const n = buckets.length;
+  const PAD = { t: 10, b: 20 };
   const chartH = viewBox.h - PAD.t - PAD.b;
 
   const points = buckets.map((v, i) => {
@@ -91,9 +94,10 @@ export default async function DashboardPage() {
   const liveTools    = myTools.filter(t => t.status === "approved").length;
   const myToolIds    = myTools.map(t => t.id);
 
-  /* ── upvote history (14 days) for chart ── */
+  /* ── chart history (14 days) ── */
   const DAYS = 14;
-  const buckets: number[] = Array(DAYS).fill(0);
+  const upvoteBuckets: number[] = Array(DAYS).fill(0);
+  const viewBuckets: number[]   = Array(DAYS).fill(0);
 
   const dayLabels: string[] = [];
   for (let i = DAYS - 1; i >= 0; i--) {
@@ -109,31 +113,41 @@ export default async function DashboardPage() {
     since.setDate(since.getDate() - (DAYS - 1));
     since.setHours(0, 0, 0, 0);
 
-    const { data: histData } = await supabase
-      .from("upvotes")
-      .select("created_at, tool_id")
-      .in("tool_id", myToolIds)
-      .gte("created_at", since.toISOString());
+    const [{ data: histUpvotes }, { data: histViews }, { data: recentData }] = await Promise.all([
+      supabase
+        .from("upvotes")
+        .select("created_at, tool_id")
+        .in("tool_id", myToolIds)
+        .gte("created_at", since.toISOString()),
+      supabase
+        .from("tool_view_logs")
+        .select("created_at")
+        .in("tool_id", myToolIds)
+        .gte("created_at", since.toISOString()),
+      supabase
+        .from("upvotes")
+        .select("created_at, tool_id")
+        .in("tool_id", myToolIds)
+        .order("created_at", { ascending: false })
+        .limit(8),
+    ]);
 
-    (histData ?? []).forEach(row => {
-      const daysAgo = Math.floor(
-        (Date.now() - new Date(row.created_at).getTime()) / 86400000
-      );
-      const idx = DAYS - 1 - daysAgo;
-      if (idx >= 0 && idx < DAYS) buckets[idx]++;
+    (histUpvotes ?? []).forEach(row => {
+      const idx = DAYS - 1 - Math.floor((Date.now() - new Date(row.created_at).getTime()) / 86400000);
+      if (idx >= 0 && idx < DAYS) upvoteBuckets[idx]++;
     });
 
-    const { data: recentData } = await supabase
-      .from("upvotes")
-      .select("created_at, tool_id")
-      .in("tool_id", myToolIds)
-      .order("created_at", { ascending: false })
-      .limit(8);
+    (histViews ?? []).forEach(row => {
+      const idx = DAYS - 1 - Math.floor((Date.now() - new Date(row.created_at).getTime()) / 86400000);
+      if (idx >= 0 && idx < DAYS) viewBuckets[idx]++;
+    });
 
     recentUpvotes = recentData ?? [];
   }
 
-  const { line: chartLine, area: chartArea } = buildChartPath(buckets);
+  const globalMax = Math.max(...upvoteBuckets, ...viewBuckets, 1);
+  const upvotePaths = buildSeriesPath(upvoteBuckets, globalMax);
+  const viewPaths   = buildSeriesPath(viewBuckets,   globalMax);
 
   const toolMap = Object.fromEntries(myTools.map(t => [t.id, t.name]));
 
@@ -182,11 +196,16 @@ export default async function DashboardPage() {
         <div style={card}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>Upvotes over time</div>
-              <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2 }}>Daily upvotes received across all your products — last 14 days</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>Engagement over time</div>
+              <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2 }}>Daily upvotes &amp; profile views across all your products — last 14 days</div>
             </div>
-            <div style={{ display: "flex", gap: 5, alignItems: "center", fontSize: 11, color: "var(--ink-muted)" }}>
-              <span style={{ width: 8, height: 8, borderRadius: 2, background: "#ff6a3d", display: "inline-block" }}/>Upvotes
+            <div style={{ display: "flex", gap: 14, alignItems: "center", fontSize: 11, color: "var(--ink-muted)" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                <span style={{ width: 24, height: 3, borderRadius: 2, background: "#ff6a3d", display: "inline-block" }}/>Upvotes
+              </span>
+              <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                <span style={{ width: 24, height: 3, borderRadius: 2, background: "#3b7fff", display: "inline-block" }}/>Views
+              </span>
             </div>
           </div>
 
@@ -194,20 +213,29 @@ export default async function DashboardPage() {
           <svg viewBox="0 0 600 160" preserveAspectRatio="none" style={{ width: "100%", height: 140 }}>
             <defs>
               <linearGradient id="gOrange" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0" stopColor="#ff6a3d" stopOpacity=".28"/>
+                <stop offset="0" stopColor="#ff6a3d" stopOpacity=".22"/>
                 <stop offset="1" stopColor="#ff6a3d" stopOpacity="0"/>
               </linearGradient>
+              <linearGradient id="gBlue" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stopColor="#3b7fff" stopOpacity=".18"/>
+                <stop offset="1" stopColor="#3b7fff" stopOpacity="0"/>
+              </linearGradient>
             </defs>
-            {/* Zero-state flat line at bottom when no data */}
-            {buckets.every(v => v === 0) ? (
+
+            {/* Zero-state flat lines when no data at all */}
+            {upvoteBuckets.every(v => v === 0) && viewBuckets.every(v => v === 0) ? (
               <>
-                <path d="M0,140 L600,140 L600,160 L0,160 Z" fill="url(#gOrange)" opacity="0.4"/>
-                <path d="M0,140 L600,140" fill="none" stroke="#ff6a3d" strokeWidth="2" opacity="0.5"/>
+                <path d="M0,140 L600,140" fill="none" stroke="#ff6a3d" strokeWidth="2" opacity="0.4" strokeDasharray="4 4"/>
+                <path d="M0,140 L600,140" fill="none" stroke="#3b7fff" strokeWidth="2" opacity="0.4" strokeDasharray="4 4"/>
               </>
             ) : (
               <>
-                <path d={chartArea} fill="url(#gOrange)"/>
-                <path d={chartLine} fill="none" stroke="#ff6a3d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                {/* View area + line (behind upvotes) */}
+                <path d={viewPaths.area} fill="url(#gBlue)"/>
+                <path d={viewPaths.line} fill="none" stroke="#3b7fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="5 3"/>
+                {/* Upvote area + line (on top) */}
+                <path d={upvotePaths.area} fill="url(#gOrange)"/>
+                <path d={upvotePaths.line} fill="none" stroke="#ff6a3d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
               </>
             )}
           </svg>

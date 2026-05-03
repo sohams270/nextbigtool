@@ -35,6 +35,9 @@ export async function POST(
   // Increment view_count via RPC
   await supabase.rpc("increment_view_count", { tool_id: id });
 
+  // Log this view for time-series chart (best-effort, ignore errors)
+  await supabase.from("tool_view_logs").insert({ tool_id: id }).then(() => {});
+
   // Set cookie for 24 hours so the same browser doesn't count again
   const res = NextResponse.json({ ok: true, counted: true });
   res.cookies.set(cookieName, "1", {
