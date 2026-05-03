@@ -3,17 +3,16 @@ import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import Razorpay from "razorpay";
 
-const rzp = new Razorpay({
-  key_id:     process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
-
-const PLANS: Record<string, string> = {
-  monthly: process.env.RAZORPAY_PLAN_MONTHLY!,
-  yearly:  process.env.RAZORPAY_PLAN_YEARLY!,
-};
-
 export async function POST(request: NextRequest) {
+  const rzp = new Razorpay({
+    key_id:     process.env.RAZORPAY_KEY_ID!,
+    key_secret: process.env.RAZORPAY_KEY_SECRET!,
+  });
+
+  const PLANS: Record<string, string> = {
+    monthly: process.env.RAZORPAY_PLAN_MONTHLY!,
+    yearly:  process.env.RAZORPAY_PLAN_YEARLY!,
+  };
   // Auth check
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
