@@ -82,7 +82,7 @@ export default async function HomePage({
         .limit(12),
       supabase
         .from("hall_of_fame")
-        .select("id, inducted_at, tools(name, slug, logo_url)")
+        .select("id, inducted_at, tools(name, slug, logo_url, website_url)")
         .eq("status", "approved")
         .order("inducted_at", { ascending: false })
         .limit(6),
@@ -96,8 +96,8 @@ export default async function HomePage({
     // Enrich posts with tool names
     const postToolIds = [...new Set((recentPosts ?? []).map((p: any) => p.tool_id).filter(Boolean))];
     const { data: postToolRows } = postToolIds.length > 0
-      ? await supabase.from("tools").select("id, name, slug").in("id", postToolIds)
-      : { data: [] as { id: string; name: string; slug: string }[] };
+      ? await supabase.from("tools").select("id, name, slug, logo_url, website_url").in("id", postToolIds)
+      : { data: [] as { id: string; name: string; slug: string; logo_url: string | null; website_url: string | null }[] };
     const toolMap = Object.fromEntries((postToolRows ?? []).map((t: any) => [t.id, t]));
 
     const items: ActivityItem[] = [];
@@ -112,6 +112,8 @@ export default async function HomePage({
         href: `/tools/${t.slug}`,
         emoji: "🚀",
         badge: "New Launch",
+        logo_url: (t as any).logo_url ?? null,
+        website_url: (t as any).website_url ?? null,
       });
     }
     for (const h of recentHof ?? []) {
@@ -126,6 +128,8 @@ export default async function HomePage({
         href: `/tools/${tool.slug}`,
         emoji: "🏆",
         badge: "Hall of Fame",
+        logo_url: tool.logo_url ?? null,
+        website_url: tool.website_url ?? null,
       });
     }
     for (const p of recentPosts ?? []) {
@@ -139,6 +143,8 @@ export default async function HomePage({
         href: tool ? `/tools/${tool.slug}` : "/",
         emoji: "📝",
         badge: "Build in Public",
+        logo_url: tool?.logo_url ?? null,
+        website_url: tool?.website_url ?? null,
       });
     }
 

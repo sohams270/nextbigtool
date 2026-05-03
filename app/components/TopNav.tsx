@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AuthModal from "./AuthModal";
@@ -268,7 +268,34 @@ function RailDropBtn({
 }
 
 /* ─── Notification types ──────────────────────────────────────────────── */
-type NotifItem = { id: string; icon: string; text: string; time: string; ts: number };
+type NotifItem = { id: string; icon: string; text: string; time: string; ts: number; logo_url?: string | null; website_url?: string | null };
+
+function NotifLogo({ n }: { n: NotifItem }) {
+  const [failed, setFailed] = React.useState(false);
+  let src: string | null = null;
+  if (!failed) {
+    if (n.logo_url) {
+      src = n.logo_url;
+    } else if (n.website_url) {
+      try {
+        const domain = new URL(n.website_url).hostname.replace(/^www\./, "");
+        src = `https://logo.clearbit.com/${domain}`;
+      } catch { /* no-op */ }
+    }
+  }
+  if (src) {
+    return (
+      <div style={{ width: 32, height: 32, borderRadius: 8, background: "#fff", border: "1px solid rgba(0,0,0,0.08)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: 3, boxSizing: "border-box", flexShrink: 0 }}>
+        <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} onError={() => setFailed(true)} />
+      </div>
+    );
+  }
+  return (
+    <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface-alt)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>
+      {n.icon}
+    </div>
+  );
+}
 
 /* ─── TopNav ─────────────────────────────────────────────────────────── */
 export default function TopNav({ dark: darkProp }: { dark?: boolean }) {
@@ -346,7 +373,7 @@ export default function TopNav({ dark: darkProp }: { dark?: boolean }) {
     const items: NotifItem[] = [];
 
     const [toolsRes, upvotesRes, postsRes] = await Promise.allSettled([
-      client.from("tools").select("id, name, created_at").eq("status", "approved")
+      client.from("tools").select("id, name, logo_url, website_url, created_at").eq("status", "approved")
         .gte("created_at", since).order("created_at", { ascending: false }).limit(6),
       client.from("upvotes").select("created_at, tool_id, tools(name)")
         .gte("created_at", since).order("created_at", { ascending: false }).limit(6),
@@ -355,8 +382,8 @@ export default function TopNav({ dark: darkProp }: { dark?: boolean }) {
     ]);
 
     if (toolsRes.status === "fulfilled") {
-      (toolsRes.value.data ?? []).forEach((t: { id: string; name: string; created_at: string }) => {
-        items.push({ id: `tool-${t.id}`, icon: "🚀", text: `${t.name} just launched on NextBigTool`, time: t.created_at, ts: new Date(t.created_at).getTime() });
+      (toolsRes.value.data ?? []).forEach((t: { id: string; name: string; logo_url?: string | null; website_url?: string | null; created_at: string }) => {
+        items.push({ id: `tool-${t.id}`, icon: "🚀", text: `${t.name} just launched on NextBigTool`, time: t.created_at, ts: new Date(t.created_at).getTime(), logo_url: t.logo_url ?? null, website_url: t.website_url ?? null });
       });
     }
     if (upvotesRes.status === "fulfilled") {
@@ -593,9 +620,7 @@ export default function TopNav({ dark: darkProp }: { dark?: boolean }) {
                             onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = "var(--surface-alt)"}
                             onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = "transparent"}
                           >
-                            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--surface-alt)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>
-                              {n.icon}
-                            </div>
+                            <NotifLogo n={n} />
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ fontSize: 12.5, color: "var(--ink)", lineHeight: 1.4 }}>{n.text}</div>
                               <div style={{ fontSize: 11, color: "var(--ink-muted)", marginTop: 3 }}>{timeAgo(n.time)}</div>

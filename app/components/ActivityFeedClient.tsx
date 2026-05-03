@@ -12,7 +12,51 @@ export type ActivityItem = {
   href: string;
   emoji: string;
   badge: string;
+  logo_url?: string | null;
+  website_url?: string | null;
 };
+
+function ActivityLogo({ item }: { item: ActivityItem }) {
+  const [failed, setFailed] = useState(false);
+  const colors = BADGE_COLORS[item.badge] ?? { bg: "rgba(255,255,255,0.08)", color: "var(--ink-2)" };
+
+  let src: string | null = null;
+  if (!failed) {
+    if (item.logo_url) {
+      src = item.logo_url;
+    } else if (item.website_url) {
+      try {
+        const domain = new URL(item.website_url).hostname.replace(/^www\./, "");
+        src = `https://logo.clearbit.com/${domain}`;
+      } catch { /* no-op */ }
+    }
+  }
+
+  if (src) {
+    return (
+      <div style={{
+        width: 36, height: 36, borderRadius: 9, flexShrink: 0,
+        background: "#fff", border: "1px solid var(--border)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        overflow: "hidden", padding: 3, boxSizing: "border-box",
+      }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} onError={() => setFailed(true)} />
+      </div>
+    );
+  }
+
+  return (
+    <div style={{
+      width: 36, height: 36, borderRadius: 9, flexShrink: 0,
+      background: colors.bg, border: `1px solid ${colors.color}33`,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      fontSize: 17,
+    }}>
+      {item.emoji}
+    </div>
+  );
+}
 
 const BADGE_COLORS: Record<string, { bg: string; color: string }> = {
   "New Launch":      { bg: "rgba(59,130,246,0.12)",  color: "#60a5fa" },
@@ -281,14 +325,7 @@ export default function ActivityFeedClient({
                 border: `1px solid ${isNew ? "rgba(0,184,122,0.25)" : "var(--border)"}`,
                 transition: "border-color 0.15s, background 0.15s",
               }}>
-                <div style={{
-                  width: 36, height: 36, borderRadius: 9, flexShrink: 0,
-                  background: colors.bg, border: `1px solid ${colors.color}33`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 17,
-                }}>
-                  {item.emoji}
-                </div>
+                  <ActivityLogo item={item} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
                     <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
