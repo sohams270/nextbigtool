@@ -191,20 +191,21 @@ export default async function HomePage({
         break;
       case "trending":
       default:
-        toolQuery = toolQuery.order("upvote_count", { ascending: false });
+        // Default: newest tools first so fresh submissions surface immediately
+        toolQuery = toolQuery.order("created_at", { ascending: false });
         break;
     }
 
     const { data: allTools } = await toolQuery.limit(20);
     tools = (allTools ?? []) as unknown as ToolRow[];
 
-    // Put featured tools first (except for "new" sort which is chronological)
-    sortedTools = sort === "new"
-      ? tools
-      : [
+    // "new" and "trending" (newly added) are chronological; "top" puts featured first
+    sortedTools = sort === "top"
+      ? [
           ...tools.filter((t) => t.featured),
           ...tools.filter((t) => !t.featured),
-        ];
+        ]
+      : tools;
 
     const displayedIds = tools.map((t) => t.id);
     if (user && displayedIds.length > 0) {

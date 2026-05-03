@@ -724,7 +724,7 @@ export default function ProductShowcase({
                   width: 7, height: 7, borderRadius: "50%", background: "#16a34a",
                   display: "inline-block", animation: "nbt-pulse 2s infinite",
                 }} />
-                Live ranking · updated just now
+                {sort === "top" ? "Live ranking · updated just now" : "Latest additions · updated just now"}
               </div>
               <h2 style={{
                 fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em",
@@ -740,10 +740,10 @@ export default function ProductShowcase({
                   : price === "freemium" ? "Top Freemium Tools"
                   : price === "paid" ? "Top Paid Tools"
                   : "Top Voted Tools"
-                  : price === "free" ? "Best Free Tools"
-                  : price === "freemium" ? "Best Freemium Tools"
-                  : price === "paid" ? "Best Paid Tools"
-                  : "Featured Tools"}
+                  : price === "free" ? "Newest Free Tools"
+                  : price === "freemium" ? "Newest Freemium Tools"
+                  : price === "paid" ? "Newest Paid Tools"
+                  : "Newly Added Tools"}
               </h2>
               <p style={{ margin: "6px 0 0", color: "var(--ink-muted)", fontSize: 13 }}>
                 {sort === "new"
@@ -756,10 +756,10 @@ export default function ProductShowcase({
                   : price === "freemium" ? "The highest-upvoted freemium tools, ranked by the community"
                   : price === "paid" ? "The highest-upvoted paid tools, ranked by the community"
                   : "The highest-upvoted tools of all time, ranked by the community"
-                  : price === "free" ? "Discover the best free tools — handpicked and ranked by builders"
-                  : price === "freemium" ? "Freemium tools worth trying — start for free, scale as you grow"
-                  : price === "paid" ? "Premium tools builders are betting on — tried, tested, upvoted"
-                  : "Hand-picked tools, ranked by builders"}
+                  : price === "free" ? "The freshest free tools — newest additions first"
+                  : price === "freemium" ? "The freshest freemium tools — newest additions first"
+                  : price === "paid" ? "The freshest paid tools — newest additions first"
+                  : "The latest tools added to the platform — freshest first"}
               </p>
             </div>
             <div style={{ display: "inline-flex", padding: 3, background: "var(--surface-alt)", borderRadius: 10, gap: 2 }}>
