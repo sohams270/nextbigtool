@@ -38,7 +38,7 @@ function buildEmailHtml(post: {
     <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#0A0B1A;color:#fff;border-radius:12px;">
 
       <!-- Logo -->
-      <div style="margin-bottom:24px;">
+      <div style="margin-bottom:24px;background:#0A0B1A;padding:8px 0;border-radius:8px;">
         <a href="https://www.nextbigtool.com" style="display:inline-block;text-decoration:none;">
           <img src="https://www.nextbigtool.com/logo-white.png" alt="NextBigTool" width="150" style="display:block;height:auto;" />
         </a>
@@ -68,7 +68,7 @@ function buildEmailHtml(post: {
       ${excerpt ? `<p style="font-size:13px;color:rgba(255,255,255,0.6);margin:0 0 28px;line-height:1.7;">${excerpt}</p>` : ""}
 
       <!-- CTA -->
-      <a href="${postUrl}" style="display:block;text-align:center;padding:14px 24px;background:linear-gradient(90deg,#3B7FFF,#6366f1);color:#fff;text-decoration:none;border-radius:10px;font-weight:700;font-size:14px;letter-spacing:0.01em;">
+      <a href="${postUrl}" style="display:block;text-align:center;padding:14px 24px;background:linear-gradient(90deg,#FF6B35,#ff3d88);color:#fff;text-decoration:none;border-radius:10px;font-weight:700;font-size:14px;letter-spacing:0.01em;">
         Read the full article →
       </a>
 
