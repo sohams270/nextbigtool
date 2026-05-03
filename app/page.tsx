@@ -22,6 +22,7 @@ import ActivityFeedClient from "./components/ActivityFeedClient";
 import FilterBar from "./components/FilterBar";
 import SubmissionNudge, { type NudgeSubmission } from "./components/SubmissionNudge";
 import HofUpgradeBtn from "./components/HofUpgradeBtn";
+import HofSortGrid from "./components/HofSortGrid";
 import NewsletterForm from "./components/NewsletterForm";
 
 
@@ -311,94 +312,7 @@ export default async function HomePage({
 
             {/* ── Hall of Fame full list ── */}
             {sort === "hof" && (
-              <>
-                <div style={{
-                  display: "flex", alignItems: "center", gap: 10,
-                  marginBottom: 20, padding: "12px 16px",
-                  background: "linear-gradient(135deg,#0D0E22,#1A0D2E)",
-                  borderRadius: 12, border: "1px solid rgba(255,215,0,0.2)",
-                }}>
-                  <span style={{ fontSize: 22 }}>🏆</span>
-                  <div>
-                    <div style={{
-                      fontSize: 15, fontWeight: 800,
-                      background: "linear-gradient(90deg,#FFD700,#FFA500)",
-                      WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                    }}>Hall of Fame</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>
-                      All inducted tools — ranked by induction date
-                    </div>
-                  </div>
-                </div>
-                {allHofEntries.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "60px 0", color: "var(--ink-muted)", fontSize: 14 }}>
-                    No tools inducted yet.
-                  </div>
-                ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {allHofEntries.map((entry, i) => {
-                      const t = entry.tool as any;
-                      const medals = ["🥇", "🥈", "🥉"];
-                      let logoSrc: string | null = t.logo_url;
-                      if (!logoSrc && t.website_url) {
-                        try {
-                          const d = new URL(t.website_url).hostname.replace(/^www\./, "");
-                          logoSrc = `https://logo.clearbit.com/${d}`;
-                        } catch { /* no-op */ }
-                      }
-                      return (
-                        <a
-                          key={t.id}
-                          href={`/tools/${t.slug}`}
-                          style={{ textDecoration: "none" }}
-                        >
-                          <div style={{
-                            display: "flex", alignItems: "center", gap: 14,
-                            padding: "14px 16px", borderRadius: 12,
-                            background: "linear-gradient(135deg,#0D0E22,#15102A)",
-                            border: "1px solid rgba(255,215,0,0.18)",
-                            transition: "border-color 0.15s, background 0.15s",
-                          }}>
-                            <span style={{ fontSize: 20, flexShrink: 0, width: 24, textAlign: "center" }}>
-                              {medals[i] ?? "🏅"}
-                            </span>
-                            <div style={{
-                              width: 40, height: 40, borderRadius: 9, overflow: "hidden", flexShrink: 0,
-                              background: "rgba(255,215,0,0.1)", border: "1px solid rgba(255,215,0,0.25)",
-                              display: "flex", alignItems: "center", justifyContent: "center",
-                              fontSize: 16, fontWeight: 800, color: "#FFD700",
-                            }}>
-                              {logoSrc
-                                ? <img src={logoSrc} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                                : t.name?.[0]}
-                            </div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{
-                                fontSize: 13, fontWeight: 700, color: "#fff",
-                                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                              }}>{t.name}</div>
-                              <div style={{
-                                fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 2,
-                                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                              }}>{t.tagline}</div>
-                            </div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
-                              <div style={{ fontSize: 11, color: "rgba(255,215,0,0.7)", fontWeight: 600 }}>
-                                ▲ {t.upvote_count ?? 0}
-                              </div>
-                              {entry.inducted_at && (
-                                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>
-                                  {new Date(entry.inducted_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </a>
-                      );
-                    })}
-                  </div>
-                )}
-              </>
+              <HofSortGrid entries={allHofEntries} />
             )}
 
             {/* ── Regular tool feed ── */}
