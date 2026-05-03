@@ -2,19 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import DodoPayments from "dodopayments";
 import { createAdminClient } from "@/utils/supabase/admin";
 
-// Route must receive raw body for signature verification
 export const runtime = "nodejs";
-
-const dodo = new DodoPayments({
-  bearerToken: process.env.DODO_API_KEY!,
-  environment: "live_mode",
-  webhookKey: process.env.DODO_WEBHOOK_SECRET || undefined,
-});
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
 
-  // Parse & optionally verify the event
+  const dodo = new DodoPayments({
+    bearerToken: process.env.DODO_API_KEY!,
+    environment: "live_mode",
+    webhookKey: process.env.DODO_WEBHOOK_SECRET || undefined,
+  });
+
   let event;
   try {
     if (process.env.DODO_WEBHOOK_SECRET) {
@@ -24,7 +22,6 @@ export async function POST(request: NextRequest) {
         key: process.env.DODO_WEBHOOK_SECRET,
       });
     } else {
-      // No secret configured yet — skip verification (safe for local dev only)
       event = dodo.webhooks.unsafeUnwrap(body);
     }
   } catch (err) {
@@ -37,14 +34,24 @@ export async function POST(request: NextRequest) {
   try {
     // ── Subscription became active → upgrade to Core ──────────────────────────
     if (event.type === "subscription.active") {
-      const email = event.data.customer.email;
-      const { error } = await supabase
-        .from("profiles")
-        .update({ plan: "core" })
-        .eq("email", email);
+      const email      = event.data.customer.email;
+      const subId      = (event.data as any).subscription_id ?? null;
+      const metadata   = (event.data as any).metadata ?? {};
+      const userId     = metadata.supabase_user_id ?? null;
 
-      if (error) throw error;
-      console.log(`[webhook/dodo] ✓ Upgraded to core: ${email}`);
+      if (userId) {
+        await supabase
+          .from("profiles")
+          .update({ plan: "core", dodo_sub_id: subId })
+          .eq("id", userId);
+        console.log(`[webhook/dodo] ✓ Core activated via userId: ${userId}`);
+      } else {
+        await supabase
+          .from("profiles")
+          .update({ plan: "core", dodo_sub_id: subId })
+          .eq("email", email);
+        console.log(`[webhook/dodo] ✓ Core activated via email: ${email}`);
+      }
     }
 
     // ── Subscription ended → downgrade to Free ────────────────────────────────
@@ -53,14 +60,23 @@ export async function POST(request: NextRequest) {
       event.type === "subscription.expired" ||
       event.type === "subscription.failed"
     ) {
-      const email = event.data.customer.email;
-      const { error } = await supabase
-        .from("profiles")
-        .update({ plan: "free" })
-        .eq("email", email);
+      const email    = event.data.customer.email;
+      const metadata = (event.data as any).metadata ?? {};
+      const userId   = metadata.supabase_user_id ?? null;
 
-      if (error) throw error;
-      console.log(`[webhook/dodo] ✓ Downgraded to free: ${email} (${event.type})`);
+      if (userId) {
+        await supabase
+          .from("profiles")
+          .update({ plan: "free", dodo_sub_id: null })
+          .eq("id", userId);
+        console.log(`[webhook/dodo] ✓ Downgraded via userId: ${userId} (${event.type})`);
+      } else {
+        await supabase
+          .from("profiles")
+          .update({ plan: "free", dodo_sub_id: null })
+          .eq("email", email);
+        console.log(`[webhook/dodo] ✓ Downgraded via email: ${email} (${event.type})`);
+      }
     }
   } catch (err) {
     console.error("[webhook/dodo] Supabase update error:", err);

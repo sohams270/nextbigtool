@@ -40,7 +40,11 @@
       "Bash(mkdir -p /Users/sohams17/NextBigTool/app/api/cms/press-releases/\\\\[id\\\\])",
       "Bash(mkdir -p /Users/sohams17/NextBigTool/app/cms/press-release/edit/\\\\[id\\\\])",
       "Bash(curl -s \"https://www.nextbigtool.com/discover/categories\")",
-      "Bash(npx vercel *)"
+      "Bash(npx vercel *)",
+      "Bash(node scripts/send-sample-emails.mjs)",
+      "Bash(node scripts/send-sample-blog-email.mjs)",
+      "Bash(pandoc --track-changes=all \"/Users/sohams17/Downloads/nextbigtool-vs-peerpush.docx\" -o /tmp/peerpush.md)",
+      "Read(//tmp/**)"
     ]
   },
   "hooks": {

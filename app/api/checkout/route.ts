@@ -1,18 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
-import Razorpay from "razorpay";
+import DodoPayments from "dodopayments";
 
 export async function POST(request: NextRequest) {
-  const rzp = new Razorpay({
-    key_id:     process.env.RAZORPAY_KEY_ID!,
-    key_secret: process.env.RAZORPAY_KEY_SECRET!,
-  });
-
-  const PLANS: Record<string, string> = {
-    monthly: process.env.RAZORPAY_PLAN_MONTHLY!,
-    yearly:  process.env.RAZORPAY_PLAN_YEARLY!,
-  };
   // Auth check
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -22,28 +13,39 @@ export async function POST(request: NextRequest) {
   }
 
   const { interval = "monthly" } = await request.json().catch(() => ({}));
-  const planId = PLANS[interval] ?? PLANS.monthly;
+
+  const productId = interval === "yearly"
+    ? process.env.DODO_PRODUCT_YEARLY!
+    : process.env.DODO_PRODUCT_MONTHLY!;
+
+  const dodo = new DodoPayments({
+    bearerToken: process.env.DODO_API_KEY!,
+    environment: "live_mode",
+  });
 
   try {
-    const subscription = await rzp.subscriptions.create({
-      plan_id:     planId,
-      total_count: 120,          // 10 years — effectively ongoing
-      quantity:    1,
-      customer_notify: 1,
-      notes: {
+    const subscription = await dodo.subscriptions.create({
+      billing: { country: "IN" },
+      customer: { email: user.email!, name: user.user_metadata?.full_name ?? undefined },
+      product_id: productId,
+      quantity: 1,
+      payment_link: true,
+      return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard/plan?upgraded=1`,
+      metadata: {
         supabase_user_id: user.id,
-        user_email:       user.email ?? "",
+        user_email: user.email ?? "",
         interval,
       },
     });
 
-    return NextResponse.json({
-      subscriptionId: subscription.id,
-      keyId:          process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-    });
+    if (!subscription.payment_link) {
+      throw new Error("No payment link returned from Dodo");
+    }
+
+    return NextResponse.json({ paymentLink: subscription.payment_link });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : JSON.stringify(err);
-    console.error("[checkout/razorpay] Error:", msg);
+    console.error("[checkout/dodo] Error:", msg);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
