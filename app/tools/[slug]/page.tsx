@@ -10,6 +10,7 @@ import UpvoteBox from "@/app/components/UpvoteBox";
 import CommentSection from "./CommentSection";
 import CopyLinkButton from "./CopyLinkButton";
 import ViewTracker from "@/app/components/ViewTracker";
+import ScreenshotLightbox from "./ScreenshotLightbox";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -513,14 +514,7 @@ export default async function ToolPage({ params }: Props) {
             {shots.length > 0 && (
               <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "24px 26px" }}>
                 <SectionHeader icon={<svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>} iconBg="#f0f9ff" iconBorder="#bae6fd" title="Product Screenshots" />
-                <div style={{ display: "grid", gridTemplateColumns: shots.length === 1 ? "1fr" : "repeat(2, 1fr)", gap: 10 }}>
-                  {shots.map((url, i) => (
-                    <div key={i} style={{ borderRadius: 10, overflow: "hidden", border: "1px solid var(--border)", background: "var(--surface-dim)", gridColumn: shots.length === 1 || (shots.length === 3 && i === 0) ? "1 / -1" : undefined, aspectRatio: shots.length === 1 ? "16 / 9" : "4 / 3" }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url} alt={`Screenshot ${i + 1}`} style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }} />
-                    </div>
-                  ))}
-                </div>
+                <ScreenshotLightbox shots={shots} />
               </div>
             )}
 
