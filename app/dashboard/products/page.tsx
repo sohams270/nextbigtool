@@ -226,6 +226,25 @@ export default function AddYourToolPage() {
   const [confirmed, setConfirmed] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [yearly, setYearly] = useState(false);
+  const [priorityLoading, setPriorityLoading] = useState(false);
+
+  async function handlePriorityReview() {
+    if (priorityLoading) return;
+    setPriorityLoading(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interval: "monthly" }),
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error || "Could not initiate checkout."); setPriorityLoading(false); return; }
+      window.location.href = data.paymentLink;
+    } catch {
+      alert("Something went wrong. Please try again.");
+      setPriorityLoading(false);
+    }
+  }
 
   const [form, setForm] = useState({
     website_url: "",
@@ -909,20 +928,22 @@ export default function AddYourToolPage() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {/* Priority review button */}
             <button
-              onClick={() => setShowUpgrade(true)}
+              onClick={handlePriorityReview}
+              disabled={priorityLoading}
               style={{
                 padding: "0 16px", height: 44, borderRadius: 10,
                 border: "1.5px solid rgba(255,200,0,0.45)",
                 background: "rgba(255,200,0,0.07)",
                 color: "#b8860b", fontSize: 12, fontWeight: 700,
-                cursor: "pointer", fontFamily: "inherit",
+                cursor: priorityLoading ? "not-allowed" : "pointer", fontFamily: "inherit",
                 display: "inline-flex", alignItems: "center", gap: 6,
                 whiteSpace: "nowrap" as const, transition: "all 0.15s",
+                opacity: priorityLoading ? 0.7 : 1,
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,200,0,0.14)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,200,0,0.7)"; }}
+              onMouseEnter={e => { if (!priorityLoading) { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,200,0,0.14)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,200,0,0.7)"; } }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,200,0,0.07)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,200,0,0.45)"; }}
             >
-              ⚡ Want priority review?
+              {priorityLoading ? "Loading…" : "⚡ Want priority review?"}
             </button>
 
             {/* Submit */}
