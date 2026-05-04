@@ -15,20 +15,15 @@ export async function GET(request: Request) {
     if (!error && sessionData?.user) {
       const user = sessionData.user;
 
-      // Check if a profile already exists BEFORE upserting so we can detect new signups
-      const { data: existingProfile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      const isNewUser = !existingProfile;
-
       // Ensure a profile row exists for this user so OnboardingGate can query it.
-      // upsert with ignoreDuplicates means we won't clobber existing profile data.
       await supabase
         .from("profiles")
         .upsert({ id: user.id }, { onConflict: "id", ignoreDuplicates: true });
+
+      // Detect new signup: created_at and last_sign_in_at are within 10 seconds of each other
+      const createdAt     = new Date(user.created_at).getTime();
+      const lastSignIn    = new Date(user.last_sign_in_at ?? user.created_at).getTime();
+      const isNewUser     = Math.abs(createdAt - lastSignIn) < 10_000;
 
       // Send emails for brand-new signups only
       if (isNewUser) {
