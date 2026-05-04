@@ -47,7 +47,7 @@ export async function GET(request: Request) {
           // 1. Admin alert to Soham
           await transporter.sendMail({
             from: `"NBT Alerts" <${process.env.ZOHO_EMAIL}>`,
-            to: "soham@nextbigtool.com",
+            to: "sohams270@gmail.com",
             subject: `🎉 New signup: ${user.email}`,
             html: `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#0A0B1A;color:#fff;border-radius:12px;">
         <div style="margin-bottom:20px;"><div style="display:inline-block;background:rgba(255,107,53,0.15);border:1px solid rgba(255,107,53,0.4);border-radius:99px;padding:4px 12px;font-size:11px;font-weight:700;color:#FF6B35;letter-spacing:0.06em;text-transform:uppercase;">✦ New Signup</div></div>
