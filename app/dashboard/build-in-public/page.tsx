@@ -161,6 +161,21 @@ function PlanSidebar({ plan, postsUsed, postsLimit }: { plan: string; postsUsed:
   const isCore  = plan === "core";
   const remaining = postsLimit === Infinity ? Infinity : Math.max(0, postsLimit - postsUsed);
   const pct = postsLimit === Infinity ? 100 : Math.min(100, (postsUsed / postsLimit) * 100);
+  const [upgrading, setUpgrading] = useState(false);
+
+  async function handleUpgrade() {
+    if (upgrading) return;
+    setUpgrading(true);
+    try {
+      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ interval: "monthly" }) });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error || "Could not initiate checkout."); setUpgrading(false); return; }
+      window.location.href = data.paymentLink;
+    } catch {
+      alert("Something went wrong. Please try again.");
+      setUpgrading(false);
+    }
+  }
 
   return (
     <div style={{
@@ -215,9 +230,9 @@ function PlanSidebar({ plan, postsUsed, postsLimit }: { plan: string; postsUsed:
               </li>
             ))}
           </ul>
-          <Link href="/dashboard/plan" style={{ display: "block", textAlign: "center", background: "linear-gradient(90deg,#ff6a3d,#ff3d88)", borderRadius: 9, padding: "9px 0", fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
-            Upgrade to Core
-          </Link>
+          <button onClick={handleUpgrade} disabled={upgrading} style={{ display: "block", width: "100%", textAlign: "center", background: "linear-gradient(90deg,#ff6a3d,#ff3d88)", borderRadius: 9, padding: "9px 0", fontSize: 13, fontWeight: 700, color: "#fff", border: "none", cursor: upgrading ? "not-allowed" : "pointer", opacity: upgrading ? 0.7 : 1, fontFamily: "inherit" }}>
+            {upgrading ? "Loading…" : "Upgrade to Core"}
+          </button>
         </>
       )}
     </div>
