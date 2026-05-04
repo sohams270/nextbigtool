@@ -116,13 +116,11 @@ export async function POST(req: NextRequest) {
 
   if (!tool) return NextResponse.json({ error: "Tool not found" }, { status: 404 });
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("email, full_name")
-    .eq("id", tool.submitter_id)
-    .maybeSingle();
+  // Get submitter email from auth.users (profiles.email is NULL for most users)
+  const { data: authUser } = await supabase.auth.admin.getUserById(tool.submitter_id);
+  const submitterEmail = authUser?.user?.email ?? null;
 
-  if (!profile?.email) {
+  if (!submitterEmail) {
     return NextResponse.json({ error: "Submitter email not found" }, { status: 404 });
   }
 
@@ -136,7 +134,7 @@ export async function POST(req: NextRequest) {
   const transporter = createTransporter();
   await transporter.sendMail({
     from: `"NextBigTool" <${process.env.ZOHO_EMAIL}>`,
-    to: profile.email,
+    to: submitterEmail,
     subject: `🎉 ${tool.name} is now live on NextBigTool!`,
     html,
   });

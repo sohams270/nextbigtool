@@ -109,12 +109,11 @@ export async function POST(req: NextRequest) {
 
   if (!post) return NextResponse.json({ error: "Post not found" }, { status: 404 });
 
-  // Collect all recipient emails
-  const { data: profiles } = await supabase
-    .from("profiles")
-    .select("email")
-    .not("email", "is", null);
+  // Collect all recipient emails:
+  // 1. Signed-up users — emails live in auth.users, NOT profiles.email (which is NULL for most)
+  const { data: authData } = await supabase.auth.admin.listUsers({ perPage: 1000 });
 
+  // 2. Newsletter subscribers
   const { data: subscribers } = await supabase
     .from("newsletter_subscribers")
     .select("email")
@@ -122,7 +121,7 @@ export async function POST(req: NextRequest) {
 
   // Deduplicate
   const allEmails = new Set<string>();
-  for (const p of profiles ?? []) if (p.email) allEmails.add(p.email.toLowerCase());
+  for (const u of authData?.users ?? []) if (u.email) allEmails.add(u.email.toLowerCase());
   for (const s of subscribers ?? []) if (s.email) allEmails.add(s.email.toLowerCase());
 
   const recipients = [...allEmails];
