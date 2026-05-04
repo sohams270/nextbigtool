@@ -62,7 +62,7 @@ function TCheck() {
   );
 }
 function TDash() {
-  return <span style={{ color: "#CFCFD4", fontWeight: 700, fontSize: 16, display: "block", textAlign: "center" }}>—</span>;
+  return <span style={{ color: "var(--ink-faint)", fontWeight: 700, fontSize: 16, display: "block", textAlign: "center" }}>—</span>;
 }
 
 /* ─── FAQ Accordion ───────────────────────────────────────────────────── */
@@ -94,7 +94,7 @@ function FaqAccordion() {
         {FAQ_ITEMS.map((item, i) => (
           <div
             key={i}
-            style={{ border: "1px solid #e5e5e3", borderRadius: 12, overflow: "hidden" }}
+            style={{ border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden" }}
           >
             <button
               onClick={() => setOpen(open === i ? null : i)}
@@ -109,7 +109,7 @@ function FaqAccordion() {
             </button>
             {open === i && (
               <div style={{ padding: "0 20px 20px", background: "var(--surface-alt)" }}>
-                <p style={{ fontSize: 13, color: "#6b6b78", lineHeight: 1.65, margin: 0 }}>{item.a}</p>
+                <p style={{ fontSize: 13, color: "var(--ink-muted)", lineHeight: 1.65, margin: 0 }}>{item.a}</p>
               </div>
             )}
           </div>
@@ -176,7 +176,7 @@ export default function PricingPage() {
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--ink-muted)", marginBottom: 12 }}>PLANS &amp; PRICING</div>
           <h1 style={{ fontSize: 38, fontWeight: 800, letterSpacing: "-0.025em", color: "var(--ink)", margin: "0 0 14px" }}>The right plan for every stage</h1>
-          <p style={{ fontSize: 16, color: "#6b6b78", margin: 0 }}>From your first launch to building serious traction.</p>
+          <p style={{ fontSize: 16, color: "var(--ink-muted)", margin: 0 }}>From your first launch to building serious traction.</p>
         </div>
 
         {/* ── Two pricing cards ── */}
@@ -188,7 +188,7 @@ export default function PricingPage() {
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
               <span style={{ fontSize: 42, fontWeight: 900, letterSpacing: "-0.04em", color: "var(--ink)" }}>$0</span>
             </div>
-            <div style={{ fontSize: 13, color: "#6b6b78", marginBottom: 16 }}>Forever free. No credit card needed.</div>
+            <div style={{ fontSize: 13, color: "var(--ink-muted)", marginBottom: 16 }}>Forever free. No credit card needed.</div>
             <p style={{ fontSize: 13, color: "var(--ink-2)", lineHeight: 1.6, marginBottom: 24, margin: "0 0 24px" }}>
               Perfect for exploring the platform and sharing your first product with the world.
             </p>
@@ -272,17 +272,17 @@ export default function PricingPage() {
         {/* ── Comparison table ── */}
         <div style={{ marginBottom: 80 }}>
           <h2 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", color: "var(--ink)", margin: "0 0 6px" }}>Compare plans in detail</h2>
-          <p style={{ fontSize: 14, color: "#6b6b78", margin: "0 0 28px" }}>See exactly what you get with each plan, side by side.</p>
+          <p style={{ fontSize: 14, color: "var(--ink-muted)", margin: "0 0 28px" }}>See exactly what you get with each plan, side by side.</p>
 
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, overflow: "hidden" }}>
             {/* Header row */}
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", borderBottom: "2px solid #e5e5e3" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", borderBottom: "2px solid var(--border)" }}>
               <div style={{ padding: "20px 24px" }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>All plans compared</div>
                 <div style={{ fontSize: 12, color: "var(--ink-muted)", marginTop: 2 }}>Full feature breakdown</div>
               </div>
               {/* FREE col header */}
-              <div style={{ padding: "20px 16px", borderLeft: "1px solid #e5e5e3", textAlign: "center" }}>
+              <div style={{ padding: "20px 16px", borderLeft: "1px solid var(--border)", textAlign: "center" }}>
                 <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ink-muted)", marginBottom: 4 }}>FREE</div>
                 <div style={{ fontSize: 20, fontWeight: 900, color: "var(--ink)", letterSpacing: "-0.03em", marginBottom: 2 }}>$0</div>
                 <div style={{ fontSize: 11, color: "var(--ink-muted)", marginBottom: 12 }}>forever</div>
@@ -291,7 +291,7 @@ export default function PricingPage() {
                 </button>
               </div>
               {/* CORE col header */}
-              <div style={{ padding: "20px 16px", borderLeft: "1px solid #e5e5e3", textAlign: "center", background: "rgba(255,107,53,0.05)" }}>
+              <div style={{ padding: "20px 16px", borderLeft: "2px solid #FF6B35", textAlign: "center", background: "rgba(255,107,53,0.08)", position: "relative" }}>
                 <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "#FF6B35", marginBottom: 4 }}>CORE</div>
                 <div style={{ fontSize: 20, fontWeight: 900, color: "var(--ink)", letterSpacing: "-0.03em", marginBottom: 2 }}>{corePrice}</div>
                 <div style={{ fontSize: 11, color: "var(--ink-muted)", marginBottom: 12 }}>/month · unlimited</div>
@@ -347,24 +347,25 @@ export default function PricingPage() {
             ].map((group, gi) => (
               <div key={gi}>
                 {/* Section header */}
-                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", background: "#f9f9f7", borderTop: "1px solid #e5e5e3" }}>
-                  <div style={{ padding: "10px 24px", gridColumn: "1 / -1" }}>
-                    <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: group.sectionColor || "#6b6b78" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", background: "var(--surface-alt)", borderTop: "1px solid var(--border)" }}>
+                  <div style={{ padding: "9px 24px", gridColumn: "1 / -1", display: "flex", alignItems: "center", gap: 8 }}>
+                    {group.sectionColor && <div style={{ width: 3, height: 14, borderRadius: 99, background: group.sectionColor, flexShrink: 0 }} />}
+                    <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase" as const, letterSpacing: "0.1em", color: group.sectionColor || "var(--ink-muted)" }}>
                       {group.section}
                     </span>
                   </div>
                 </div>
                 {/* Feature rows */}
                 {group.rows.map((row, ri) => (
-                  <div key={ri} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", borderTop: "1px solid var(--border-faint)" }}>
+                  <div key={ri} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", borderTop: "1px solid var(--border)" }}>
                     <div style={{ padding: "14px 24px" }}>
                       <div style={{ fontSize: 13, color: "var(--ink)", fontWeight: 500 }}>{row.feature}</div>
                       {row.sub && <div style={{ fontSize: 11.5, color: "var(--ink-muted)", marginTop: 2 }}>{row.sub}</div>}
                     </div>
-                    <div style={{ padding: "14px 16px", borderLeft: "1px solid var(--border-faint)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ padding: "14px 16px", borderLeft: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       {typeof row.free === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-2)" }}>{row.free}</span> : row.free}
                     </div>
-                    <div style={{ padding: "14px 16px", borderLeft: "1px solid var(--border-faint)", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,107,53,0.03)" }}>
+                    <div style={{ padding: "14px 16px", borderLeft: "2px solid #FF6B35", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,107,53,0.05)" }}>
                       {typeof row.core === "string" ? <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-2)" }}>{row.core}</span> : row.core}
                     </div>
                   </div>
