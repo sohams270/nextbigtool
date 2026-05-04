@@ -174,11 +174,8 @@ export async function POST(req: NextRequest) {
   };
 
   // Collect all recipient emails:
-  // 1. Signed-up users (from profiles)
-  const { data: profiles } = await supabase
-    .from("profiles")
-    .select("email")
-    .not("email", "is", null);
+  // 1. Signed-up users — emails live in auth.users, NOT profiles.email (which is NULL for most)
+  const { data: authData } = await supabase.auth.admin.listUsers({ perPage: 1000 });
 
   // 2. Newsletter subscribers
   const { data: subscribers } = await supabase
@@ -188,7 +185,7 @@ export async function POST(req: NextRequest) {
 
   // Deduplicate emails
   const allEmails = new Set<string>();
-  for (const p of profiles ?? []) if (p.email) allEmails.add(p.email.toLowerCase());
+  for (const u of authData?.users ?? []) if (u.email) allEmails.add(u.email.toLowerCase());
   for (const s of subscribers ?? []) if (s.email) allEmails.add(s.email.toLowerCase());
 
   const recipients = [...allEmails];
