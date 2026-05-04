@@ -129,14 +129,11 @@ export async function POST(request: Request) {
 
   if (!tool) return NextResponse.json({ error: "Tool not found" }, { status: 404 });
 
-  // Get owner's email from profiles
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("email, full_name")
-    .eq("id", tool.submitter_id)
-    .maybeSingle();
+  // Get owner's email from auth.users (profiles.email is NULL for most users)
+  const { data: authUser } = await supabase.auth.admin.getUserById(tool.submitter_id);
+  const ownerEmail = authUser?.user?.email ?? null;
 
-  if (!profile?.email) return NextResponse.json({ ok: true, skipped: "no owner email" });
+  if (!ownerEmail) return NextResponse.json({ ok: true, skipped: "no owner email" });
 
   try {
     const transporter = createTransporter();
@@ -144,14 +141,14 @@ export async function POST(request: Request) {
     if (type === "upvote") {
       await transporter.sendMail({
         from: `"Next Big Tool" <${process.env.ZOHO_EMAIL}>`,
-        to: profile.email,
+        to: ownerEmail,
         subject: `🔺 [NextBigTool] ${tool.name} just received an upvote!`,
         html: buildUpvoteHtml(tool.name, tool.slug),
       });
     } else if (type === "comment") {
       await transporter.sendMail({
         from: `"Next Big Tool" <${process.env.ZOHO_EMAIL}>`,
-        to: profile.email,
+        to: ownerEmail,
         subject: `💬 [NextBigTool] New comment on ${tool.name}`,
         html: buildCommentHtml(tool.name, tool.slug, comment ?? "", commenterName ?? "Someone"),
       });
