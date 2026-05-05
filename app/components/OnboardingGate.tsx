@@ -13,10 +13,9 @@ export default function OnboardingGate() {
     const client = createClient();
 
     async function check(userId: string, email: string) {
-      // ── Fast-path: once the user completes onboarding we store a flag in
-      //    localStorage so auth-state re-fires never re-show the modal.
-      if (localStorage.getItem(`nbt_ob_done_${userId}`) === "1") return;
-
+      // Always query the DB — localStorage is only used to avoid
+      // re-showing after a confirmed complete profile, but we still
+      // verify the DB so stale flags never let incomplete profiles through.
       const { data, error } = await client
         .from("profiles")
         .select("full_name, username, company, role")
@@ -25,23 +24,24 @@ export default function OnboardingGate() {
 
       // Query error (e.g. no row yet) → treat as new user, show modal
       if (error || !data) {
+        localStorage.removeItem(`nbt_ob_done_${userId}`);
         setUserId(userId);
         setUserEmail(email);
         setShow(true);
         return;
       }
 
-      // All mandatory fields filled → profile already complete, skip
+      // All mandatory fields filled → profile complete
       const fullName = (data.full_name ?? "").trim();
       const [first, ...rest] = fullName.split(" ");
       const lastName = rest.join(" ").trim();
       if (first && lastName && data.username && data.company && data.role) {
-        // Mark done so we never query again for this user on this device
         localStorage.setItem(`nbt_ob_done_${userId}`, "1");
         return;
       }
 
-      // Incomplete profile → show onboarding
+      // Incomplete profile → clear stale flag and show onboarding
+      localStorage.removeItem(`nbt_ob_done_${userId}`);
       setUserId(userId);
       setUserEmail(email);
       setShow(true);
@@ -66,7 +66,7 @@ export default function OnboardingGate() {
       userId={userId}
       userEmail={userEmail}
       onComplete={() => {
-        // Lock out re-shows for this user on this device
+        // Only set the flag after a confirmed successful save (handleComplete already verified)
         localStorage.setItem(`nbt_ob_done_${userId}`, "1");
         setShow(false);
       }}
