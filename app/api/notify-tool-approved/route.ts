@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
-import { createTransporter, EMAIL_FROM } from "@/utils/email";
+import { sendEmail } from "@/utils/email";
 
 function buildApprovedHtml(tool: {
   name: string;
@@ -119,9 +119,7 @@ export async function POST(req: NextRequest) {
     logo_url: tool.logo_url ?? null,
   });
 
-  const transporter = createTransporter();
-  await transporter.sendMail({
-    from: EMAIL_FROM,
+  await sendEmail({
     to: submitterEmail,
     subject: `🎉 ${tool.name} is now live on NextBigTool!`,
     html,

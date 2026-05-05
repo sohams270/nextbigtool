@@ -1,17 +1,5 @@
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
-
-function createTransporter() {
-  return nodemailer.createTransport({
-    host: "smtp.zoho.in",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.ZOHO_EMAIL,
-      pass: process.env.ZOHO_PASSWORD,
-    },
-  });
-}
+import { sendEmail, EMAIL_FROM } from "@/utils/email";
 
 type NotifyPayload =
   | { type: "tool_submission";   toolName: string; tagline: string; plan: string; website: string; contactEmail: string; founderName: string }
@@ -125,16 +113,14 @@ export async function POST(request: Request) {
   };
 
   try {
-    const transporter = createTransporter();
-    await transporter.sendMail({
-      from: `"NBT Alerts" <${process.env.ZOHO_EMAIL}>`,
+    await sendEmail({
       to: "soham@nextbigtool.com",
       subject: subjects[payload.type],
       html: buildHtml(payload, meta),
     });
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("[notify-admin] SMTP error:", err);
+    console.error("[notify-admin] email error:", err);
     return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
   }
 }

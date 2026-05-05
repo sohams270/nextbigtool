@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import { createAdminClient } from "@/utils/supabase/admin";
-import { createTransporter, EMAIL_FROM } from "@/utils/email";
+import { sendEmail, EMAIL_FROM } from "@/utils/email";
 
 /* ─── Server-side admin email notification ──────────────────────────────── */
 export async function sendAdminNotification(payload: {
@@ -18,8 +18,6 @@ export async function sendAdminNotification(payload: {
   pitch?: string;
 }) {
   try {
-    const transporter = createTransporter();
-
     const isToolSubmission = payload.type === "tool_submission";
     const emoji   = isToolSubmission ? "🛠️" : "🏆";
     const label   = isToolSubmission ? "New Tool Submission" : "Hall of Fame Nomination";
@@ -61,8 +59,7 @@ export async function sendAdminNotification(payload: {
         </div>
       </div>`;
 
-    await transporter.sendMail({
-      from: EMAIL_FROM,
+    await sendEmail({
       to: "soham@nextbigtool.com",
       subject,
       html,

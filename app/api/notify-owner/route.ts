@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
-import { createTransporter, EMAIL_FROM } from "@/utils/email";
+import { sendEmail, EMAIL_FROM } from "@/utils/email";
 
 const NBT_LOGO = `<div style="margin-bottom:24px;"><a href="https://www.nextbigtool.com" style="display:inline-block;text-decoration:none;"><img src="https://www.nextbigtool.com/logo-white.png" alt="NextBigTool" width="160" style="display:block;height:auto;" /></a></div>`;
 
@@ -124,18 +124,14 @@ export async function POST(request: Request) {
   if (!ownerEmail) return NextResponse.json({ ok: true, skipped: "no owner email" });
 
   try {
-    const transporter = createTransporter();
-
     if (type === "upvote") {
-      await transporter.sendMail({
-        from: EMAIL_FROM,
+      await sendEmail({
         to: ownerEmail,
         subject: `🔺 ${tool.name} just received an upvote!`,
         html: buildUpvoteHtml(tool.name, tool.slug),
       });
     } else if (type === "comment") {
-      await transporter.sendMail({
-        from: EMAIL_FROM,
+      await sendEmail({
         to: ownerEmail,
         subject: `💬 New comment on ${tool.name}`,
         html: buildCommentHtml(tool.name, tool.slug, comment ?? "", commenterName ?? "Someone"),
@@ -144,7 +140,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("[notify-owner] SMTP error:", err);
+    console.error("[notify-owner] email error:", err);
     return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
   }
 }

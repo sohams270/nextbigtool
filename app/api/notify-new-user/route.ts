@@ -1,18 +1,5 @@
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
-
-// Zoho SMTP transporter — credentials come from env vars
-function createTransporter() {
-  return nodemailer.createTransport({
-    host: "smtp.zoho.in",       // use smtp.zoho.com if your account is on .com
-    port: 465,
-    secure: true,               // SSL
-    auth: {
-      user: process.env.ZOHO_EMAIL,    // soham@nextbigtool.com
-      pass: process.env.ZOHO_PASSWORD, // Zoho app-specific password
-    },
-  });
-}
+import { sendEmail } from "@/utils/email";
 
 export async function POST(request: Request) {
   // Guard: only allow internal calls with the shared secret
@@ -37,9 +24,7 @@ export async function POST(request: Request) {
   });
 
   try {
-    const transporter = createTransporter();
-    await transporter.sendMail({
-      from: `"NBT Alerts" <${process.env.ZOHO_EMAIL}>`,
+    await sendEmail({
       to: "soham@nextbigtool.com",
       subject: `🎉 New signup: ${email}`,
       html: `
@@ -81,7 +66,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("[notify-new-user] SMTP error:", err);
+    console.error("[notify-new-user] email error:", err);
     return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
   }
 }

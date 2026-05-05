@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
-import { createTransporter, EMAIL_FROM } from "@/utils/email";
+import { sendEmail, EMAIL_FROM } from "@/utils/email";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -29,14 +29,12 @@ export async function GET(request: Request) {
       // Send emails for brand-new signups only
       if (isNewUser) {
         try {
-          const transporter = createTransporter();
           const displayName = user.user_metadata?.full_name ?? user.user_metadata?.name ?? "";
           const firstName = displayName.split(" ")[0] || "there";
           const formatted = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "full", timeStyle: "short" });
 
           // 1. Admin alert to Soham
-          await transporter.sendMail({
-            from: EMAIL_FROM,
+          await sendEmail({
             to: "soham@nextbigtool.com",
             subject: `🎉 New signup: ${user.email}`,
             html: `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#0A0B1A;color:#fff;border-radius:12px;">
@@ -53,7 +51,7 @@ export async function GET(request: Request) {
           });
 
           // 2. Welcome email to the new user
-          await transporter.sendMail({
+          await sendEmail({
             from: `"Soham from NextBigTool" <soham@nextbigtool.com>`,
             to: user.email!,
             subject: "Welcome to NextBigTool 🚀 — here's where to start",

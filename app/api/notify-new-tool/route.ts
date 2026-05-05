@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
-import { createTransporter, EMAIL_FROM } from "@/utils/email";
+import { sendEmail, EMAIL_FROM } from "@/utils/email";
 
 function buildEmailHtml(tool: {
   name: string;
@@ -184,22 +184,13 @@ export async function POST(req: NextRequest) {
   const html = buildEmailHtml(toolData);
   const subject = `🚀 ${toolData.name} just launched on NextBigTool — check it out!`;
 
-  const transporter = createTransporter();
-
-  // Send in batches of 20 to avoid SMTP timeouts
+  // Send in batches of 20 to avoid rate limits
   const BATCH = 20;
   let sent = 0;
   for (let i = 0; i < recipients.length; i += BATCH) {
     const batch = recipients.slice(i, i + BATCH);
     await Promise.allSettled(
-      batch.map(email =>
-        transporter.sendMail({
-          from: EMAIL_FROM,
-          to: email,
-          subject,
-          html,
-        })
-      )
+      batch.map(email => sendEmail({ to: email, subject, html }))
     );
     sent += batch.length;
   }

@@ -1,20 +1,24 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+export const resend = new Resend(process.env.RESEND_API_KEY);
+export const EMAIL_FROM = `NextBigTool <${process.env.EMAIL_FROM ?? "soham@nextbigtool.com"}>`;
 
 /**
- * Shared Resend SMTP transporter.
- * Resend SMTP: host=smtp.resend.com, port=465, user="resend", pass=API_KEY
+ * Send an email via Resend HTTP API.
+ * Returns the Resend response (id) or throws on failure.
  */
-export function createTransporter() {
-  return nodemailer.createTransport({
-    host: "smtp.resend.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: "resend",
-      pass: process.env.RESEND_API_KEY,
-    },
-  });
+export async function sendEmail({
+  to,
+  subject,
+  html,
+  from = EMAIL_FROM,
+}: {
+  to: string | string[];
+  subject: string;
+  html: string;
+  from?: string;
+}) {
+  const { data, error } = await resend.emails.send({ from, to, subject, html });
+  if (error) throw new Error(error.message);
+  return data;
 }
-
-/** The verified sending address */
-export const EMAIL_FROM = `"NextBigTool" <${process.env.EMAIL_FROM ?? "soham@nextbigtool.com"}>`;

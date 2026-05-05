@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
-import nodemailer from "nodemailer";
+import { sendEmail } from "@/utils/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,15 +39,7 @@ export async function POST(req: NextRequest) {
 
     // Notify admin via email
     try {
-      const transporter = nodemailer.createTransport({
-        host: "smtp.zoho.in",
-        port: 465,
-        secure: true,
-        auth: { user: process.env.ZOHO_EMAIL, pass: process.env.ZOHO_PASSWORD },
-      });
-
-      await transporter.sendMail({
-        from: `"NBT Alerts" <${process.env.ZOHO_EMAIL}>`,
+      await sendEmail({
         to: "soham@nextbigtool.com",
         subject: `📧 New newsletter subscriber: ${email}`,
         html: `
