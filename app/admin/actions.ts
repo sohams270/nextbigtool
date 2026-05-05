@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import { createAdminClient } from "@/utils/supabase/admin";
-import nodemailer from "nodemailer";
+import { createTransporter, EMAIL_FROM } from "@/utils/email";
 
 /* ─── Server-side admin email notification ──────────────────────────────── */
 export async function sendAdminNotification(payload: {
@@ -18,12 +18,7 @@ export async function sendAdminNotification(payload: {
   pitch?: string;
 }) {
   try {
-    const transporter = nodemailer.createTransport({
-      host: "smtp.zoho.in",
-      port: 465,
-      secure: true,
-      auth: { user: process.env.ZOHO_EMAIL, pass: process.env.ZOHO_PASSWORD },
-    });
+    const transporter = createTransporter();
 
     const isToolSubmission = payload.type === "tool_submission";
     const emoji   = isToolSubmission ? "🛠️" : "🏆";
@@ -67,7 +62,7 @@ export async function sendAdminNotification(payload: {
       </div>`;
 
     await transporter.sendMail({
-      from: `"NBT Alerts" <${process.env.ZOHO_EMAIL}>`,
+      from: EMAIL_FROM,
       to: "soham@nextbigtool.com",
       subject,
       html,

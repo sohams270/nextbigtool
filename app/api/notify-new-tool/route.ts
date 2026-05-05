@@ -1,18 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import nodemailer from "nodemailer";
 import { createAdminClient } from "@/utils/supabase/admin";
-
-function createTransporter() {
-  return nodemailer.createTransport({
-    host: "smtp.zoho.in",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.ZOHO_EMAIL,
-      pass: process.env.ZOHO_PASSWORD,
-    },
-  });
-}
+import { createTransporter, EMAIL_FROM } from "@/utils/email";
 
 function buildEmailHtml(tool: {
   name: string;
@@ -206,7 +194,7 @@ export async function POST(req: NextRequest) {
     await Promise.allSettled(
       batch.map(email =>
         transporter.sendMail({
-          from: `"NextBigTool" <${process.env.ZOHO_EMAIL}>`,
+          from: EMAIL_FROM,
           to: email,
           subject,
           html,

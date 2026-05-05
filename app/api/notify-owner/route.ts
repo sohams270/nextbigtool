@@ -1,18 +1,6 @@
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
 import { createAdminClient } from "@/utils/supabase/admin";
-
-function createTransporter() {
-  return nodemailer.createTransport({
-    host: "smtp.zoho.in",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.ZOHO_EMAIL,
-      pass: process.env.ZOHO_PASSWORD,
-    },
-  });
-}
+import { createTransporter, EMAIL_FROM } from "@/utils/email";
 
 const NBT_LOGO = `<div style="margin-bottom:24px;"><a href="https://www.nextbigtool.com" style="display:inline-block;text-decoration:none;"><img src="https://www.nextbigtool.com/logo-white.png" alt="NextBigTool" width="160" style="display:block;height:auto;" /></a></div>`;
 
@@ -140,14 +128,14 @@ export async function POST(request: Request) {
 
     if (type === "upvote") {
       await transporter.sendMail({
-        from: `"Next Big Tool" <${process.env.ZOHO_EMAIL}>`,
+        from: EMAIL_FROM,
         to: ownerEmail,
         subject: `🔺 [NextBigTool] ${tool.name} just received an upvote!`,
         html: buildUpvoteHtml(tool.name, tool.slug),
       });
     } else if (type === "comment") {
       await transporter.sendMail({
-        from: `"Next Big Tool" <${process.env.ZOHO_EMAIL}>`,
+        from: EMAIL_FROM,
         to: ownerEmail,
         subject: `💬 [NextBigTool] New comment on ${tool.name}`,
         html: buildCommentHtml(tool.name, tool.slug, comment ?? "", commenterName ?? "Someone"),
