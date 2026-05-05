@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
-import { sendEmail, EMAIL_FROM } from "@/utils/email";
+import { sendEmailBlast } from "@/utils/email";
 
 function buildEmailHtml(post: {
   title: string;
@@ -118,28 +118,7 @@ export async function POST(req: NextRequest) {
   const html = buildEmailHtml(post);
   const subject = `New Blog Alert on NextBigTool 🚨: ${post.title}`;
 
-  // Send in batches of 20
-  const BATCH = 20;
-  let sent = 0;
-  let failed = 0;
-  const errors: string[] = [];
+  const { sent, failed, errors } = await sendEmailBlast({ recipients, subject, html });
 
-  for (let i = 0; i < recipients.length; i += BATCH) {
-    const batch = recipients.slice(i, i + BATCH);
-    const results = await Promise.allSettled(
-      batch.map(email => sendEmail({ to: email, subject, html }))
-    );
-    for (const result of results) {
-      if (result.status === "fulfilled") {
-        sent++;
-      } else {
-        failed++;
-        const msg = result.reason?.message ?? String(result.reason);
-        errors.push(msg);
-        console.error("[notify-new-blog] send failed:", msg);
-      }
-    }
-  }
-
-  return NextResponse.json({ ok: true, sent, failed, errors: errors.slice(0, 5) });
+  return NextResponse.json({ ok: true, sent, failed, errors });
 }
