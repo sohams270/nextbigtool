@@ -148,8 +148,8 @@ export async function POST(req: NextRequest) {
     .from("tools")
     .select(`
       id, name, slug, tagline, description, pricing, pricing_amount, logo_url,
-      categories(name),
-      tool_tags(tags(name))
+      categories!left(name),
+      tool_tags!left(tags!left(name))
     `)
     .eq("id", toolId)
     .maybeSingle();
