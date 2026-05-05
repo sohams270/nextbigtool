@@ -76,16 +76,33 @@ export default function CommentSection({ toolId, userId }: { toolId: string; use
 
   async function fetchComments() {
     setLoading(true);
-    const { data } = await supabase
+    // tool_comments.user_id → auth.users (no direct FK to profiles),
+    // so we fetch comments first, then look up profiles separately.
+    const { data: rows } = await supabase
       .from("tool_comments")
-      .select("id, content, created_at, user_id, profiles(full_name, avatar_url, username)")
+      .select("id, content, created_at, user_id")
       .eq("tool_id", toolId)
       .order("created_at", { ascending: false })
       .limit(50);
-    // profiles may be returned as array or object depending on FK resolution
-    const normalized = (data ?? []).map((row: any) => ({
+
+    if (!rows || rows.length === 0) {
+      setComments([]);
+      setLoading(false);
+      return;
+    }
+
+    const userIds = [...new Set(rows.map((r: any) => r.user_id))];
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, full_name, avatar_url, username")
+      .in("id", userIds);
+
+    const profileMap: Record<string, any> = {};
+    for (const p of profiles ?? []) profileMap[p.id] = p;
+
+    const normalized = rows.map((row: any) => ({
       ...row,
-      profiles: Array.isArray(row.profiles) ? (row.profiles[0] ?? null) : row.profiles,
+      profiles: profileMap[row.user_id] ?? null,
     }));
     setComments(normalized as Comment[]);
     setLoading(false);
@@ -99,10 +116,16 @@ export default function CommentSection({ toolId, userId }: { toolId: string; use
     const { data, error } = await supabase
       .from("tool_comments")
       .insert({ tool_id: toolId, user_id: userId, content: text })
-      .select("id, content, created_at, user_id, profiles(full_name, avatar_url, username)")
+      .select("id, content, created_at, user_id")
       .single();
     if (!error && data) {
-      const normalized = { ...(data as any), profiles: Array.isArray((data as any).profiles) ? ((data as any).profiles[0] ?? null) : (data as any).profiles };
+      // Attach the current user's profile we already have in state
+      const normalized = {
+        ...(data as any),
+        profiles: currentUser
+          ? { full_name: currentUser.full_name, avatar_url: currentUser.avatar_url, username: null }
+          : null,
+      };
       setComments((prev) => [normalized as Comment, ...prev]);
       setDraft("");
       // Notify tool owner — fire and forget
