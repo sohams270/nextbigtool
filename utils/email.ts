@@ -53,7 +53,7 @@ export async function sendEmailBlast({
       errors.push(error.message);
       console.error("[sendEmailBlast] batch error:", error.message);
     } else {
-      sent += (data as any[])?.length ?? slice.length;
+      sent += (data as unknown as any[])?.length ?? slice.length;
     }
   }
 
