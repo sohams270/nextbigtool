@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
   const { data: tool } = await supabase
     .from("tools")
     .select(`
-      id, name, slug, tagline, description, pricing, pricing_amount, logo_url,
+      id, name, slug, tagline, description, pricing, logo_url,
       categories!left(name),
       tool_tags!left(tags!left(name))
     `)
@@ -167,7 +167,7 @@ export async function POST(req: NextRequest) {
     tagline: tool.tagline ?? "",
     description: tool.description ?? "",
     pricing: tool.pricing ?? "free",
-    pricing_amount: (tool as any).pricing_amount ?? null,
+    pricing_amount: null,
     category,
     use_cases,
     logo_url: tool.logo_url ?? null,
