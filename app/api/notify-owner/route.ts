@@ -130,14 +130,14 @@ export async function POST(request: Request) {
       await transporter.sendMail({
         from: EMAIL_FROM,
         to: ownerEmail,
-        subject: `🔺 [NextBigTool] ${tool.name} just received an upvote!`,
+        subject: `🔺 ${tool.name} just received an upvote!`,
         html: buildUpvoteHtml(tool.name, tool.slug),
       });
     } else if (type === "comment") {
       await transporter.sendMail({
         from: EMAIL_FROM,
         to: ownerEmail,
-        subject: `💬 [NextBigTool] New comment on ${tool.name}`,
+        subject: `💬 New comment on ${tool.name}`,
         html: buildCommentHtml(tool.name, tool.slug, comment ?? "", commenterName ?? "Someone"),
       });
     }
