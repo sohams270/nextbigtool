@@ -94,20 +94,25 @@ export default function OnboardingModal({ userId, userEmail, onComplete }: {
     return "";
   }
 
+  function scrollTop() {
+    // Scroll the outer container back to top on step change (mobile UX)
+    if (typeof window !== "undefined") window.scrollTo({ top: 0 });
+  }
+
   function goNext() {
     const err = validateStep();
     if (err) { setError(err); return; }
     if (step === STEPS.length - 1) { handleComplete(); return; }
     setDir(1);
     setAnimating(true);
-    setTimeout(() => { setStep(s => s + 1); setAnimating(false); }, 200);
+    setTimeout(() => { setStep(s => s + 1); setAnimating(false); scrollTop(); }, 200);
   }
 
   function goBack() {
     if (step === 0) return;
     setDir(-1);
     setAnimating(true);
-    setTimeout(() => { setStep(s => s - 1); setError(""); setAnimating(false); }, 200);
+    setTimeout(() => { setStep(s => s - 1); setError(""); setAnimating(false); scrollTop(); }, 200);
   }
 
   async function handleSignOut() {
@@ -165,16 +170,23 @@ export default function OnboardingModal({ userId, userEmail, onComplete }: {
       {/* Backdrop */}
       <div style={{ position: "fixed", inset: 0, background: "rgba(10,11,26,0.55)", zIndex: 2000, backdropFilter: "blur(3px)" }} />
 
+      {/* Scroll container — fills the viewport, centres the modal, scrollable on mobile */}
+      <div style={{
+        position: "fixed", inset: 0, zIndex: 2001,
+        display: "flex", alignItems: "flex-start", justifyContent: "center",
+        overflowY: "auto", padding: "16px 0 32px",
+        // Padding-top increases when keyboard is open (dvh < vh)
+      }}>
+
       {/* Modal */}
       <div style={{
-        position: "fixed", top: "50%", left: "50%",
-        transform: "translate(-50%,-50%)",
-        zIndex: 2001,
         width: "min(92vw, 500px)",
+        marginTop: "auto", marginBottom: "auto",
         background: "var(--surface)",
         borderRadius: 20,
         boxShadow: "0 24px 80px rgba(0,0,0,.22)",
         overflow: "hidden",
+        flexShrink: 0,
       }}>
         {/* Top bar */}
         <div style={{ height: 4, background: "var(--border-faint)" }}>
@@ -444,6 +456,8 @@ export default function OnboardingModal({ userId, userEmail, onComplete }: {
           )}
         </div>
       </div>
+
+      </div> {/* end scroll container */}
     </>
   );
 }
