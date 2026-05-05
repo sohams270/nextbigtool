@@ -185,6 +185,16 @@ export default async function AdminPage() {
     .select("id, full_name, email, plan, company, role, created_at")
     .order("created_at", { ascending: false });
 
+  // Enrich profiles with real emails from auth.users (profiles.email is NULL for most users)
+  const { data: authData } = await adminDb.auth.admin.listUsers({ perPage: 1000 });
+  const authEmailMap: Record<string, string> = {};
+  const authNameMap: Record<string, string> = {};
+  for (const u of authData?.users ?? []) {
+    if (u.email) authEmailMap[u.id] = u.email;
+    const name = u.user_metadata?.full_name ?? u.user_metadata?.name ?? "";
+    if (name) authNameMap[u.id] = name;
+  }
+
   // Newsletter subscribers
   const { data: allSubscribers } = await adminDb
     .from("newsletter_subscribers")
@@ -203,7 +213,11 @@ export default async function AdminPage() {
     toolCountMap[t.submitter_id] = (toolCountMap[t.submitter_id] ?? 0) + 1;
   });
 
-  const members = (allMembers ?? []) as Array<{
+  const members = (allMembers ?? []).map((m: any) => ({
+    ...m,
+    email:     m.email     ?? authEmailMap[m.id] ?? null,
+    full_name: m.full_name ?? authNameMap[m.id]  ?? null,
+  })) as Array<{
     id: string; full_name: string | null; email: string | null;
     plan: string | null; company: string | null; role: string | null; created_at: string;
   }>;
