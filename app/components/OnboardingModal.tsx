@@ -443,15 +443,12 @@ export default function OnboardingModal({ userId, userEmail, onComplete }: {
             </button>
           </div>
 
-          {/* Skip link (only on optional last step) */}
+          {/* Optional hint on last step */}
           {step === STEPS.length - 1 && (
             <div style={{ textAlign: "center", marginTop: 12 }}>
-              <button onClick={handleComplete} disabled={saving} style={{
-                background: "none", border: "none", fontSize: 12,
-                color: "var(--ink-muted)", cursor: "pointer", fontFamily: "inherit",
-              }}>
-                Skip for now →
-              </button>
+              <p style={{ fontSize: 11.5, color: "var(--ink-muted)", margin: 0 }}>
+                Bio and social links are optional — you can fill them in later from your profile.
+              </p>
             </div>
           )}
         </div>
