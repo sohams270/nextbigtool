@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
+import { createTransporter, EMAIL_FROM } from "@/utils/email";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -28,21 +29,15 @@ export async function GET(request: Request) {
       // Send emails for brand-new signups only
       if (isNewUser) {
         try {
-          const nodemailer = (await import("nodemailer")).default;
-          const transporter = nodemailer.createTransport({
-            host: "smtp.zoho.in",
-            port: 465,
-            secure: true,
-            auth: { user: process.env.ZOHO_EMAIL, pass: process.env.ZOHO_PASSWORD },
-          });
+          const transporter = createTransporter();
           const displayName = user.user_metadata?.full_name ?? user.user_metadata?.name ?? "";
           const firstName = displayName.split(" ")[0] || "there";
           const formatted = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "full", timeStyle: "short" });
 
           // 1. Admin alert to Soham
           await transporter.sendMail({
-            from: `"NBT Alerts" <${process.env.ZOHO_EMAIL}>`,
-            to: "sohams270@gmail.com",
+            from: EMAIL_FROM,
+            to: "soham@nextbigtool.com",
             subject: `🎉 New signup: ${user.email}`,
             html: `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#0A0B1A;color:#fff;border-radius:12px;">
         <div style="margin-bottom:20px;"><div style="display:inline-block;background:rgba(255,107,53,0.15);border:1px solid rgba(255,107,53,0.4);border-radius:99px;padding:4px 12px;font-size:11px;font-weight:700;color:#FF6B35;letter-spacing:0.06em;text-transform:uppercase;">✦ New Signup</div></div>
@@ -59,7 +54,7 @@ export async function GET(request: Request) {
 
           // 2. Welcome email to the new user
           await transporter.sendMail({
-            from: `"Soham from NextBigTool" <${process.env.ZOHO_EMAIL}>`,
+            from: `"Soham from NextBigTool" <soham@nextbigtool.com>`,
             to: user.email!,
             subject: "Welcome to NextBigTool 🚀 — here's where to start",
             html: `<!DOCTYPE html>
