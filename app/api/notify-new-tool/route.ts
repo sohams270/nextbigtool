@@ -182,7 +182,7 @@ export async function POST(req: NextRequest) {
   }
 
   const html = buildEmailHtml(toolData);
-  const subject = `🚀 ${toolData.name} just launched — check it out!`;
+  const subject = `🚀 ${toolData.name} just launched on NextBigTool — check it out!`;
 
   const transporter = createTransporter();
 
