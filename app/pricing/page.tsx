@@ -124,12 +124,25 @@ export default function PricingPage() {
   const [yearly, setYearly] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
+  const [userPlan, setUserPlan] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const corePrice = yearly ? "$29" : "$49";
+  const isCore = userPlan === "core";
 
   useEffect(() => {
-    createClient().auth.getUser().then(({ data: { user } }) => setUserId(user?.id ?? null));
+    const supabase = createClient();
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      setUserId(user?.id ?? null);
+      if (user?.id) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("plan")
+          .eq("id", user.id)
+          .single();
+        setUserPlan(data?.plan ?? null);
+      }
+    });
   }, []);
 
   function handleFree() {
@@ -256,9 +269,15 @@ export default function PricingPage() {
                 </div>
               ))}
             </div>
-            <button onClick={handleCore} disabled={loading} style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", background: "#fff", fontSize: 14, fontWeight: 700, color: "#FF6B35", cursor: loading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: loading ? 0.7 : 1 }}>
-              {loading ? "Loading…" : "Upgrade to Core →"}
-            </button>
+            {isCore ? (
+              <div style={{ width: "100%", padding: "12px 0", borderRadius: 10, background: "rgba(255,255,255,0.15)", fontSize: 14, fontWeight: 700, color: "#fff", textAlign: "center", border: "1.5px solid rgba(255,255,255,0.4)" }}>
+                ✓ You're already a Core member
+              </div>
+            ) : (
+              <button onClick={handleCore} disabled={loading} style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", background: "#fff", fontSize: 14, fontWeight: 700, color: "#FF6B35", cursor: loading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: loading ? 0.7 : 1 }}>
+                {loading ? "Loading…" : "Upgrade to Core →"}
+              </button>
+            )}
           </div>
         </div>
 
@@ -295,9 +314,15 @@ export default function PricingPage() {
                 <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "#FF6B35", marginBottom: 4 }}>CORE</div>
                 <div style={{ fontSize: 20, fontWeight: 900, color: "var(--ink)", letterSpacing: "-0.03em", marginBottom: 2 }}>{corePrice}</div>
                 <div style={{ fontSize: 11, color: "var(--ink-muted)", marginBottom: 12 }}>/month · unlimited</div>
-                <button onClick={handleCore} disabled={loading} style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "none", background: "#FF6B35", fontSize: 12, fontWeight: 700, color: "#fff", cursor: loading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: loading ? 0.7 : 1 }}>
-                  {loading ? "Loading…" : "Start Core"}
-                </button>
+                {isCore ? (
+                  <div style={{ width: "100%", padding: "7px 0", borderRadius: 8, background: "rgba(255,107,53,0.15)", border: "1px solid rgba(255,107,53,0.4)", fontSize: 11, fontWeight: 700, color: "#FF6B35", textAlign: "center" }}>
+                    ✓ Current plan
+                  </div>
+                ) : (
+                  <button onClick={handleCore} disabled={loading} style={{ width: "100%", padding: "7px 0", borderRadius: 8, border: "none", background: "#FF6B35", fontSize: 12, fontWeight: 700, color: "#fff", cursor: loading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: loading ? 0.7 : 1 }}>
+                    {loading ? "Loading…" : "Start Core"}
+                  </button>
+                )}
               </div>
             </div>
 
