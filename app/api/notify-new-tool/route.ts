@@ -187,13 +187,25 @@ export async function POST(req: NextRequest) {
   // Send in batches of 20 to avoid rate limits
   const BATCH = 20;
   let sent = 0;
+  let failed = 0;
+  const errors: string[] = [];
+
   for (let i = 0; i < recipients.length; i += BATCH) {
     const batch = recipients.slice(i, i + BATCH);
-    await Promise.allSettled(
+    const results = await Promise.allSettled(
       batch.map(email => sendEmail({ to: email, subject, html }))
     );
-    sent += batch.length;
+    for (const result of results) {
+      if (result.status === "fulfilled") {
+        sent++;
+      } else {
+        failed++;
+        const msg = result.reason?.message ?? String(result.reason);
+        errors.push(msg);
+        console.error("[notify-new-tool] send failed:", msg);
+      }
+    }
   }
 
-  return NextResponse.json({ ok: true, sent });
+  return NextResponse.json({ ok: true, sent, failed, errors: errors.slice(0, 5) });
 }
