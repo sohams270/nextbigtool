@@ -54,7 +54,7 @@ export default async function HallOfFameStrip() {
             </div>
           </div>
         </div>
-        <Link href="/discover?tab=hall-of-fame" style={{
+        <Link href="/discover/hall-of-fame" style={{
           fontSize: 11.5, fontWeight: 600, color: "#ff6a3d",
           textDecoration: "none", display: "flex", alignItems: "center", gap: 4,
         }}>

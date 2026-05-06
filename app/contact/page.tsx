@@ -183,7 +183,7 @@ export default async function ContactPage() {
                     <span style={{ fontSize: 14 }}>🏆</span>
                     <span style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.01em" }}>Hall of Fame</span>
                   </div>
-                  <Link href="/discover?tab=hall-of-fame" style={{ fontSize: 10, fontWeight: 700, color: "#ff6a3d", textDecoration: "none" }}>View all →</Link>
+                  <Link href="/discover/hall-of-fame" style={{ fontSize: 10, fontWeight: 700, color: "#ff6a3d", textDecoration: "none" }}>View all →</Link>
                 </div>
                 {hofTools.length === 0 ? (
                   <div style={{ fontSize: 11, color: "var(--ink-muted)", textAlign: "center", padding: "10px 0" }}>No inductees yet</div>
@@ -381,7 +381,7 @@ export default async function ContactPage() {
                   { label: "Browse all tools", href: "/" },
                   { label: "Pricing", href: "/pricing" },
                   { label: "About us", href: "/about" },
-                  { label: "Hall of Fame", href: "/discover?tab=hall-of-fame" },
+                  { label: "Hall of Fame", href: "/discover/hall-of-fame" },
                 ].map(({ label, href }) => (
                   <Link key={label} href={href} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 10px", borderRadius: 9, border: "1px solid var(--border)", background: "var(--surface-dim)", textDecoration: "none", fontSize: 12, fontWeight: 600, color: "var(--ink)" }}>
                     {label}

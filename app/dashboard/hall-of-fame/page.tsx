@@ -454,7 +454,7 @@ export default function HallOfFamePage() {
                 </div>
               </div>
             </div>
-            <Link href="/discover?tab=hall-of-fame" style={{
+            <Link href="/discover/hall-of-fame" style={{
               fontSize: 12, fontWeight: 600, color: "#ff6a3d",
               textDecoration: "none",
             }}>

@@ -44,7 +44,8 @@
       "Bash(node scripts/send-sample-emails.mjs)",
       "Bash(node scripts/send-sample-blog-email.mjs)",
       "Bash(pandoc --track-changes=all \"/Users/sohams17/Downloads/nextbigtool-vs-peerpush.docx\" -o /tmp/peerpush.md)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(curl -s 'https://yqocgsuolryhioggmwlr.supabase.co/rest/v1/tool_comments?select=id&limit=1' -H 'apikey: __CMDSUB_OUTPUT__')"
     ]
   },
   "hooks": {

@@ -687,7 +687,7 @@ export default function ProductShowcase({
                 Hall of Fame
               </h2>
             </div>
-            <Link href="/discover?tab=hall-of-fame" style={{ fontSize: 12.5, fontWeight: 600, color: "#ff6a3d", textDecoration: "none" }}>
+            <Link href="/discover/hall-of-fame" style={{ fontSize: 12.5, fontWeight: 600, color: "#ff6a3d", textDecoration: "none" }}>
               View all →
             </Link>
           </div>
